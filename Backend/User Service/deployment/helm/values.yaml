@@ -47,7 +47,7 @@ database:
   enableSSL: false
   userSecret: database-user-service
 
-accessTokenSecret: auth-service-access-token-keypair
+accessTokenSecret: token-keys
 
 serviceAccount:
   create: true
