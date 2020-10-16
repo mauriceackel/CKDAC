@@ -1,0 +1,21 @@
+#Node
+node_modules
+
+#IDE
+.vscode
+
+#Binary Code
+bin
+
+#Logs
+log
+**/*.log
+
+#Environment
+*.env*
+
+#Exclude
+git_exclude
+
+#MISC
+.DS_Store
