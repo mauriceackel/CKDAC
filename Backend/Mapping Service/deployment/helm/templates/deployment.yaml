@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mapping-service.fullname" . }}
+  labels:
+    {{- include "mapping-service.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "mapping-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "mapping-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mapping-service.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.environment.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: access-token-keypair
+              mountPath: "/etc/secrets-volume/access-token"
+              readOnly: true
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.environment.production | ternary "production" "development" }}
+            - name: HOST
+              value: {{ .Values.environment.host | quote }}
+            - name: PORT
+              value: {{ .Values.environment.port | quote }}
+            - name: DB_URL
+              value: {{ include "mapping-service.databaseUrl" . }}
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "Secret reference to database user required" .Values.database.userSecret }}
+                  key: username
+            - name: DB_PW
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "Secret reference to database user required" .Values.database.userSecret }}
+                  key: password
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "Secret reference to api key required" .Values.environment.apiKeySecret }}
+                  key: key
+            - name: MIN_PW_LEN
+              value: {{ .Values.environment.minPwLength | quote }}
+            - name: LOG_PATH
+              value: {{ .Values.environment.logPath | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: access-token-keypair
+          secret:
+            defaultMode: 0444
+            secretName: {{ required "Name of access token secret required" .Values.accessTokenSecret }}
+            items:
+              - key: public-key
+                path: public-key
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

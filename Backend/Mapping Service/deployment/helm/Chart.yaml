@@ -1,0 +1,7 @@
+apiVersion: v2
+name: mapping-service
+description: Deploys the CKDAC mapping service
+
+type: application
+version: 0.1.0
+appVersion: latest

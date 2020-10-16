@@ -1,0 +1,43 @@
+{
+  "name": "mapping-service",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Maurice Ackel",
+  "main": "Service.js",
+  "dockerRepoPrefix": "mackel/ckdac-",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/Service.js",
+    "debug": "node --inspect ./bin/Service.js",
+    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-push": "docker push ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "helm-build": "helm package ./deployment/helm --app-version=${npm_package_version}",
+    "helm-push": "",
+    "open-cluster": "telepresence --mount=/tmp/tel_root --swap-deployment ${npm_package_name} --expose 8080 --method inject-tcp"
+  },
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^10.0.2",
+    "@asyncapi/parser": "^1.0.0-rc.5",
+    "axios": "^0.18.1",
+    "deepcopy": "^2.1.0",
+    "express": "^4.16.1",
+    "express-session": "^1.15.6",
+    "flat": "^5.0.2",
+    "jsonata": "^1.8.0",
+    "jsonwebtoken": "^8.5.0",
+    "mongodb": "^3.1.13",
+    "mongoose": "^5.4.19",
+    "openapi-types": "^7.0.1",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/express-session": "^1.15.12",
+    "@types/flat": "^5.0.1",
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/mongodb": "^3.1.22",
+    "@types/mongoose": "^5.3.22",
+    "@types/node": "^11.11.0",
+    "typescript": "3.7.2"
+  }
+}
