@@ -1,0 +1,34 @@
+apiVersion: getambassador.io/v2
+kind: AuthService
+metadata:
+  name: {{ include "auth-service.fullname" . }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+spec:
+  ambassador_id: [ {{ required "Internal API gateway id required" .Values.apiGateway.internal.id | quote }}, {{ required "External API gateway id required" .Values.apiGateway.external.id | quote }} ]
+  auth_service: "{{ include "auth-service.fullname" . }}:{{ .Values.service.port }}"
+  allowed_authorization_headers:
+    - "auth-details"
+    - "Access-Control-Allow-Origin"
+    - "Access-Control-Allow-Methods"
+    - "Access-Control-Allow-Headers"
+    - "Access-Control-Allow-Credentials"
+    - "Access-Control-Expose-Headers"
+
+#   tls: true                         # optional; default is true if `auth_service` starts with "https://" (case-insensitive), false otherwise
+#   proto: http                       # optional; default is "http"
+#   timeout_ms: 5000                  # optional; default is 5000
+#   allow_request_body: true         # deprecated; use include_body instead
+#   include_body:                     # optional; default is null
+#     max_bytes: 4096                   # required
+#     allow_partial: true               # required
+#   status_on_error:                  # optional
+#     code: 503                         # optional; default is 403
+#   failure_mode_allow: false         # optional; default is false
+#   # the following are used only if `proto: http`; they are ignored if `proto: grpc`
+#   path_prefix: "/path"             # optional; default is ""
+#   allowed_request_headers:         # optional; default is []
+#   - "x-example-header"
+#   add_auth_headers:                # optional; default is {}
+#     x-added-auth: auth-added
+#   add_linkerd_headers: bool        # optional; default is based on the ambassador Module

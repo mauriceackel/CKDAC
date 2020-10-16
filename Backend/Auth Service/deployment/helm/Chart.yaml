@@ -1,0 +1,7 @@
+apiVersion: v2
+name: auth-service
+description: Deploys the CKDAC auth service
+
+type: application
+version: 0.1.0
+appVersion: latest
