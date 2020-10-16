@@ -1,0 +1,46 @@
+@import "../../theme-vars.scss";
+
+.mat-tree-invisible {
+  display: none;
+}
+
+.mat-tree ul,
+.mat-tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+.mapping-container {
+  padding-top: 0.75rem;
+  margin: -0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.mapping-pair {
+  padding: 8px;
+  border-radius: 5px;
+  position: relative;
+
+  background-color: mat-color($app-primary, 500) !important;
+  color: mat-contrast($app-primary, 700) !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invalid {
+  background-color: red !important;
+}
+
+.remove-icon {
+  cursor: pointer;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  border-radius: 50%;
+  color: mat-contrast($app-warn, 500) !important;
+  background-color: mat-color($app-warn, 500) !important;
+}

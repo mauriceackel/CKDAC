@@ -1,0 +1,20 @@
+<ng-container>
+  <div class="row border-bottom">
+    <div class="col border-right d-flex justify-content-center">
+      <h3 class="font-weight-bold">{{leftHeading}}</h3>
+    </div>
+    <div class="col border-left d-flex justify-content-center">
+      <h3 class="font-weight-bold">{{rightHeading}}</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col border-right py-2">
+      <app-json-editor #leftEditor [disabled]="disabled" [data]="leftData" (jsonChange)="uncommittedLeftData = $event"></app-json-editor>
+      <button mat-raised-button *ngIf="!disabled" color="primary" class="float-right mt-1" [disabled]="!(leftEditor.hasChanges && leftEditor.valid)" (click)="saveLeft.emit(uncommittedLeftData)">Store</button>
+    </div>
+    <div class="col border-left py-2">
+      <app-json-editor #rightEditor [disabled]="disabled" [data]="rightData" (jsonChange)="uncommittedRightData = $event"></app-json-editor>
+      <button mat-raised-button *ngIf="!disabled" color="primary" class="float-right mt-1" [disabled]="!(rightEditor.hasChanges  && rightEditor.valid)" (click)="saveRight.emit(uncommittedRightData)">Store</button>
+    </div>
+  </div>
+</ng-container>

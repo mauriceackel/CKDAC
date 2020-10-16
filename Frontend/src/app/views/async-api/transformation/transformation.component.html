@@ -1,0 +1,192 @@
+<ng-container>
+
+  <form [formGroup]="inputForm">
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+        <span class="mr-3">Subscribe</span>
+        <mat-slide-toggle [disabled]="inputForm.valid" formControlName="publish"></mat-slide-toggle>
+        <span class="ml-3">Publish</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <mat-tab-group mat-stretch-tabs>
+          <mat-tab label="Source">
+
+            <div class="overflow-hidden">
+              <div class="row mt-4">
+                <div class="col-8 d-flex">
+                  <mat-form-field appearance="outline" class="flex-grow-1">
+                    <mat-label>Mapping Source</mat-label>
+                    <mat-select [disabled]="inputForm.valid" formControlName="mS"
+                      (openedChange)="sourceSearch.value=''">
+                      <div class="d-flex align-items-center">
+                        <mat-icon class="ml-3">
+                          search
+                        </mat-icon>
+                        <input #sourceSearch matInput class="p-3" placeholder="Search..." />
+                      </div>
+                      <mat-option *ngFor="let api of apis | filter:sourceSearch.value" [value]="api">
+                        {{api.name}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-4 d-flex">
+                  <mat-form-field appearance="outline" class="flex-grow-1">
+                    <mat-label>Source Server</mat-label>
+                    <mat-select [disabled]="inputForm.valid" formControlName="mSServ">
+                      <mat-option *ngFor="let server of sourceServers" [value]="server">
+                        {{server}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 d-flex">
+                  <mat-form-field appearance="outline" class="flex-grow-1">
+                    <mat-label>Operation</mat-label>
+                    <mat-select [disabled]="inputForm.valid" formControlName="mSO">
+                      <mat-option *ngFor="let operation of sourceOperations" [value]="operation">
+                        {{operation.operationId}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+            </div>
+
+          </mat-tab>
+        </mat-tab-group>
+
+      </div>
+      <div class="col">
+
+        <button mat-raised-button color="primary" class="float-right" style="margin-left: 4px; height: 100%;"
+          (click)="addTarget()">+</button>
+
+        <mat-tab-group mat-stretch-tabs>
+          <mat-tab label="Target {{i + 1}}" *ngFor="let group of targets.controls; let i = index">
+
+            <div class="overflow-hidden">
+              <div class="row mt-4">
+                <div class="col-8 d-flex">
+                  <mat-form-field appearance="outline" class="flex-grow-1">
+                    <mat-label>Mapping Target</mat-label>
+                    <mat-select [disabled]="inputForm.valid" [formControl]="group.get('mT')"
+                      (openedChange)="targetSearch.value=''">
+                      <div class="d-flex align-items-center">
+                        <mat-icon class="ml-3">
+                          search
+                        </mat-icon>
+                        <input #targetSearch matInput class="p-3" placeholder="Search..." />
+                      </div>
+                      <mat-option *ngFor="let api of apis | filter:targetSearch.value" [value]="api">
+                        {{api.name}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-4 d-flex">
+                  <mat-form-field appearance="outline" class="flex-grow-1">
+                    <mat-label>Target Server</mat-label>
+                    <mat-select [disabled]="inputForm.valid" [formControl]="group.get('mTServ')">
+                      <mat-option *ngFor="let server of group.get('servers').value" [value]="server">
+                        {{server}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 d-flex">
+                  <mat-form-field appearance="outline" class="flex-grow-1">
+                    <mat-label>Operation</mat-label>
+                    <mat-select [disabled]="inputForm.valid" [formControl]="group.get('mTO')">
+                      <mat-option *ngFor="let operation of group.get('operations').value" [value]="operation">
+                        {{operation.operationId}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+
+      </div>
+    </div>
+  </form>
+
+  <div class="row">
+    <div class="col p-4">
+      <app-mapping-zone [isPublish]="inputForm.get('publish').value" leftHeading="Source Message Body" rightHeading="Target Message Body"
+        [leftData]="sourceMessageBody" [rightData]="targetMessageBodies" [mappingPairs]="mappingPairs"
+        (mapSame)="mapSame()">
+      </app-mapping-zone>
+    </div>
+  </div>
+
+  <!-- TODO: Disabled until known how to test -->
+  <!-- <div class="row mt-5">
+    <div class="col">
+      <mat-accordion multi="true">
+        <mat-expansion-panel #testRequest [disabled]="!inputForm.valid">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <b>Test Mapping</b>
+            </mat-panel-title>
+            <mat-panel-description>
+              {{(!inputForm.valid) ? "Select a source and target interface first" : "Expand this to test a request with your current mapping"}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          TODO: Add simple data converter here for testing
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div> -->
+
+  <div class="row mt-5">
+    <div class="col">
+      <button mat-raised-button color="warn" [disabled]="!inputForm.valid" (click)="reset()">Reset</button>
+      <button mat-raised-button color="accent" class="float-right" [disabled]="!inputForm.valid"
+        (click)="finishMapping()">Finish Mapping</button>
+      <button mat-raised-button color="accent" class="float-right mr-2" [disabled]="!inputForm.valid"
+        (click)="buildAdapter()">Build Adapter</button>
+    </div>
+  </div>
+  <div class="mt-2" *ngIf="mappingError">
+    <mat-card class="color-primary">
+      <mat-card-header>
+        <mat-card-title>Errors in mapping</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="row">
+          <div class="col">
+            <h3>Error Message: {{mappingError.message}}</h3>
+          </div>
+        </div>
+        <div class="row mb-1">
+          <div class="col">
+            <b>Missing in Mapping</b>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div *ngFor="let missing of mappingError.missingMessageProperties">
+              {{missing | join:'.'}}
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</ng-container>
