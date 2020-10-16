@@ -27,9 +27,8 @@ environment:
   production: false
   host: "0.0.0.0"
   port: 8080
-  minPwLength: 8
   logPath: "./log"
-  apiKeySecret: api-keys-mapping-service
+  apiKeySecret: secrets-api-keys-mapping-service
 
 database:
   protocol: mongodb+srv

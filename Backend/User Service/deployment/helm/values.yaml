@@ -36,7 +36,7 @@ environment:
   port: 8080
   minPwLength: 8
   logPath: "./log"
-  apiKeySecret: api-keys-user-service
+  apiKeySecret: secrets-api-keys-user-service
 
 database:
   protocol: mongodb+srv
