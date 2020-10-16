@@ -17,15 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Backend/Mapping\ Service
+        working-directory: "./Backend/Mapping\ Service"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Install dev dependencies
-        run: npm install --only=dev
+      - name: Install dependencies
+        run: npm install
 
       - name: Build typescript
         run: npm run build
