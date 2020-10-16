@@ -1,12 +1,12 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Api Service
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - "Backend/Api\ Service/**"
 
@@ -15,29 +15,29 @@ jobs:
   build:
     name: Build Api Service
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Backend/Api\ Service
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Move to auth service folder
-        run: cd Backend/Api\ Service
-      
       - name: Install dev dependencies
         run: npm install --only=dev
-      
+
       - name: Build typescript
         run: npm run build
-      
+
       - name: Build docker
         run: npm run docker-build
-      
+
       - name: Push docker
         run: npm run docker-push
-        
+
       - name: Create fresh helm chart
         run: npm run helm-build
-      
+
       - name: Push chart to chart repository
         run: npm run helm-push
