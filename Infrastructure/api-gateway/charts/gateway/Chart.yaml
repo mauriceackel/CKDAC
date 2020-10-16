@@ -1,0 +1,7 @@
+apiVersion: v2
+name: gateway
+description: Sets up one ambassador API gateway
+
+type: application
+version: 0.1.0
+appVersion: 1.7.4

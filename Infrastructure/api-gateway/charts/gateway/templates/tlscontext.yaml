@@ -1,0 +1,12 @@
+{{- if .Values.tls -}}
+apiVersion: getambassador.io/v2
+kind: TLSContext
+metadata:
+  name: {{ include "gateway.fullname" . }}
+  labels:
+    {{- include "gateway.labels" . | nindent 4 }}
+spec:
+  ambassador_id: {{ .Values.ambassadorId }}
+  hosts: [{{ .Values.tls.appHostname | quote }}]
+  secret: {{ .Values.tls.appSecretsName }}
+{{- end }}

@@ -1,0 +1,72 @@
+apiVersion: kubedb.com/v1alpha1
+kind: MongoDB
+metadata:
+  name: {{ include "database.fullname" . }}
+  labels:
+    {{- include "database.labels" . | nindent 4 }}
+spec:
+  version: "4.1.7-v2"
+  terminationPolicy: Pause
+  resume: true
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  replicaSet:
+    name: {{ required "Missing replicaSet name" .Values.database.replicaSetName }}
+  databaseSecret:
+    secretName: {{ .Values.database.adminCredentialsName }}
+  storage:
+    # storageClassName: "standard"
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+  {{- if .Values.database.createInitScripts }}
+  init:
+    scriptSource:
+      configMap:
+        name: "{{ include "database.fullname" . }}-db-init-scripts"
+  {{- end }}
+  podTemplate:
+    spec:
+      env:
+      - name: CLUSTER_ADMIN_USER
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.database.adminCredentialsName }}
+            key: username
+      - name: CLUSTER_ADMIN_PW
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.database.adminCredentialsName }}
+            key: password
+      {{- range .Values.database.services }}
+      - name: {{ include "database.serviceEnvironmentName" .name }}_USER
+        valueFrom:
+          secretKeyRef:
+            name: {{ .credentialsName }}
+            key: username
+      - name: {{ include "database.serviceEnvironmentName" .name }}_PW
+        valueFrom:
+          secretKeyRef:
+            name: {{ .credentialsName }}
+            key: password
+      {{- if .apiKeyName }}
+      - name: {{ include "database.serviceEnvironmentName" .name }}_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: {{ .apiKeyName }}
+            key: key
+      {{- end }}
+      {{- end }}
+  serviceTemplate:
+    metadata:
+      name: {{ include "database.fullname" . }}
+      labels:
+        {{- include "database.labels" . | nindent 4 }}
+    spec:
+      clusterIP: None #Headless service = no cluster IP only DNS
+      ports:
+        - name: db
+          port: {{ .Values.service.port }}

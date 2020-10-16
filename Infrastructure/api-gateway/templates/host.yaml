@@ -1,0 +1,24 @@
+{{ range .Values.gatewayDescriptions }}
+{{ $gatewayData := (index $.Values .)}}
+---
+apiVersion: getambassador.io/v2
+kind: Host
+metadata:
+  name: {{ include "api-gateway.fullname" $ }}-{{ . }}
+  labels:
+    {{- include "api-gateway.labels" $ | nindent 4 }}
+spec:
+  ambassador_id: {{ $gatewayData.ambassadorId }}
+  hostname: {{ ($gatewayData.hostname | default "*") | quote }}
+  acmeProvider:
+    authority: none
+  {{- if $gatewayData.hostSecretsName }}
+  tlsSecret:
+    name: {{ $gatewayData.hostSecretsName }}
+  {{- end }}
+  {{- if $gatewayData.insecure }}
+  requestPolicy:
+    insecure:
+      action: {{ $gatewayData.insecure }}
+  {{- end }}
+{{- end}}

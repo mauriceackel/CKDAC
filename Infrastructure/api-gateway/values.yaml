@@ -1,0 +1,20 @@
+# Default values for api-gateway.
+# This is a YAML-formatted file.
+
+gatewayDescriptions:
+  - 'internal-gateway'
+  - 'external-gateway'
+
+internal-gateway:
+  ambassadorId: gateway-int
+  insecure: 'Route'
+
+external-gateway:
+  ambassadorId: gateway-ext
+  hostname: '*.ckdac.com'
+  hostSecretsName: ssl-host
+  tls:
+    appHostname: '*.ckdac.com'
+    appSecretsName: 'ssl-application'
+  service:
+    securePort: 443

@@ -1,0 +1,46 @@
+# Default values for gateway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# ambassadorId: 'some_unique_id'
+
+image:
+  repository: quay.io/datawire/aes
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  runAsUser: 8888
+
+service:
+  type: ClusterIP
+  port: 80
+  # securePort:
+
+# tls:
+#   appHostname: '*.myapp.com'
+#   appSecretsName: 'name_of_app_tls_secret'
+
+resources: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

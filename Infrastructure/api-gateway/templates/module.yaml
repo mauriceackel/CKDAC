@@ -1,0 +1,14 @@
+apiVersion: getambassador.io/v2
+kind:  Module
+metadata:
+  name: {{ include "api-gateway.fullname" . }}
+  labels:
+    {{- include "api-gateway.labels" . | nindent 4 }}
+spec:
+  ambassador_id: [{{ include "api-gateway.gatewayIds" .}}]
+  config:
+    cors:
+      headers: "*"
+      origins: "*"
+      methods: "*"
+      credentials: true

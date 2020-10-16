@@ -1,0 +1,53 @@
+# Default values for database.
+# This is a YAML-formatted file.
+
+replicaCount: 2
+
+service:
+  port: 27017
+
+database:
+  replicaSetName: rs0
+  createInitScripts: true
+  adminCredentialsName: secrets-db-users-cluster-admin
+  services:
+    - name: auth-service
+      credentialsName: secrets-db-users-auth-service
+      apiKeyName: secrets-api-keys-auth-service
+    - name: user-service
+      credentialsName: secrets-db-users-user-service
+      apiKeyName: secrets-api-keys-user-service
+    - name: api-service
+      credentialsName: secrets-db-users-api-service
+      apiKeyName: secrets-api-keys-api-service
+    - name: mapping-service
+      credentialsName: secrets-db-users-mapping-service
+      apiKeyName: secrets-api-keys-mapping-service
+    - name: adapter-service
+      credentialsName: secrets-db-users-adapter-service
+      apiKeyName: secrets-api-keys-adapter-service
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
