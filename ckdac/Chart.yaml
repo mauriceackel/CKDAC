@@ -1,0 +1,34 @@
+apiVersion: v2
+name: ckdac
+description: Install the containerized KDAC application to a cluster
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: secrets
+    repository: "file://../Infrastructure/secrets"
+    version: 0.1.0
+  - name: api-gateway
+    repository: "file://../Infrastructure/api-gateway"
+    version: 0.1.0
+  - name: database
+    repository: "file://../Infrastructure/database"
+    version: 0.1.0
+  - name: web-app
+    repository: "file://../Frontend/deployment/helm"
+    version: 0.1.0
+  - name: auth-service
+    repository: "file://../Backend/Auth\ Service/deployment/helm"
+    version: 0.1.0
+  - name: api-service
+    repository: "file://../Backend/Api\ Service/deployment/helm"
+    version: 0.1.0
+  - name: mapping-service
+    repository: "file://../Backend/Mapping\ Service/deployment/helm"
+    version: 0.1.0
+  - name: adapter-service
+    repository: "file://../Backend/Adapter\ Service/deployment/helm"
+    version: 0.1.0
+  - name: user-service
+    repository: "file://../Backend/User\ Service/deployment/helm"
+    version: 0.1.0
