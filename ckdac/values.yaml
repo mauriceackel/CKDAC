@@ -1,25 +1,25 @@
-secrets:
-  db-users:
+# secrets:
+#   db-users:
 
-  api-keys:
+#   api-keys:
 
-  token-keys:
+#   token-keys:
 
-  ssl:
+#   ssl:
 
-api-gateway:
+# api-gateway:
 
-database:
+# database:
 
-web-app:
+# web-app:
   
-adapter-service:
+# adapter-service:
 
-auth-service:
+# auth-service:
 
-api-service:
+# api-service:
 
-mapping-service:
+# mapping-service:
 
-user-service:
+# user-service:
   
