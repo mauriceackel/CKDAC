@@ -1,0 +1,7 @@
+apiVersion: v2
+name: user-service
+description: Deploys the CKDAC user service
+
+type: application
+version: 0.1.0
+appVersion: latest

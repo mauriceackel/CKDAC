@@ -1,0 +1,38 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Maurice Ackel",
+  "main": "Service.js",
+  "dockerRepoPrefix": "mackel/ckdac-",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/Service.js",
+    "debug": "node --inspect ./bin/Service.js",
+    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-push": "docker push ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "helm-build": "helm package ./deployment/helm --app-version=${npm_package_version}",
+    "helm-push": "",
+    "open-cluster": "telepresence --mount=/tmp/tel_root --swap-deployment ${npm_package_name} --expose 8080 --method inject-tcp"
+  },
+  "dependencies": {
+    "axios": "^0.18.1",
+    "express": "^4.16.1",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^8.5.0",
+    "mongodb": "^3.1.13",
+    "mongoose": "^5.4.19",
+    "validator": "^10.11.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "typescript": "3.7.2",
+    "@types/express": "^4.16.1",
+    "@types/express-session": "^1.15.12",
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/mongodb": "^3.1.22",
+    "@types/mongoose": "^5.3.22",
+    "@types/node": "^11.11.0",
+    "@types/validator": "^10.9.0"
+  }
+}
