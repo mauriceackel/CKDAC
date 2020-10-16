@@ -1,0 +1,89 @@
+# Default values for adapter-service.
+# This is a YAML-formatted file.
+
+replicaCount: 1
+
+image:
+  repository: mackel/ckdac-adapter-service
+  pullPolicy: Always
+
+apiGateway:
+  internal:
+    id: gateway-int
+    hostname: api-gateway-internal-gateway
+  external:
+    id: gateway-ext
+    hostname: api.ckdac.com
+
+routes:
+  - name: adapters
+    gatewayName:
+      - external
+    prefix: /adapters/
+    rewrite: /
+    bypassAuth: false
+
+environment:
+  production: false
+  host: "0.0.0.0"
+  port: 8080
+  minPwLength: 8
+  logPath: "./log"
+  apiKeySecret: api-keys-adapter-service
+
+database:
+  protocol: mongodb+srv
+  databaseServiceName: database
+  databaseName: adapter-service
+  replicaSetName: rs0
+  portName: db
+  enableSSL: false
+  userSecret: database-adapter-service
+
+accessTokenSecret: auth-service-access-token-keypair
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

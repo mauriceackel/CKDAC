@@ -1,0 +1,22 @@
+{{ range .Values.routes }}
+---
+apiVersion: getambassador.io/v2
+kind:  Mapping
+metadata:
+  name: {{ include "adapter-service.fullname" $ }}-{{ required "Route name is required" .name }}
+  labels:
+    {{- include "adapter-service.labels" $ | nindent 4 }}
+spec:
+  ambassador_id: [{{ include "adapter-service.gatewayIds" (dict "gatewayName" .gatewayName "apiGateway" $.Values.apiGateway) }}]
+  host: "^({{ include "adapter-service.hosts" (dict "gatewayName" .gatewayName "apiGateway" $.Values.apiGateway) }})$" #Specify which hosts headers are allowed
+  host_regex: true
+  bypass_auth: {{ .bypassAuth }}
+  prefix: {{ .prefix | quote }} #The prefix that is used to identify the service. If not other specified (i.e. in the rewrite rule) this gets cut away from the url (http://example.com/template/help -> http://example.com/help)
+  rewrite: {{ .rewrite | quote }} #Prevents ambassador to rewrite the url (i.e. does not cut the prefix from the url)
+  service: {{ include "adapter-service.fullname" $ }} #If the service uses a port different from default http, add ":<PortNr>"
+  cors:
+    headers: "*"
+    origins: "*"
+    methods: "*"
+    credentials: true
+{{- end }}

@@ -1,0 +1,108 @@
+{
+  "name": "source-template",
+  "version": "0.9.1",
+  "description": "Node.js template for the AsyncAPI generator.",
+  "keywords": [
+    "asyncapi",
+    "generator",
+    "nodejs",
+    "template"
+  ],
+  "author": "Maurice Ackel",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asyncapi/nodejs-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/asyncapi/nodejs-template/issues"
+  },
+  "homepage": "https://github.com/asyncapi/nodejs-template#readme",
+  "scripts": {
+    "test": "echo \"No test specified yet\"",
+    "release": "semantic-release",
+    "get-version": "echo $npm_package_version"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@asyncapi/generator-filters": "^1.0.0",
+    "@asyncapi/generator-hooks": "^0.1.0",
+    "filenamify": "^4.1.0",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^8.0.1",
+    "@semantic-release/github": "^7.0.4",
+    "@semantic-release/npm": "^7.0.3",
+    "@semantic-release/release-notes-generator": "^9.0.1",
+    "conventional-changelog-conventionalcommits": "^4.2.3",
+    "semantic-release": "^17.0.4"
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits"
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "conventionalcommits"
+        }
+      ],
+      "@semantic-release/npm",
+      "@semantic-release/github"
+    ]
+  },
+  "generator": {
+    "supportedProtocols": [
+      "amqp",
+      "mqtt",
+      "kafka",
+      "ws"
+    ],
+    "parameters": {
+      "server": {
+        "description": "The server you want to use in the code.",
+        "required": true
+      },
+      "sourceTopic": {
+        "description": "The topic related to the mapping source",
+        "required": true
+      },
+      "sourceId": {
+        "description": "The extended id of the mapping source",
+        "required": true
+      },
+      "mappingDirection": {
+        "description": "0 = input, 1 = output",
+        "required": true
+      },
+      "targets": {
+        "description": "An array of target apis",
+        "required": true
+      },
+      "asyncapiFileDir": {
+        "description": "Custom location of the AsyncAPI file that you provided as an input in generation. By default it is located in the root of the output directory"
+      }
+    },
+    "nonRenderableFiles": [
+      "src/api/middlewares/!(adapter).*",
+      "src/lib/config.js"
+    ],
+    "generator": ">=0.50.0 <2.0.0",
+    "filters": [
+      "@asyncapi/generator-filters"
+    ],
+    "hooks": {
+      "@asyncapi/generator-hooks": "createAsyncapiFile"
+    }
+  }
+}
