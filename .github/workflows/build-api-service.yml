@@ -38,8 +38,24 @@ jobs:
       - name: Push docker
         run: npm run docker-push
 
-      - name: Create fresh helm chart
-        run: npm run helm-build
+      # Checkout chart repo
+      - uses: actions/checkout@v2
+        with:
+          ref: 'chart-repo'
+          path: chart-repo
 
-      - name: Push chart to chart repository
-        run: npm run helm-push
+      - name: Create fresh helm chart
+        run: npm run helm-build -- -d chart-repo/docs
+      
+      - name: Register chart in repository
+        run: npm run helm-index -- chart-repo/docs --url ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}
+
+      # Push to chart repo
+      - run: |
+          cd chart-repo
+          date > generated.txt
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Updated chart repository"
+          git push

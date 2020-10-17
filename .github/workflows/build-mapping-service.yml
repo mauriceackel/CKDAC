@@ -42,4 +42,4 @@ jobs:
         run: npm run helm-build
 
       - name: Push chart to chart repository
-        run: npm run helm-push
+        run: npm run helm-index
