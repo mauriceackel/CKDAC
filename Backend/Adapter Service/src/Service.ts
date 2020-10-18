@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import * as Config from './config/Config';
 import http from 'http';
 import Winston, { format, transports, Logger } from 'winston';
+import axios from 'axios';
 import { ErrorResponse } from './utils/responses/ApiResponse';
 import AdapterController from './controller/AdapterController';
 import FileController from './controller/FileController';
@@ -27,6 +28,7 @@ export class Service {
         this.express = Express();
 
         this.initLogging();
+        this.initAuth();
         this.initRoutes();
 
         process.on('SIGINT', () => {
@@ -161,6 +163,18 @@ export class Service {
         } else {
             logger.error('Express is undefined. Exiting.')
         }
+    }
+
+    /**
+     * Sets up authentication for api calls FROM this service
+     */
+    private initAuth(): void {
+        axios.interceptors.request.use(function (config) {
+            config.headers["authorization"] = `ApiKey ${Config.API_KEY}`;
+            return config;
+        }, function (error) {
+            return Promise.reject(error);
+        });
     }
 
 }
