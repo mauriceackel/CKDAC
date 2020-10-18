@@ -1,9 +1,20 @@
 apiVersion: v1
 entries:
+  auth-service:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2020-10-18T09:00:28.102163216Z"
+    description: Deploys the CKDAC auth service
+    digest: 2c3e6b9307a71b58f5a2a6a0d04f077836a3470d8611a032af35a230c793051e
+    name: auth-service
+    type: application
+    urls:
+    - https://mauriceackel.github.io/CKDAC/auth-service-0.1.0.tgz
+    version: 0.1.0
   mapping-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:00:12.644474831Z"
+    created: "2020-10-18T09:00:28.102808616Z"
     description: Deploys the CKDAC mapping service
     digest: 671be5991cd41640396122aa5dd7f1a2ca65cb28c29e6754562e752a60fea6dd
     name: mapping-service
@@ -14,7 +25,7 @@ entries:
   user-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:00:12.645295431Z"
+    created: "2020-10-18T09:00:28.103418616Z"
     description: Deploys the CKDAC user service
     digest: f70274e65573e9acd687e522beff08683d7ab27a032e98920c8a53696ab2bb79
     name: user-service
@@ -22,4 +33,4 @@ entries:
     urls:
     - https://mauriceackel.github.io/CKDAC/user-service-0.1.0.tgz
     version: 0.1.0
-generated: "2020-10-18T09:00:12.633605023Z"
+generated: "2020-10-18T09:00:28.101251315Z"
