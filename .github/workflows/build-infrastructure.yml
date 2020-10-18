@@ -1,0 +1,49 @@
+name: Infrastructure
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [main]
+    paths:
+      - "Infrastructure/**"
+
+jobs:
+  build:
+    name: Build Infrastructure
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "./main/Infrastructure"
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          path: main
+
+      # Checkout chart repo
+      - name: Checkout chart-repo
+        uses: actions/checkout@v2
+        with:
+          ref: 'chart-repo'
+          path: chart-repo
+
+      - name: Create helm charts
+        run: |
+          for dirname in `find . -mindepth 1 -maxdepth 1 -type d`
+          do
+            helm package $dirname -d $GITHUB_WORKSPACE/chart-repo
+            helm repo index $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+          done
+
+      # Push to chart repo
+      - name: Push to chart-repo
+        run: |
+          cd $GITHUB_WORKSPACE/chart-repo
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Updated chart repository"
+          git push
