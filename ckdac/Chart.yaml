@@ -6,29 +6,29 @@ version: 0.1.0
 
 dependencies:
   - name: secrets
-    repository: "file://../Infrastructure/secrets"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: api-gateway
-    repository: "file://../Infrastructure/api-gateway"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: database
-    repository: "file://../Infrastructure/database"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: web-app
-    repository: "file://../Frontend/deployment/helm"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: auth-service
-    repository: "file://../Backend/Auth\ Service/deployment/helm"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: api-service
-    repository: "file://../Backend/Api\ Service/deployment/helm"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: mapping-service
-    repository: "file://../Backend/Mapping\ Service/deployment/helm"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: adapter-service
-    repository: "file://../Backend/Adapter\ Service/deployment/helm"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
   - name: user-service
-    repository: "file://../Backend/User\ Service/deployment/helm"
+    repository: "https://mauriceackel.github.io/CKDAC"
     version: 0.1.0
