@@ -3,7 +3,7 @@ entries:
   adapter-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T10:26:57.225010269Z"
+    created: "2020-10-18T13:37:30.349052806Z"
     description: Deploys the CKDAC mapping service
     digest: 005f9b5f9ab11e89a26d0e9a3be2825a03ee33d6debc13d2aad7c1454d3b2703
     name: adapter-service
@@ -13,7 +13,7 @@ entries:
     version: 0.1.0
   api-gateway:
   - apiVersion: v2
-    created: "2020-10-18T10:26:57.226460474Z"
+    created: "2020-10-18T13:37:30.349780386Z"
     dependencies:
     - alias: internal-gateway
       name: gateway
@@ -24,7 +24,7 @@ entries:
       repository: file://./charts/gateway
       version: 0.1.0
     description: A Helm chart for Kubernetes
-    digest: 056624efd53707b68b49426da34edfe472eb8ed7523ea799525b84b23f599b88
+    digest: ac81ceb95c1b26d34b454ab48f8f8555a6ac38af9d9ee249ab5c3126a3c20c58
     name: api-gateway
     type: application
     urls:
@@ -33,7 +33,7 @@ entries:
   api-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T10:26:57.227039075Z"
+    created: "2020-10-18T13:37:30.350423156Z"
     description: Deploys the CKDAC mapping service
     digest: d5ad27beedcabcf5871d6d31a068d3057baf3356301fe6df5b0ec791199197c3
     name: api-service
@@ -44,7 +44,7 @@ entries:
   auth-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T10:26:57.227629777Z"
+    created: "2020-10-18T13:37:30.351101631Z"
     description: Deploys the CKDAC auth service
     digest: 2c3e6b9307a71b58f5a2a6a0d04f077836a3470d8611a032af35a230c793051e
     name: auth-service
@@ -54,7 +54,7 @@ entries:
     version: 0.1.0
   ckdac:
   - apiVersion: v2
-    created: "2020-10-18T10:26:57.23167679Z"
+    created: "2020-10-18T13:37:30.356045374Z"
     dependencies:
     - name: secrets
       repository: https://mauriceackel.github.io/CKDAC
@@ -93,8 +93,8 @@ entries:
   database:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2020-10-18T10:26:57.232166391Z"
-    digest: 329a1eb239696cf1da781aaef348c0112584be895dd0480dbae303d539d310af
+    created: "2020-10-18T13:37:30.356579532Z"
+    digest: 8b631643d23ee1f24466b22c40d5a70eda9963155106e16a23a96641ff8b7f10
     name: database
     type: application
     urls:
@@ -103,7 +103,7 @@ entries:
   mapping-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T10:26:57.232713393Z"
+    created: "2020-10-18T13:37:30.357760562Z"
     description: Deploys the CKDAC mapping service
     digest: 671be5991cd41640396122aa5dd7f1a2ca65cb28c29e6754562e752a60fea6dd
     name: mapping-service
@@ -113,7 +113,7 @@ entries:
     version: 0.1.0
   secrets:
   - apiVersion: v2
-    created: "2020-10-18T10:26:57.233405395Z"
+    created: "2020-10-18T13:37:30.358486542Z"
     dependencies:
     - name: db-users
       repository: file://./charts/db-users
@@ -128,7 +128,7 @@ entries:
       repository: file://./charts/ssl
       version: 0.1.0
     description: A Helm chart for Kubernetes
-    digest: dc0de834b4ede2a3b8f5ce7af276d175bf4a0d14df24b68366ac91c0b51e9751
+    digest: 189e9af3f4215f31d6434cef9c567516c33234f2956cae4515e1dbf433c5fbae
     name: secrets
     type: application
     urls:
@@ -137,7 +137,7 @@ entries:
   user-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T10:26:57.233981097Z"
+    created: "2020-10-18T13:37:30.359104009Z"
     description: Deploys the CKDAC user service
     digest: f70274e65573e9acd687e522beff08683d7ab27a032e98920c8a53696ab2bb79
     name: user-service
@@ -148,7 +148,7 @@ entries:
   web-app:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T10:26:57.2349163Z"
+    created: "2020-10-18T13:37:30.359551059Z"
     description: A user frontend for Knowledge Driven Architecture Composition
     digest: 4cc775cb6151e3ff56a70985779e5401a82461253b3efff646ba48f5cd1b755c
     name: web-app
@@ -156,4 +156,4 @@ entries:
     urls:
     - https://mauriceackel.github.io/CKDAC/web-app-0.1.0.tgz
     version: 0.1.0
-generated: "2020-10-18T10:26:57.223846166Z"
+generated: "2020-10-18T13:37:30.347771965Z"
