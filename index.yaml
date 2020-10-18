@@ -3,7 +3,7 @@ entries:
   adapter-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:47:24.601047447Z"
+    created: "2020-10-18T10:26:57.225010269Z"
     description: Deploys the CKDAC mapping service
     digest: 005f9b5f9ab11e89a26d0e9a3be2825a03ee33d6debc13d2aad7c1454d3b2703
     name: adapter-service
@@ -13,7 +13,7 @@ entries:
     version: 0.1.0
   api-gateway:
   - apiVersion: v2
-    created: "2020-10-18T09:47:24.601768154Z"
+    created: "2020-10-18T10:26:57.226460474Z"
     dependencies:
     - alias: internal-gateway
       name: gateway
@@ -33,7 +33,7 @@ entries:
   api-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:47:24.60237756Z"
+    created: "2020-10-18T10:26:57.227039075Z"
     description: Deploys the CKDAC mapping service
     digest: d5ad27beedcabcf5871d6d31a068d3057baf3356301fe6df5b0ec791199197c3
     name: api-service
@@ -44,7 +44,7 @@ entries:
   auth-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:47:24.603023366Z"
+    created: "2020-10-18T10:26:57.227629777Z"
     description: Deploys the CKDAC auth service
     digest: 2c3e6b9307a71b58f5a2a6a0d04f077836a3470d8611a032af35a230c793051e
     name: auth-service
@@ -52,10 +52,48 @@ entries:
     urls:
     - https://mauriceackel.github.io/CKDAC/auth-service-0.1.0.tgz
     version: 0.1.0
+  ckdac:
+  - apiVersion: v2
+    created: "2020-10-18T10:26:57.23167679Z"
+    dependencies:
+    - name: secrets
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: api-gateway
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: database
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: web-app
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: auth-service
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: api-service
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: mapping-service
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: adapter-service
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    - name: user-service
+      repository: https://mauriceackel.github.io/CKDAC
+      version: 0.1.0
+    description: Install the containerized KDAC application to a cluster
+    digest: bce0136bd814a159cadbde31829260d14ea6f4ef32de7dd52051c979abf8b914
+    name: ckdac
+    type: application
+    urls:
+    - https://mauriceackel.github.io/CKDAC/ckdac-0.1.0.tgz
+    version: 0.1.0
   database:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2020-10-18T09:47:24.60353577Z"
+    created: "2020-10-18T10:26:57.232166391Z"
     digest: 329a1eb239696cf1da781aaef348c0112584be895dd0480dbae303d539d310af
     name: database
     type: application
@@ -65,7 +103,7 @@ entries:
   mapping-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:47:24.604130076Z"
+    created: "2020-10-18T10:26:57.232713393Z"
     description: Deploys the CKDAC mapping service
     digest: 671be5991cd41640396122aa5dd7f1a2ca65cb28c29e6754562e752a60fea6dd
     name: mapping-service
@@ -75,7 +113,7 @@ entries:
     version: 0.1.0
   secrets:
   - apiVersion: v2
-    created: "2020-10-18T09:47:24.604870883Z"
+    created: "2020-10-18T10:26:57.233405395Z"
     dependencies:
     - name: db-users
       repository: file://./charts/db-users
@@ -99,7 +137,7 @@ entries:
   user-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:47:24.605440588Z"
+    created: "2020-10-18T10:26:57.233981097Z"
     description: Deploys the CKDAC user service
     digest: f70274e65573e9acd687e522beff08683d7ab27a032e98920c8a53696ab2bb79
     name: user-service
@@ -110,7 +148,7 @@ entries:
   web-app:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:47:24.605861892Z"
+    created: "2020-10-18T10:26:57.2349163Z"
     description: A user frontend for Knowledge Driven Architecture Composition
     digest: 4cc775cb6151e3ff56a70985779e5401a82461253b3efff646ba48f5cd1b755c
     name: web-app
@@ -118,4 +156,4 @@ entries:
     urls:
     - https://mauriceackel.github.io/CKDAC/web-app-0.1.0.tgz
     version: 0.1.0
-generated: "2020-10-18T09:47:24.599993938Z"
+generated: "2020-10-18T10:26:57.223846166Z"
