@@ -14,4 +14,5 @@ kubectl --namespace=kube-system wait --for=condition=ready pod -l "release=kubed
 helm install kubedb-catalog --version v0.13.0-rc.0 --namespace kube-system appscode/kubedb-catalog
 
 ## Install application
-helm install ckdac ckdac
+helm repo add ckdac https://mauriceackel.github.io/CKDAC/
+helm install ckdac ckdac/ckdac
