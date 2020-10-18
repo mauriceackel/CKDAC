@@ -21,6 +21,7 @@ routes:
     gatewayName:
       - external
     prefix: /adapters/
+    timeout: 10000
     rewrite: /
     bypassAuth: false
 
@@ -29,6 +30,7 @@ environment:
   host: "0.0.0.0"
   port: 8080
   logPath: "./log"
+  storagePath: /tmp/adapter-generator
   apiKeySecret: secrets-api-keys-adapter-service
 
 database:

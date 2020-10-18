@@ -71,6 +71,8 @@ spec:
               value: {{ .Values.environment.logPath | quote }}
             - name: GATEWAY_INT_URL
               value: {{ include "adapter-service.internalGatewayUrl" . }}
+            - name: STORAGE_PATH
+              value: {{ .Values.environment.storagePath }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
