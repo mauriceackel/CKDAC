@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  user-service:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2020-10-18T09:00:03.188824622Z"
+    description: Deploys the CKDAC user service
+    digest: f70274e65573e9acd687e522beff08683d7ab27a032e98920c8a53696ab2bb79
+    name: user-service
+    type: application
+    urls:
+    - https://mauriceackel.github.io/CKDAC/user-service-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-10-18T09:00:03.186479517Z"
