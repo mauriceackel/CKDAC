@@ -94,3 +94,15 @@ Create the name of the service account to use
 {{- define "adapter-service.escapeRegex" -}}
 {{ regexReplaceAll "([.*?])" . "\\\\${1}"}}
 {{- end }}
+
+{{/*
+Create the internal api gateway hostname
+*/}}
+{{- define "adapter-service.internalGatewayUrl" -}}
+{{- with .Values.apiGateway.internal -}}
+{{ required "Gateway protocol needed" .protocol }}://{{ required "Gateway hostname required" .hostname }}
+{{- if .port -}}
+:{{ .port }}
+{{- end }}
+{{- end }}
+{{- end }}
