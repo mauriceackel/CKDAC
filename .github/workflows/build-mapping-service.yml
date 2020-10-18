@@ -14,11 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "./Backend/Mapping\ Service"
+        working-directory: "./main/Backend/Mapping\ Service"
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          path: main
 
       - name: Install dependencies
         run: npm install
@@ -38,8 +41,25 @@ jobs:
       - name: Push docker
         run: npm run docker-push
 
-      - name: Create fresh helm chart
-        run: npm run helm-build
+      # Checkout chart repo
+      - name: Checkout chart-repo
+        uses: actions/checkout@v2
+        with:
+          ref: 'chart-repo'
+          path: chart-repo
 
-      - name: Push chart to chart repository
-        run: npm run helm-index
+      - name: Create fresh helm chart
+        run: npm run helm-build -- -d $GITHUB_WORKSPACE/chart-repo
+      
+      - name: Register chart in repository
+        run: npm run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+
+      # Push to chart repo
+      - name: Push to chart-repo
+        run: |
+          cd $GITHUB_WORKSPACE/chart-repo
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Updated chart repository"
+          git push
