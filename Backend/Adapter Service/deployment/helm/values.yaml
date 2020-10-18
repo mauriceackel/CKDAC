@@ -11,6 +11,7 @@ apiGateway:
   internal:
     id: gateway-int
     hostname: api-gateway-internal-gateway
+    protocol: http
   external:
     id: gateway-ext
     hostname: api.ckdac.com
