@@ -10,7 +10,7 @@ kubectl create namespace ambassador && helm install ambassador --namespace ambas
 ## Install kubedb
 helm repo add appscode https://charts.appscode.com/stable/
 helm install kubedb-operator --version v0.13.0-rc.0 --namespace kube-system appscode/kubedb && \
-kubectl --namespace=kube-system wait --for=condition=ready pod -l "release=kubedb-operator, app=kubedb" && \
+kubectl --namespace=kube-system wait --for=condition=ready pod -l "release=kubedb-operator, app=kubedb" --timeout=180s && \
 helm install kubedb-catalog --version v0.13.0-rc.0 --namespace kube-system appscode/kubedb-catalog
 
 ## Install application

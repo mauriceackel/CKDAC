@@ -16,7 +16,9 @@ spec:
   databaseSecret:
     secretName: {{ .Values.database.adminCredentialsName }}
   storage:
-    # storageClassName: "standard"
+    {{- if .Values.database.storageClassName }}
+    storageClassName: {{ .Values.database.storageClassName | quote }}
+    {{- end }}
     accessModes:
     - ReadWriteOnce
     resources:
