@@ -3,7 +3,7 @@ entries:
   adapter-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:04:46.779509647Z"
+    created: "2020-10-18T09:44:23.336724538Z"
     description: Deploys the CKDAC mapping service
     digest: 005f9b5f9ab11e89a26d0e9a3be2825a03ee33d6debc13d2aad7c1454d3b2703
     name: adapter-service
@@ -14,7 +14,7 @@ entries:
   api-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:04:46.780138161Z"
+    created: "2020-10-18T09:44:23.337353323Z"
     description: Deploys the CKDAC mapping service
     digest: d5ad27beedcabcf5871d6d31a068d3057baf3356301fe6df5b0ec791199197c3
     name: api-service
@@ -25,7 +25,7 @@ entries:
   auth-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:04:46.788470343Z"
+    created: "2020-10-18T09:44:23.337966006Z"
     description: Deploys the CKDAC auth service
     digest: 2c3e6b9307a71b58f5a2a6a0d04f077836a3470d8611a032af35a230c793051e
     name: auth-service
@@ -36,7 +36,7 @@ entries:
   mapping-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:04:46.789335162Z"
+    created: "2020-10-18T09:44:23.338581989Z"
     description: Deploys the CKDAC mapping service
     digest: 671be5991cd41640396122aa5dd7f1a2ca65cb28c29e6754562e752a60fea6dd
     name: mapping-service
@@ -47,7 +47,7 @@ entries:
   user-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:04:46.79017828Z"
+    created: "2020-10-18T09:44:23.339208174Z"
     description: Deploys the CKDAC user service
     digest: f70274e65573e9acd687e522beff08683d7ab27a032e98920c8a53696ab2bb79
     name: user-service
@@ -58,7 +58,7 @@ entries:
   web-app:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2020-10-18T09:04:46.790999998Z"
+    created: "2020-10-18T09:44:23.339674537Z"
     description: A user frontend for Knowledge Driven Architecture Composition
     digest: 4cc775cb6151e3ff56a70985779e5401a82461253b3efff646ba48f5cd1b755c
     name: web-app
@@ -66,4 +66,4 @@ entries:
     urls:
     - https://mauriceackel.github.io/CKDAC/web-app-0.1.0.tgz
     version: 0.1.0
-generated: "2020-10-18T09:04:46.778593927Z"
+generated: "2020-10-18T09:44:23.335535777Z"
