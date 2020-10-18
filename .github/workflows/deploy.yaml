@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Deploy to kubernetes
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+
+      - name: Build values file
+        run: echo "$HELM_VALUES" > deployment-values.yaml
+        env:
+          HELM_VALUES: ${{ secrets.HELM_VALUES }}
+
+      - name: Deploy
+        uses: deliverybot/helm@v1
+        with:
+          release: ckdac
+          namespace: default
+          chart: ckdac
+          repo: https://mauriceackel.github.io/CKDAC
+          token: ${{ github.token }}
+          value-files: deployment-values.yaml
+        env:
+          KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
