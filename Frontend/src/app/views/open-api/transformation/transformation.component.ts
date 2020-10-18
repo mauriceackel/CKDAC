@@ -19,6 +19,7 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { ProgressIndicatorComponent } from '~/app/components/progress-indicator/progress-indicator.component';
 import { transToMappingPairs } from '~/app/utils/mapping-pairs';
+import { DownloadService } from '~/app/services/download.service';
 
 @Component({
   selector: 'app-openapi-transformation',
@@ -64,6 +65,7 @@ export class TransformationComponent implements OnInit, OnDestroy {
     private mappingService: MappingService,
     private adapterService: AdapterService,
     private validationService: ValidationService,
+    private downloadService: DownloadService,
     private dialog: MatDialog,
     private router: Router,
     private overlay: Overlay
@@ -262,7 +264,7 @@ export class TransformationComponent implements OnInit, OnDestroy {
       this.mappingError = undefined;
       const downloadLink = await this.adapterService.createAdapter(mapping, AdapterType.JAVASCRIPT);
 
-      window.open(downloadLink, "_blank");
+      this.downloadService.downloadFile(downloadLink);
     } catch (err) {
       if (err instanceof OpenApiValidationError) {
         this.mappingError = err;
