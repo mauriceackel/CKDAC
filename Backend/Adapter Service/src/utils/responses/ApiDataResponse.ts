@@ -5,7 +5,7 @@ abstract class ApiResponse extends SuccessResponse {
     public get Result(): { api?: IApi, apis?: Array<IApi> } {
         return this.result;
     }
-    protected result: {
+    public result: {
         api?: IApi,
         apis?: Array<IApi>
     };

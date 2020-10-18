@@ -11,9 +11,9 @@ export async function getApiById(apiId: string) {
         const response = await http.get<SingleApiResponse>(`${apiEndpoint}/${apiId}`);
         
         logger.info(`Successfully fetched api ${apiId}.`);
-        return response.data.Result.api as IApi;
+        return response.data.result.api as IApi;
     } catch (err) {
-        logger.error(`Error while fetching user ${apiId}`, err);
+        logger.error(`Error while fetching api ${apiId}`, err);
         const axiosError = err as AxiosError;
         throw new ForeignServiceError(axiosError.response!.status, axiosError.response!.data.err.msg);
     }
@@ -24,7 +24,7 @@ export async function getApis(type?: ApiType) {
 
     try {
         const response = await http.get<MultiApiResponse>(`${apiEndpoint}${type ? `?type=${type}` : ''}`);
-        const data = response.data.Result.apis as Array<IApi>;
+        const data = response.data.result.apis as Array<IApi>;
 
         logger.info(`Successfully fetched all apis${type ? ` with type ${type}` : ''}`);
         return data || [];
