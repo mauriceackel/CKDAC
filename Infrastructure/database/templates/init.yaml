@@ -67,12 +67,12 @@ data:
     {"_id":{"$oid":"5e14d0ff6ed91211d6b55cfc"},"name":"generateMapping","activities":[{"$oid":"5e14cffe9db771209adf8312"}]}
     {"_id":{"$oid":"5e14cd276ed91211d6b5523b"},"name":"createMapping","activities":[{"$oid":"5e14cfdb9db771209adf830e"}]}
     {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"getMapping","activities":[{"$oid":"5e14cf5f9db771209adf8308"}]}
-    {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"listMappings","activities":[{"$oid":"5e14cfab9db771209adf830b"}]}
+    {"_id":{"$oid":"5e14cd916ed91211d6b55352"},"name":"listMappings","activities":[{"$oid":"5e14cfab9db771209adf830b"}]}
     {"_id":{"$oid":"5e14d1776ed91211d6b55e4c"},"name":"createAdapter","activities":[{"$oid":"5e14d2219db771209adf8313"},{"$oid":"5e14d2219db771209adf8314"}]}
     PERMISSIONS
 
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=user-service --collection=users <<"USERS"
-    {"_id":{"$oid":"5dcad79be032c89c33eda9f4"},"password":"$APP_ROOT_PW","email":"$APP_ROOT_USER","firstname":"Root","lastname":"User","type":0}}
+    {"_id":{"$oid":"5dcad79be032c89c33eda9f4"},"password":"$APP_ROOT_PW","email":"$APP_ROOT_USER","firstname":"Root","lastname":"User","type":0}
     USERS
 
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=auth-service --collection=roles <<"ROLES"
