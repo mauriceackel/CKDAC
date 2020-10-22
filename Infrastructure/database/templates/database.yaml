@@ -43,6 +43,16 @@ spec:
           secretKeyRef:
             name: {{ .Values.database.adminCredentialsName }}
             key: password
+      - name: APP_ROOT_USER
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.database.rootUserCredentialsName }}
+            key: username
+      - name: APP_ROOT_PW
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.database.rootUserCredentialsName }}
+            key: password
       {{- range .Values.database.services }}
       - name: {{ include "database.serviceEnvironmentName" .name }}_USER
         valueFrom:

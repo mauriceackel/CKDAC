@@ -10,6 +10,7 @@ database:
   replicaSetName: rs0
   createInitScripts: true
   adminCredentialsName: secrets-db-users-cluster-admin
+  rootUserCredentialsName: secrets-db-users-root-user
   services:
     - name: auth-service
       credentialsName: secrets-db-users-auth-service

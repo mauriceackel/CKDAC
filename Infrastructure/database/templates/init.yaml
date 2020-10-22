@@ -33,81 +33,51 @@ data:
     set -e
 
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=auth-service --collection=activities <<"ACTIVITIES"
-    {"_id":{"$oid":"5dcad79be032c89c33eda9fd"},"name":"god","method":"*","url":"^.*$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14c65d6ed91211d6b53f17"},"name":"getOwnUser","method":"GET","url":"^.*/users/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14c6946ed91211d6b53f81"},"name":"getUserBasic","method":"GET","url":"^.*/users/([^/]*|.*/)$","accessLevel":1000.0}
-    {"_id":{"$oid":"5e14c6a76ed91211d6b53fe0"},"name":"getUserMaximum","method":"GET","url":"^.*/users/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14c7066ed91211d6b540d9"},"name":"getUsersBasic","method":"GET","url":"^.*/users/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":1000.0}
-    {"_id":{"$oid":"5e14c71c6ed91211d6b54139"},"name":"getUsersMaximum","method":"GET","url":"^.*/users/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14c7416ed91211d6b5417f"},"name":"createUser","method":"POST","url":"^.*/users/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14c7696ed91211d6b541fd"},"name":"updateOwnUser","method":"PUT","url":"^.*/users/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14c77a6ed91211d6b54222"},"name":"updateUserMaximum","method":"PUT","url":"^.*/users/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14c7b76ed91211d6b542c6"},"name":"deleteOwnUser","method":"DELETE","url":"^.*/users/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14c7d66ed91211d6b54331"},"name":"deleteUserMaximum","method":"DELETE","url":"^.*/users/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14ca606ed91211d6b54a87"},"name":"getOwnApi","method":"GET","url":"^.*/apis/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14ca776ed91211d6b54aba"},"name":"getApiBasic","method":"GET","url":"^.*/apis/([^/]*|.*/)$","accessLevel":1000.0}
-    {"_id":{"$oid":"5e14ca916ed91211d6b54afa"},"name":"getApiMaximum","method":"GET","url":"^.*/apis/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14caca6ed91211d6b54b98"},"name":"getOwnApis","method":"GET","url":"^.*/apis/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cade6ed91211d6b54bf4"},"name":"getApisBasic","method":"GET","url":"^.*/apis/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":1000.0}
-    {"_id":{"$oid":"5e14caf76ed91211d6b54c27"},"name":"getApisMaximum","method":"GET","url":"^.*/apis/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14cb326ed91211d6b54cdd"},"name":"createApi","method":"POST","url":"^.*/apis/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cb576ed91211d6b54d59"},"name":"updateOwnApi","method":"PUT","url":"^.*/apis/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cb796ed91211d6b54d90"},"name":"updateApiMaximum","method":"PUT","url":"^.*/apis/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14cbb46ed91211d6b54e37"},"name":"deleteOwnApi","method":"DELETE","url":"^.*/apis/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cbcd6ed91211d6b54e9c"},"name":"deleteApiMaximum","method":"DELETE","url":"^.*/apis/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14cf5f9db771209adf8308"},"name":"getOwnMapping","method":"GET","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cf809db771209adf8309"},"name":"getMappingBasic","method":"GET","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":1000.0}
-    {"_id":{"$oid":"5e14cf909db771209adf830a"},"name":"getMappingMaximum","method":"GET","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14cfab9db771209adf830b"},"name":"getOwnMappings","method":"GET","url":"^.*/mappings/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cfb89db771209adf830c"},"name":"getMappingsBasic","method":"GET","url":"^.*/mappings/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":1000.0}
-    {"_id":{"$oid":"5e14cfc59db771209adf830d"},"name":"getMappingsMaximum","method":"GET","url":"^.*/mappings/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14cfdb9db771209adf830e"},"name":"createMapping","method":"POST","url":"^.*/mappings/?(\\?(([^=\u0026]+?=[^=\u0026]+?)(\u0026|$))+)?$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cfe59db771209adf830f"},"name":"updateOwnMapping","method":"PUT","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14cff19db771209adf8310"},"name":"updateMappingMaximum","method":"PUT","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14cffe9db771209adf8311"},"name":"deleteOwnMapping","method":"DELETE","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":0.0}
-    {"_id":{"$oid":"5e14d0099db771209adf8312"},"name":"deleteMappingMaximum","method":"DELETE","url":"^.*/mappings/([^/]*|.*/)$","accessLevel":1.7976931348623157e+308}
-    {"_id":{"$oid":"5e14d2219db771209adf8313"},"name":"createAdapter","method":"POST","url":"^.*/adapters/([^/]*|.*/)$","accessLevel":0.0}
+    {"_id":{"$oid":"5dcad79be032c89c33eda9fd"},"name":"god","method":"*","url":"^.*$"}
+    {"_id":{"$oid":"5e14c65d6ed91211d6b53f17"},"name":"getUser","method":"GET","url":"^.*/users/[^/]+/?$"}
+    {"_id":{"$oid":"5e14c7066ed91211d6b540d9"},"name":"listUsers","method":"GET","url":"^.*/users/?(\\?([^=\u0026]+?=[^=\u0026]+?)(\u0026[^=\u0026]+?=[^=\u0026]+?)*)?$"}
+    {"_id":{"$oid":"5e14c7416ed91211d6b5417f"},"name":"createUser","method":"POST","url":"^.*/users/?$"}
+    {"_id":{"$oid":"5e14c7696ed91211d6b541fd"},"name":"updateUser","method":"PUT","url":"^.*/users/[^/]+/?$"}
+    {"_id":{"$oid":"5e14c7b76ed91211d6b542c6"},"name":"deleteUser","method":"DELETE","url":"^.*/users/[^/]+/?$"}
+    {"_id":{"$oid":"5e14ca606ed91211d6b54a87"},"name":"getApi","method":"GET","url":"^.*/apis/[^/]+/?$"}
+    {"_id":{"$oid":"5e14caca6ed91211d6b54b98"},"name":"listApis","method":"GET","url":"^.*/apis/?(\\?([^=\u0026]+?=[^=\u0026]+?)(\u0026[^=\u0026]+?=[^=\u0026]+?)*)?$"}
+    {"_id":{"$oid":"5e14cb326ed91211d6b54cdd"},"name":"createApi","method":"POST","url":"^.*/apis/?$"}
+    {"_id":{"$oid":"5e14cb576ed91211d6b54d59"},"name":"updateApi","method":"PUT","url":"^.*/apis/[^/]+/?$"}
+    {"_id":{"$oid":"5e14cbb46ed91211d6b54e37"},"name":"deleteApi","method":"DELETE","url":"^.*/apis/[^/]+/?$"}
+    {"_id":{"$oid":"5e14cf5f9db771209adf8308"},"name":"getMapping","method":"GET","url":"^.*/mappings/(?!generate(/|$))[^/]+/?$"}
+    {"_id":{"$oid":"5e14cfab9db771209adf830b"},"name":"listMappings","method":"GET","url":"^.*/mappings/?(\\?([^=\u0026]+?=[^=\u0026]+?)(\u0026[^=\u0026]+?=[^=\u0026]+?)*)?$"}
+    {"_id":{"$oid":"5e14cfdb9db771209adf830e"},"name":"createMapping","method":"POST","url":"^.*/mappings/?$"}
+    {"_id":{"$oid":"5e14cfe59db771209adf830f"},"name":"updateMapping","method":"PUT","url":"^.*/mappings/(?!generate(/|$))[^/]+/?$"}
+    {"_id":{"$oid":"5e14cffe9db771209adf8311"},"name":"deleteMapping","method":"DELETE","url":"^.*/mappings/(?!generate(/|$))[^/]+/?$"}
+    {"_id":{"$oid":"5e14cffe9db771209adf8312"},"name":"generateMapping","method":"POST","url":"^.*/mappings/generate/?$"}
+    {"_id":{"$oid":"5e14d2219db771209adf8313"},"name":"createAdapter","method":"POST","url":"^.*/adapters/generate/[^/]+/?$"}
+    {"_id":{"$oid":"5e14d2219db771209adf8314"},"name":"createAdapter","method":"GET","url":"^.*/adapters/download/[^/]+/?$"}
     ACTIVITIES
 
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=auth-service --collection=permissions <<"PERMISSIONS"
     {"_id":{"$oid":"5dcad79be032c89c33eda9fe"},"name":"god","activities":[{"$oid":"5dcad79be032c89c33eda9fd"}]}
-    {"_id":{"$oid":"5e14c8826ed91211d6b54518"},"name":"manageOwnUser","activities":[{"$oid":"5e14c65d6ed91211d6b53f17"},{"$oid":"5e14c7696ed91211d6b541fd"},{"$oid":"5e14c7b76ed91211d6b542c6"}]}
-    {"_id":{"$oid":"5e14c89c6ed91211d6b54550"},"name":"readUsersBasic","activities":[{"$oid":"5e14c7066ed91211d6b540d9"}]}
-    {"_id":{"$oid":"5e14c9216ed91211d6b546a5"},"name":"readUserBasic","activities":[{"$oid":"5e14c6946ed91211d6b53f81"}]}
-    {"_id":{"$oid":"5e14c9536ed91211d6b54740"},"name":"manageUsersMaximum","activities":[{"$oid":"5e14c6a76ed91211d6b53fe0"},{"$oid":"5e14c77a6ed91211d6b54222"},{"$oid":"5e14c7d66ed91211d6b54331"}]}
-    {"_id":{"$oid":"5e14cc236ed91211d6b54f78"},"name":"createAndManageOwnEvents","activities":[{"$oid":"5e14ca606ed91211d6b54a87"},{"$oid":"5e14caca6ed91211d6b54b98"},{"$oid":"5e14cb326ed91211d6b54cdd"},{"$oid":"5e14cb576ed91211d6b54d59"},{"$oid":"5e14cbb46ed91211d6b54e37"}]}
-    {"_id":{"$oid":"5e14cca76ed91211d6b550cf"},"name":"manageEventsMaximum","activities":[{"$oid":"5e14ca916ed91211d6b54afa"},{"$oid":"5e14caf76ed91211d6b54c27"},{"$oid":"5e14cb326ed91211d6b54cdd"},{"$oid":"5e14cb796ed91211d6b54d90"},{"$oid":"5e14cbcd6ed91211d6b54e9c"}]}
-    {"_id":{"$oid":"5e14cd276ed91211d6b5523b"},"name":"readEventBasic","activities":[{"$oid":"5e14ca776ed91211d6b54aba"}]}
-    {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"readEventsBasic","activities":[{"$oid":"5e14cade6ed91211d6b54bf4"}]}
-    {"_id":{"$oid":"5e14d0e76ed91211d6b55cb6"},"name":"createAndManageOwnFacilities","activities":[{"$oid":"5e14cf5f9db771209adf8308"},{"$oid":"5e14cfab9db771209adf830b"},{"$oid":"5e14cfdb9db771209adf830e"},{"$oid":"5e14cfe59db771209adf830f"},{"$oid":"5e14cffe9db771209adf8311"}]}
-    {"_id":{"$oid":"5e14d0ff6ed91211d6b55cfc"},"name":"manageFacilitiesMaximum","activities":[{"$oid":"5e14cf909db771209adf830a"},{"$oid":"5e14cfc59db771209adf830d"},{"$oid":"5e14cfdb9db771209adf830e"},{"$oid":"5e14cff19db771209adf8310"},{"$oid":"5e14d0099db771209adf8312"}]}
-    {"_id":{"$oid":"5e14d15c6ed91211d6b55de3"},"name":"readFacilityBasic","activities":[{"$oid":"5e14cf809db771209adf8309"}]}
-    {"_id":{"$oid":"5e14d1776ed91211d6b55e4c"},"name":"readFacilitiesBasic","activities":[{"$oid":"5e14cfb89db771209adf830c"}]}
-    {"_id":{"$oid":"5e14d2d26ed91211d6b56246"},"name":"createAndManageOwnPois","activities":[{"$oid":"5e14d2219db771209adf8313"},{"$oid":"5e14d2479db771209adf8316"},{"$oid":"5e14d2699db771209adf8319"},{"$oid":"5e14d2719db771209adf831a"},{"$oid":"5e14d2889db771209adf831c"}]}
-    {"_id":{"$oid":"5e14d3256ed91211d6b56315"},"name":"managePoisMaximum","activities":[{"$oid":"5e14d23a9db771209adf8315"},{"$oid":"5e14d25e9db771209adf8318"},{"$oid":"5e14d2699db771209adf8319"},{"$oid":"5e14d27c9db771209adf831b"},{"$oid":"5e14d2919db771209adf831d"}]}
-    {"_id":{"$oid":"5e14d37f6ed91211d6b56425"},"name":"readPoiBasic","activities":[{"$oid":"5e14d2309db771209adf8314"}]}
-    {"_id":{"$oid":"5e14d38f6ed91211d6b56445"},"name":"readPoisBasic","activities":[{"$oid":"5e14d2519db771209adf8317"}]}
-    {"_id":{"$oid":"5e14d5fe6ed91211d6b56b42"},"name":"createLocation","activities":[{"$oid":"5e14d5259db771209adf8324"}]}
-    {"_id":{"$oid":"5e14d6126ed91211d6b56b9c"},"name":"manageLocationsMaximum","activities":[{"$oid":"5e14d5259db771209adf8324"},{"$oid":"5e14d5929db771209adf8328"},{"$oid":"5e14d5179db771209adf8323"},{"$oid":"5e14d4f49db771209adf8320"}]}
-    {"_id":{"$oid":"5e14d8bc6ed91211d6b57302"},"name":"getOwnHeatmaps","activities":[{"$oid":"5e14d8706ed91211d6b57235"},{"$oid":"5e14d84c6ed91211d6b571b0"},{"$oid":"5e14d8236ed91211d6b5712a"}]}
-    {"_id":{"$oid":"5e14d8fa6ed91211d6b573a9"},"name":"getObjectHeatmaps","activities":[{"$oid":"5e14d83a6ed91211d6b5718b"},{"$oid":"5e14d85e6ed91211d6b571da"},{"$oid":"5e14d8856ed91211d6b57260"}]}
-    {"_id":{"$oid":"5e14d9086ed91211d6b573c5"},"name":"getArbitraryHeatmaps","activities":[{"$oid":"5e14d83a6ed91211d6b5718b"},{"$oid":"5e14d85e6ed91211d6b571da"},{"$oid":"5e14d8856ed91211d6b57260"},{"$oid":"5e14d7876ed91211d6b56fa2"}]}
-    {"_id":{"$oid":"5e14e66e6ed91211d6b59ce0"},"name":"getOwnFacilityThroughput","activities":[{"$oid":"5e14e5169db771209adf832a"}]}
-    {"_id":{"$oid":"5e14e6986ed91211d6b59d76"},"name":"getFacilityThroughput","activities":[{"$oid":"5e14e5269db771209adf832b"}]}
-    {"_id":{"$oid":"5e14e6de6ed91211d6b59e38"},"name":"getOwnFacilityQueueLength","activities":[{"$oid":"5e14e56f9db771209adf832c"}]}
-    {"_id":{"$oid":"5e14e6ee6ed91211d6b59e71"},"name":"getFacilityQueueLength","activities":[{"$oid":"5e14e57b9db771209adf832d"}]}
-    {"_id":{"$oid":"5e14e7256ed91211d6b59ef8"},"name":"getOwnPoiUtility","activities":[{"$oid":"5e14e5a19db771209adf832e"}]}
-    {"_id":{"$oid":"5e14e7386ed91211d6b59f58"},"name":"getPoiUtility","activities":[{"$oid":"5e14e5aa9db771209adf832f"}]}
-    {"_id":{"$oid":"5e76268c8b95eca297737314"},"name":"createAndManageOwnServices","activities":[{"$oid":"5e7622e78b95eca297736cb8"},{"$oid":"5e7623178b95eca297736d12"},{"$oid":"5e7624e48b95eca297737062"},{"$oid":"5e76255f8b95eca297737122"},{"$oid":"5e7625e28b95eca2977371fd"}]}
-    {"_id":{"$oid":"5e76279a8b95eca2977374d3"},"name":"manageOwnApis","activities":[{"$oid":"5e7626e88b95eca2977373b0"},{"$oid":"5e7627068b95eca2977373e4"},{"$oid":"5e76273d8b95eca297737440"}]}
-    {"_id":{"$oid":"5e7628868b95eca297737678"},"name":"createAndManageOwnRules","activities":[{"$oid":"5e7628398b95eca2977375fc"},{"$oid":"5e7628268b95eca2977375d6"},{"$oid":"5e76280d8b95eca2977375ac"},{"$oid":"5e7627fe8b95eca297737588"},{"$oid":"5e7627ee8b95eca29773756c"},{"$oid":"5e7627fe8b95eca297737589"}]}
-    {"_id":{"$oid":"5e7b808e8b95eca2977b40a1"},"name":"getOwnFacilityWaittimePrediction","activities":[{"$oid":"5e7b801e8b95eca2977b3fdf"}]}
-    {"_id":{"$oid":"5e7b80ae8b95eca2977b40da"},"name":"getFacilityWaittimePrediction","activities":[{"$oid":"5e7b804a8b95eca2977b402a"}]}
+    {"_id":{"$oid":"5e14c8826ed91211d6b54518"},"name":"manageUser","activities":[{"$oid":"5e14c65d6ed91211d6b53f17"},{"$oid":"5e14c7696ed91211d6b541fd"},{"$oid":"5e14c7b76ed91211d6b542c6"}]}
+    {"_id":{"$oid":"5e14d15c6ed91211d6b55de3"},"name":"getUser","activities":[{"$oid":"5e14c65d6ed91211d6b53f17"}]}
+    {"_id":{"$oid":"5e14c89c6ed91211d6b54550"},"name":"listUsers","activities":[{"$oid":"5e14c7066ed91211d6b540d9"}]}
+    {"_id":{"$oid":"5e14c89c6ed91211d6b54551"},"name":"createUser","activities":[{"$oid":"5e14c7416ed91211d6b5417f"}]}
+    {"_id":{"$oid":"5e14cc236ed91211d6b54f78"},"name":"manageApi","activities":[{"$oid":"5e14ca606ed91211d6b54a87"},{"$oid":"5e14cb326ed91211d6b54cdd"},{"$oid":"5e14cb576ed91211d6b54d59"},{"$oid":"5e14cbb46ed91211d6b54e37"}]}
+    {"_id":{"$oid":"5e14cca76ed91211d6b550cf"},"name":"getApi","activities":[{"$oid":"5e14ca606ed91211d6b54a87"}]}
+    {"_id":{"$oid":"5e14d2d26ed91211d6b56246"},"name":"listApis","activities":[{"$oid":"5e14c7066ed91211d6b540d9"}]}
+    {"_id":{"$oid":"5e14d0e76ed91211d6b55cb6"},"name":"manageMapping","activities":[{"$oid":"5e14cfdb9db771209adf830e"},{"$oid":"5e14cf5f9db771209adf8308"},{"$oid":"5e14cfe59db771209adf830f"},{"$oid":"5e14cffe9db771209adf8311"}]}
+    {"_id":{"$oid":"5e14d0ff6ed91211d6b55cfc"},"name":"generateMapping","activities":[{"$oid":"5e14cffe9db771209adf8312"}]}
+    {"_id":{"$oid":"5e14cd276ed91211d6b5523b"},"name":"createMapping","activities":[{"$oid":"5e14cfdb9db771209adf830e"}]}
+    {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"getMapping","activities":[{"$oid":"5e14cf5f9db771209adf8308"}]}
+    {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"listMappings","activities":[{"$oid":"5e14cfab9db771209adf830b"}]}
+    {"_id":{"$oid":"5e14d1776ed91211d6b55e4c"},"name":"createAdapter","activities":[{"$oid":"5e14d2219db771209adf8313"},{"$oid":"5e14d2219db771209adf8314"}]}
     PERMISSIONS
 
+    mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=user-service --collection=users <<"USERS"
+    {"_id":{"$oid":"5dcad79be032c89c33eda9f4"},"password":"$APP_ROOT_PW","email":"$APP_ROOT_USER","firstname":"Root","lastname":"User","type":0}}
+    USERS
+
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=auth-service --collection=roles <<"ROLES"
-    {"_id":{"$oid":"5dcad79be032c89c33eda9ff"},"name":"god","users":[{"$oid":"5dcad79be032c89c33eda9f4"}],"services":[{{ range $idx, $val := .Values.database.services }}{{ if ne $idx 0 }},{{ end }}{{ .name | lower | quote }}{{ end }}],"permissions":[{"$oid":"5dcad79be032c89c33eda9fe"}]}
-    {"_id":{"$oid":"5dcad79be032c89c33edaa03"},"name":"standard","users":[{"$oid":"5e77ac2e35cce57141f3b88f"}],"services":[],"permissions":[{"$oid":"5e14c8826ed91211d6b54518"},{"$oid":"5e14cd916ed91211d6b55351"},{"$oid":"5e14cd276ed91211d6b5523b"},{"$oid":"5e14d15c6ed91211d6b55de3"},{"$oid":"5e14d1776ed91211d6b55e4c"},{"$oid":"5e14d37f6ed91211d6b56425"},{"$oid":"5e14d38f6ed91211d6b56445"},{"$oid":"5e14d5fe6ed91211d6b56b42"},{"$oid":"5e14d8fa6ed91211d6b573a9"},{"$oid":"5e14e6986ed91211d6b59d76"},{"$oid":"5e14e6ee6ed91211d6b59e71"},{"$oid":"5e7b80ae8b95eca2977b40da"},{"$oid":"5e14e7386ed91211d6b59f58"}]}
+    {"_id":{"$oid":"5dcad79be032c89c33eda9ff"},"name":"god","claims":["admin"],"users":[{"$oid":"5dcad79be032c89c33eda9f4"}],"services":[{{ range $idx, $val := .Values.database.services }}{{ if ne $idx 0 }},{{ end }}{{ .name | lower | quote }}{{ end }}],"permissions":[{"$oid":"5dcad79be032c89c33eda9fe"}]}
+    {"_id":{"$oid":"5dcad79be032c89c33edaa03"},"name":"standard","claims":[],"users":[],"services":[],"permissions":[]}
     ROLES
 
     mongo <<APIKEYS
