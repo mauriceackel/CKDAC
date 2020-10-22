@@ -5,14 +5,14 @@
     </div>
 
     <div class="col-4 d-flex justify-content-center">
-      TODO: Toolname
+      SYMBIOTE - An application-layer tool that allows iot devices to communicate automatically
     </div>
 
     <div class="col-4">
       <div *ngIf="identificationService.AuthUser as user" class="float-right">
-        <span style="font-size: 12pt">{{user.email}}</span>
-        <button mat-icon-button (click)="identificationService.logout()">
-          <mat-icon>logout</mat-icon>
+        <button cdkOverlayOrigin #accountCardOrigin="cdkOverlayOrigin" mat-mini-fab class="float-right"
+          (click)="openAccountCard($event)">
+          <mat-icon>person</mat-icon>
         </button>
       </div>
     </div>
@@ -24,21 +24,45 @@
   <div class="container-fluid px-5 py-4">
     <div class="row">
       <div class="col d-flex justify-content-center">
-        <h1>Welcome to TODO, plaese select the technology framework you are using</h1>
+        <h1>Please select the component model you are using</h1>
       </div>
     </div>
     <div class="row mt-4">
       <div class="col d-flex flex-wrap justify-content-center">
         <button mat-raised-button color="primary" class="p-3" [routerLink]="['/openapi']">
           <h3 class="mb-2">OpenAPI</h3>
-          <span>TODO: Some more explanation</span>
+          <span>A description standard for RESTful APIs (e.g. HTTTP)</span>
         </button>
       </div>
       <div class="col d-flex justify-content-center">
         <button mat-raised-button color="primary" class="p-3" [routerLink]="['/asyncapi']">
           <h3 class="mb-2">AsyncAPI</h3>
-          <span>TODO: Some more explanation</span>
+          <span>A description standard for Event-driven Architectures (e.g. MQTT)</span>
         </button>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col d-flex justify-content-center">
+        <mat-card style="width: 50%; text-align: justify">
+          <mat-card-title>About SYMBIOTE</mat-card-title>
+          <mat-card-content>
+            SYMBIOTE is a composed word that is related to IoT, symbiotic bonds (biology) and Bots (software). Embedded
+            devices are connected to the world wide web
+            by using internet protocols. So called Internet-of-Things (IoT) devices already create value. Application
+            examples include monitoring capabilities or predictive
+            maintenance scenarios. However, even more value is hidden when multiple IoT devices are architected with
+            open interfaces that chat can be access by
+            third-parties. Hence, SYMBIOTE breaks down IoT application silos to enable symbiotic bonds between open IoT
+            devices. In the short-term, the tool
+            supports software engineers to generate software adapters easily. In the long-term, the tool can work
+            without human intervention by automating the generation
+            process completely - just like a bot. This is mainly achieved by using reasoning principles (e.g. transitive
+            relations) from
+            logical artificial intelligence. Hence, SYMBIOTE takes over repetitive software adapter implementation tasks
+            such that software engineers can focus on
+            the important stuff.
+          </mat-card-content>
+        </mat-card>
       </div>
     </div>
   </div>

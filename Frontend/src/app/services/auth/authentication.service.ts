@@ -35,18 +35,17 @@ export class AuthenticationService {
   }
 
   public async login(email: string, password: string) {
-    try {
-      await this.tokenService.retrieveAccessToken(email, password);
-      return true;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
+    await this.tokenService.retrieveAccessToken(email, password);
   }
 
   public async logout() {
     this.tokenService.logout();
     this.router.navigate(['/home/login']);
+  }
+
+  public async refreshUser() {
+    this.authUserSubject.next(await this.getAuthenticatedUser());
+    this.loadingUserSubject.next(false);
   }
 
   private async getAuthenticatedUser() {

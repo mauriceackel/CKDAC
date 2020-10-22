@@ -15,6 +15,8 @@ import { LoginModule } from './views/login/login.module';
 import { AuthGuardService } from './services/auth/guard.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { TokenInterceptor } from './services/auth/token.interceptor';
+import { RegistrationModule } from './views/registration/registration.module';
+import { ProfileModule } from './views/profile/profile.module';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,8 @@ import { TokenInterceptor } from './services/auth/token.interceptor';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    RegistrationModule,
+    ProfileModule,
     MatIconModule,
     HomeModule,
     OpenApiBaseModule,

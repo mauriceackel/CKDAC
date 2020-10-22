@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SingleUserResponse } from '~/app/utils/responses/user-response';
 import { environment } from '~/environments/environment';
+import { IUser } from '~/app/models/user-model';
 
 const host = environment.backendBaseUrl;
 const userUrl = `${host}/users`;
@@ -22,4 +23,15 @@ export class UserService {
       return null;
     }
   }
+
+  public async updateUser(userData: IUser) {
+    try {
+      let response = await this.http.put(`${userUrl}/${userData.id}`, userData).toPromise();
+      return true;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
 }

@@ -14,7 +14,11 @@ export class LoginComponent implements OnInit {
   private returnUrl: string = '/';
   public identificationForm: FormGroup;
 
-  constructor(private identificationService: AuthenticationService, private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private identificationService: AuthenticationService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
 
   public ngOnInit() {
     this.identificationForm = new FormGroup({
@@ -29,13 +33,15 @@ export class LoginComponent implements OnInit {
       await this.identificationService.login(this.identificationForm.get("email").value, this.identificationForm.get("password").value);
       this.router.navigateByUrl(this.returnUrl);
     } catch (err) {
-      if(err instanceof AuthError) {
-        this.identificationForm.get("password").reset();
-        this.identificationForm.setErrors({
-          authError: err.message
-        })
-      }
+      this.identificationForm.get("password").reset();
+      this.identificationForm.setErrors({
+        authError: 'Wrong username or password'
+      });
     }
+  }
+
+  public goToRegister() {
+    this.router.navigate(['/home/register'], { queryParams: { returnUrl: this.returnUrl } });
   }
 
 }

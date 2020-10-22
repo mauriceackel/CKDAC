@@ -1,0 +1,27 @@
+<mat-card>
+  <mat-card-header>
+    <img mat-card-avatar src="http://placehold.it/200x200" alt="Profile Picture">
+    <mat-card-title>{{user?.email}}</mat-card-title>
+    <mat-card-subtitle>{{user?.displayname}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="row">
+      <div class="col-6">
+
+      </div>
+      <div class="coll-6">
+
+      </div>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="edit()">
+      <mat-icon>edit</mat-icon>
+      Edit
+    </button>
+    <button class="float-right" mat-button (click)="logout()">
+      Logout
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>

@@ -11,6 +11,8 @@ import { TransformationComponent as AsyncApiTransform } from './views/async-api/
 import { HomeComponent } from './views/home/home.component';
 import { LoginComponent } from './views/login/login.component';
 import { AuthGuardService } from './services/auth/guard.service';
+import { RegistrationComponent } from './views/registration/registration.component';
+import { ProfileComponent } from './views/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -40,6 +42,8 @@ const routes: Routes = [
     component: HomeComponent,
     children: [
       { path: 'login', component: LoginComponent, },
+      { path: 'register', component: RegistrationComponent, },
+      { path: 'profile', component: ProfileComponent, },
     ]
   },
   {

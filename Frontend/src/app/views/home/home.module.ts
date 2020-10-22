@@ -10,6 +10,8 @@ import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { AccountCardModule } from '~/app/components/account-card/account-card.module';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatCardModule,
     MatSelectModule,
     MatButtonModule,
+    AccountCardModule,
+    OverlayModule,
     MatListModule,
     RouterModule,
     MatIconModule,

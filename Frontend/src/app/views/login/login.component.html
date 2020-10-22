@@ -42,7 +42,16 @@
         <div class="row">
           <div class="col">
             <button mat-raised-button color="primary" class="float-right" type="submit"
-              [disabled]="!identificationForm.valid">Login</button>
+              [disabled]="!identificationForm.valid">
+              Login
+            </button>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col">
+            <button mat-raised-button color="default" class="float-right" type="submit" (click)="goToRegister()">
+              Register
+            </button>
           </div>
         </div>
       </form>

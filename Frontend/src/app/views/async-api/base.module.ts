@@ -8,6 +8,8 @@ import { ExplanationModule } from './explanation/explanation.module';
 import { DescribeModule } from './describe/describe.module';
 import { TransformationModule } from './transformation/transformation.module';
 import { MatIconModule } from '@angular/material/icon';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { AccountCardModule } from '~/app/components/account-card/account-card.module';
 
 @NgModule({
   declarations: [
@@ -19,6 +21,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatToolbarModule,
     RouterModule,
     ExplanationModule,
+    AccountCardModule,
+    OverlayModule,
     DescribeModule,
     TransformationModule,
     MatIconModule
