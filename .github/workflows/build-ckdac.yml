@@ -1,4 +1,4 @@
-name: CKDAC
+name: Build App Helm
 
 on:
   workflow_dispatch:
