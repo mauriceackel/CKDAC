@@ -12,16 +12,16 @@ import { UserType } from "../middleware/Authorization";
  * 
  * @returns The permission level or -1 of the user has no permissions.
  */
-export async function checkPermissions(userId: string, userType: UserType, method: string, url: string) {
+export async function checkPermissions(userId: string, userType: UserType, method: string, url: string): Promise<string[]> {
 
     try {
-        let roles : IRole[];
-        switch(userType) {
+        let roles: IRole[];
+        switch (userType) {
             case UserType.USER: {
-                roles = await Role.find({users: userId});
+                roles = await Role.find({ users: userId });
             } break;
             case UserType.SERVICE: {
-                roles = await Role.find({services: userId });
+                roles = await Role.find({ services: userId });
             } break;
             default: throw new Error("Unknown user type");
         }
@@ -29,14 +29,13 @@ export async function checkPermissions(userId: string, userType: UserType, metho
 
         let activities = roles.flatMap(r => r.permissions).flatMap(p => p.activities);
         let matchedActivities = activities.filter(a => (a.method == "*" || a.method == method) && new RegExp(a.url).test(url));
-
-        let max = -1;
-        for (const activity of matchedActivities) {
-            max = (activity.accessLevel > max) ? activity.accessLevel : max;
+        
+        if(matchedActivities.length > 0) {
+            return roles.flatMap(r => r.claims);
         }
-        return max;
+        throw new Error("No matching activities.")
     } catch (err) {
         logger.error(`Error while authorizing ${userType} with id: ${userId}`, err);
-        return -1;
+        return [];
     }
 }

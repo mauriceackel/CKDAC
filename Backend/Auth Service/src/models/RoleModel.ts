@@ -9,7 +9,8 @@ export interface IRole {
     name: string,
     users: Array<Schema.Types.ObjectId>,
     services: Array<string>,
-    permissions: Array<IPermission>
+    permissions: Array<IPermission>,
+    claims: string[]
 }
 
 /**
@@ -36,7 +37,11 @@ const RoleSchema = new Schema({
         type: [{type: Schema.Types.ObjectId, ref: 'Permission'}],
         default: [],
         autopopulate: true
-    }
+    },
+    claims: {
+        type: [{type: String}],
+        default: [],
+    },
 });
 RoleSchema.plugin(require('mongoose-autopopulate'));
 

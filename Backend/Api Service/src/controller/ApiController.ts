@@ -24,9 +24,9 @@ async function createApi(req: Request, res: Response, next: NextFunction) {
         if (!createCondition(undefined, req.userId, apiData)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
-        
+
         const api = await ApiService.createApi(apiData);
-        
+
         response = new SingleApiResponse(200, undefined, api);
     } catch (err) {
         if (err instanceof NoSuchElementError) {
@@ -51,11 +51,11 @@ async function getApis(req: Request, res: Response, next: NextFunction) {
     try {
         const apis = await ApiService.getApis(req.query.type);
 
-        if (apis.some(api => !listCondition(api, req.userId))) {
+        if (apis.some(api => !listCondition(api.toObject(), req.userId))) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
-        response = new MultiApiResponse(200, undefined, apis);
+        response = new MultiApiResponse(200, undefined, apis.map(api => api.toJSON({ claims: [...req.claims, ...(api.createdBy === req.userId ? ['owner'] : [])] })));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
@@ -79,11 +79,11 @@ async function getApi(req: Request, res: Response, next: NextFunction) {
     try {
         const api = await ApiService.getApi(req.params.apiId);
 
-        if (!getCondition(api, req.userId)) {
+        if (!getCondition(api.toObject(), req.userId)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
-        response = new SingleApiResponse(200, undefined, api);
+        response = new SingleApiResponse(200, undefined, api.toJSON({ claims: [...req.claims, ...(api.createdBy === req.userId ? ['owner'] : [])] }));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
@@ -110,7 +110,7 @@ async function updateApi(req: Request, res: Response, next: NextFunction) {
     try {
         const api = await ApiService.getApi(req.params.apiId);
 
-        if (!updateCondition(api, req.userId, apiData)) {
+        if (!updateCondition(api.toObject(), req.userId, apiData)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
@@ -140,7 +140,7 @@ async function deleteApi(req: Request, res: Response, next: NextFunction) {
     try {
         const api = await ApiService.getApi(req.params.apiId);
 
-        if (!deleteCondition(api, req.userId)) {
+        if (!deleteCondition(api.toObject(), req.userId)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 

@@ -14,7 +14,7 @@ const router: Router = Router();
  * Create a mapping
  */
 router.post('/', createMapping)
-const createCondition = (mapping: IMapping| undefined, userId: string, data: IMapping) => data.createdBy === userId;
+const createCondition = (mapping: IMapping | undefined, userId: string, data: IMapping) => data.createdBy === userId;
 async function createMapping(req: Request, res: Response, next: NextFunction) {
 
     const mappingData: IMapping = req.body;
@@ -55,7 +55,7 @@ async function getMappings(req: Request, res: Response, next: NextFunction) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
-        response = new MultiMappingResponse(200, undefined, mappings);
+        response = new MultiMappingResponse(200, undefined, mappings.map(mapping => mapping.toJSON({ claims: [...req.claims, ...(mapping.createdBy === req.userId ? ['owner'] : [])] })));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
@@ -83,7 +83,7 @@ async function getMapping(req: Request, res: Response, next: NextFunction) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
-        response = new SingleMappingResponse(200, undefined, mapping);
+        response = new SingleMappingResponse(200, undefined, mapping.toJSON({ claims: [...req.claims, ...(mapping.createdBy === req.userId ? ['owner'] : [])] }));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);

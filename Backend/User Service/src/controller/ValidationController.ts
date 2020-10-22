@@ -22,7 +22,7 @@ async function validateCredentials(req: Request, res: Response, next: NextFuncti
     if (loginData.email && loginData.password) {
         try {
             let authenticatedUser = await UserService.validateCredentials(loginData.email, loginData.password);
-            response = new SingleUserResponse(200, undefined, authenticatedUser.toJSON({ userId: req.userId, accessLevel: req.accessLevel }));
+            response = new SingleUserResponse(200, undefined, authenticatedUser.toJSON({ claims: [...req.claims, ...(authenticatedUser.id === req.userId ? ['owner'] : [])] }));
         } catch (err) {
             if (err instanceof NoSuchElementError) {
                 //TODO: Could be seperate error messages for better user experience (but less security)

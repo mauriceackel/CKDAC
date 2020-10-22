@@ -3,6 +3,7 @@ import validator from 'validator';
 import crypto from 'crypto';
 import * as Config from '../config/Config';
 import { IDocumentToObjectOptions } from "../utils/interfaces/IDocumentToObjectOptions";
+import { IJSONifyable } from "../utils/interfaces/IJSONifyable";
 
 export enum UserType {
     STANDARD
@@ -11,7 +12,7 @@ export enum UserType {
 /**
  * The user interface, which only contains the fields of a user.
  */
-export interface IUser {
+export interface IUser extends IJSONifyable {
     id: string
     password?: string,
     email: string,
@@ -20,7 +21,6 @@ export interface IUser {
     displayname?: string,
     type: UserType,
     validatePassword(password: string): boolean;
-    toJSON(options?: IDocumentToObjectOptions): any;
 }
 
 /**
@@ -49,9 +49,9 @@ const UserSchema = new Schema({
         },
         set: function (password: string) {
             // generate a salt
-            let salt = crypto.randomBytes(16).toString('hex');
+            const salt = crypto.randomBytes(16).toString('hex');
             // hashing user's salt and password with 1000 iterations, 64 length and sha512 digest 
-            let hash = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
+            const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
             return hash + "/" + salt;
         }
     },
@@ -86,7 +86,7 @@ const UserSchema = new Schema({
             delete result.__v;
 
             //Fields only deleted if not enough permissions
-            if (options.accessLevel < 1000 && options.userId != user.id) {
+            if (options.claims.filter(c => ["admin", "owner"].includes(c)).length === 0) {
                 delete result.email;
             }
         }

@@ -40,12 +40,18 @@ async function createUser(req: Request, res: Response, next: NextFunction) {
  * Get all existing users
  */
 router.get('/', getUsers)
+const listCondition = (user: IUser, userId: string) => true;
 async function getUsers(req: Request, res: Response, next: NextFunction) {
-    
+
     let response: ApiResponse;
     try {
-        let users = await UserService.getUsers(req.query);
-        response = new MultiUserResponse(200, undefined, users.map(u => u.toJSON({ userId: req.userId, accessLevel: req.accessLevel })));
+        const users = await UserService.getUsers(req.query);
+
+        if (users.some(user => !listCondition(user, req.userId))) {
+            throw new ForbiddenError("Insufficient right, permission denied");
+        }
+
+        response = new MultiUserResponse(200, undefined, users.map(u => u.toJSON({ claims: [...req.claims, ...(u.id === req.userId ? ['owner'] : [])] })));
     } catch (err) {
         response = new ErrorResponse(500);
     }
@@ -56,12 +62,18 @@ async function getUsers(req: Request, res: Response, next: NextFunction) {
  * Get a specific user by his userId
  */
 router.get('/:userId', getUser)
+const getCondition = (user: IUser, userId: string) => user.id === userId;
 async function getUser(req: Request, res: Response, next: NextFunction) {
-    
+
     let response: ApiResponse;
     try {
-        let user = await UserService.getUserById(req.params.userId);
-        response = new SingleUserResponse(200, undefined, user.toJSON({ userId: req.userId, accessLevel: req.accessLevel }));
+        const user = await UserService.getUserById(req.params.userId);
+
+        if (!getCondition(user.toObject(), req.userId)) {
+            throw new ForbiddenError("Insufficient right, permission denied");
+        }
+
+        response = new SingleUserResponse(200, undefined, user.toJSON({ claims: [...req.claims, ...(user.id === req.userId ? ['owner'] : [])] }));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
@@ -76,20 +88,22 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
  * Update a user
  */
 router.put('/:userId', updateUser)
+const updateCondition = (user: IUser, userId: string, data: IUser) => user.id === userId;
 async function updateUser(req: Request, res: Response, next: NextFunction) {
-    
-    let userData: IUser = req.body;
+
+    const userData: IUser = req.body;
     userData.id = req.params.userId;
 
     let response: ApiResponse;
     try {
-        //If no admin and username does not match
-        // if (userType > 0 && loggedInUser.username != userData.username) {
-        //     logger.info(`Logged in user "${loggedInUser.username}" has no permissions to upsert user "${userData.username}".`);
-        //     return res.status(403).send();
-        // }
+        const user = await UserService.getUserById(req.params.userId);
+
+        if (!updateCondition(user.toObject(), req.userId, userData)) {
+            throw new ForbiddenError("Insufficient right, permission denied");
+        }
 
         await UserService.updateUser(userData);
+
         response = new SuccessResponse(200);
     } catch (err) {
         if (err instanceof NoSuchElementError) {
@@ -105,13 +119,15 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
  * Remove a user
  */
 router.delete('/:userId', deleteUser)
+const deleteCondition = (user: IUser, userId: string) => user.id === userId;
 async function deleteUser(req: Request, res: Response, next: NextFunction) {
-    
+
     let response: ApiResponse;
     try {
-        if (req.accessLevel < 1.7976931348623+308 - 1000 && req.userId !== req.params.userId) {
-            logger.warn(`User with id ${req.userId} does not have rights to delete user with id ${req.params.id}`)
-            throw new ForbiddenError("You don't have sufficient rights to delete that object")
+        const user = await UserService.getUserById(req.params.userId);
+
+        if (!deleteCondition(user.toObject(), req.userId)) {
+            throw new ForbiddenError("Insufficient right, permission denied");
         }
 
         await UserService.deleteUser(req.params.userId);

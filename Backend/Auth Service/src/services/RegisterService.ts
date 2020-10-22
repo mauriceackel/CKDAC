@@ -17,8 +17,7 @@ export async function registerUser(userData: IUser) {
             logger.info(`Successfully registered user ${user.id}`);
             let role;
             switch(user.type) {
-                case UserType.SERVICE_OWNER: role = "service_owner"; break;
-                case UserType.VISITOR: role = "visitor"; break;
+                case UserType.STANDARD: role = "standard"; break;
                 default: throw new Error("Unknown user type");
             }
             PermissionService.addUserToRole(user.id, role);

@@ -23,24 +23,24 @@ export async function authorizeRequest(req: Request, res: Response, next: NextFu
         default: throw new Error("Unknown auth type");
     }
 
-    let authResult = await AuthorizationService.checkPermissions(req.userId, userType, req.method, req.originalUrl);
+    const claims = await AuthorizationService.checkPermissions(req.userId, userType, req.method, req.originalUrl);
 
-    if (authResult < 0) {
-        let response = new ErrorResponse(403);
+    if (claims.length === 0) {
+        const response = new ErrorResponse(403);
         return res.status(response.Code).json(response);
     } else {
-        let authDetailsToken = getAuthDetailsToken(userType, req.userId, authResult);
-  
+        const authDetailsToken = getAuthDetailsToken(userType, req.userId, claims);
+        
         res.header("auth-details", authDetailsToken);
         return next();
     }
 }
 
-export function getAuthDetailsToken(userType: UserType, userId: string, accessLevel: number) {
+export function getAuthDetailsToken(userType: UserType, userId: string, claims: string[]) {
     return jwt.sign({
-        userType: userType,
-        userId: userId,
-        accessLevel: accessLevel,
+        userType,
+        userId,
+        claims,
         exp: Math.floor((Date.now() + AUTH_DETAILS_TOKEN_TTL) / 1000)
     }, ACCESS_TOKEN_PRIV, { algorithm: "RS512" });
 }

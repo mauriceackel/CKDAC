@@ -7,7 +7,6 @@ export interface IActivity {
     name: string,
     method: string,
     url: string,
-    accessLevel: number
 }
 
 /**
@@ -32,11 +31,6 @@ const ActivitySchema = new Schema({
         type: String,
         required: true
     },
-    //Adds an  additional level to the activity. In general, the higher the number the higher the permissions with Number.MAX_VALUE (1.7976931348623157e+308) being the highest.
-    accessLevel: {
-        type: Number,
-        default: 0
-    }
 });
 
 export const Activity = model<IActivity & Document, IActivityModel>('Activity', ActivitySchema);

@@ -1,5 +1,5 @@
 export enum UserType {
-    SERVICE_OWNER, VISITOR
+    STANDARD
 }
 
 /**

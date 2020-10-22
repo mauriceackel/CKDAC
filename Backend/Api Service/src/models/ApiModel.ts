@@ -1,11 +1,12 @@
 import { Document, model, Model, Schema } from "mongoose";
 import { IDocumentToObjectOptions } from "../utils/interfaces/IDocumentToObjectOptions";
+import { IJSONifyable } from "../utils/interfaces/IJSONifyable";
 
 export enum ApiType {
     OPEN_API, ASYNC_API
 }
 
-export interface IApi {
+export interface IApi extends IJSONifyable {
     id: string
     createdBy: string
     name: string
@@ -63,7 +64,7 @@ const ApiSchema = new Schema({
             delete result._id;
             delete result.__v;
 
-            if (options.accessLevel < 1000) {
+            if (options.claims.filter(c => ["admin", "owner"].includes(c)).length === 0) {
                 delete result.createdBy;
             }
         }

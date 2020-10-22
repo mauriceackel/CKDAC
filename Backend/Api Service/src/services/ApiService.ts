@@ -3,6 +3,7 @@ import { Api, ApiType, IApi } from "../models/ApiModel";
 import { MongoError } from "mongodb";
 import { ElementAlreadyExistsError } from "../utils/errors/ElementAlreadyExistsError";
 import { NoSuchElementError } from "../utils/errors/NoSuchElementError";
+import { Document } from "mongoose";
 
 export async function createApi(apiData: IApi): Promise<IApi> {
     logger.info(`Trying to create new api with data: `, apiData);
@@ -23,7 +24,7 @@ export async function createApi(apiData: IApi): Promise<IApi> {
     }
 }
 
-export async function getApi(apiId: string): Promise<IApi> {
+export async function getApi(apiId: string): Promise<IApi & Document> {
     logger.info(`Trying to retrieve api with id ${apiId}`);
 
     try {
@@ -39,7 +40,7 @@ export async function getApi(apiId: string): Promise<IApi> {
     }
 }
 
-export async function getApis(type?: ApiType): Promise<Array<IApi>> {
+export async function getApis(type?: ApiType): Promise<Array<IApi & Document>> {
     logger.info(`Trying to retrieve all apis${type ? ` with type ${type}` : ''}`);
 
     try {
