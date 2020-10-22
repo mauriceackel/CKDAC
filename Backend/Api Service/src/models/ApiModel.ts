@@ -1,4 +1,5 @@
-import { Document, model, Model, Schema } from "mongoose";
+import { model, Model, Schema } from "mongoose";
+import { Document } from "../utils/interfaces/Document";
 import { IDocumentToObjectOptions } from "../utils/interfaces/IDocumentToObjectOptions";
 import { IJSONifyable } from "../utils/interfaces/IJSONifyable";
 
@@ -6,7 +7,7 @@ export enum ApiType {
     OPEN_API, ASYNC_API
 }
 
-export interface IApi extends IJSONifyable {
+export interface IApi {
     id: string
     createdBy: string
     name: string

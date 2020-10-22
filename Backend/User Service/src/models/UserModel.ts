@@ -1,9 +1,9 @@
-import { Schema, Document, Model, model, DocumentToObjectOptions } from "mongoose";
+import { Schema, Model, model, DocumentToObjectOptions } from "mongoose";
 import validator from 'validator';
 import crypto from 'crypto';
 import * as Config from '../config/Config';
 import { IDocumentToObjectOptions } from "../utils/interfaces/IDocumentToObjectOptions";
-import { IJSONifyable } from "../utils/interfaces/IJSONifyable";
+import { Document } from "../utils/interfaces/Document";
 
 export enum UserType {
     STANDARD
@@ -12,7 +12,7 @@ export enum UserType {
 /**
  * The user interface, which only contains the fields of a user.
  */
-export interface IUser extends IJSONifyable {
+export interface IUser {
     id: string
     password?: string,
     email: string,

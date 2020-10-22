@@ -4,6 +4,7 @@ import { logger } from "../Service";
 import { MongoError } from "mongodb";
 import { ElementAlreadyExistsError } from "../utils/errors/ElementAlreadyExistsError";
 import { InvalidCredentialsError } from "../utils/errors/InvalidCredentialsError";
+import { Document } from "../utils/interfaces/Document";
 
 /**
  * Create a user with the given data.
@@ -32,7 +33,7 @@ export async function createUser(userData: IUser) {
  * 
  * @returns All existing users or an empty array.
  */
-export async function getUsers(conditions: any) {
+export async function getUsers(conditions: any): Promise<Array<IUser & Document>> {
     logger.info(`Trying to retrieve all users from the database with conditions: `, conditions);
 
     try {
@@ -55,7 +56,7 @@ export async function getUsers(conditions: any) {
  * @returns The user with the specified userId.
  * @throws NoSuchElementError if no user with the given userId exists.
  */
-export async function getUserById(userId: string) {
+export async function getUserById(userId: string): Promise<IUser & Document> {
     logger.info(`Trying to retrieve user "${userId}" from the database.`);
 
     try {

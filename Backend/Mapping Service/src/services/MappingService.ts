@@ -5,9 +5,9 @@ import { ElementAlreadyExistsError } from "../utils/errors/ElementAlreadyExistsE
 import * as ReverseMappingService from "./ReverseService";
 import { NoSuchElementError } from "../utils/errors/NoSuchElementError";
 import { ApiType } from "../models/ApiModel";
-import { Document } from "mongoose";
+import { Document } from "../utils/interfaces/Document";
 
-export async function createMapping(mappingData: IMapping): Promise<IMapping> {
+export async function createMapping(mappingData: IMapping): Promise<IMapping & Document> {
     logger.info(`Trying to create new mapping with data: `, mappingData);
 
     try {
@@ -37,7 +37,7 @@ export async function createMapping(mappingData: IMapping): Promise<IMapping> {
     }
 }
 
-export async function getMapping(mappingId: string): Promise<IMapping> {
+export async function getMapping(mappingId: string): Promise<IMapping & Document> {
     logger.info(`Trying to retrieve mapping with id ${mappingId}`);
 
     try {

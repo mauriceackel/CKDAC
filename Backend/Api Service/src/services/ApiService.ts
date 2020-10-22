@@ -3,9 +3,9 @@ import { Api, ApiType, IApi } from "../models/ApiModel";
 import { MongoError } from "mongodb";
 import { ElementAlreadyExistsError } from "../utils/errors/ElementAlreadyExistsError";
 import { NoSuchElementError } from "../utils/errors/NoSuchElementError";
-import { Document } from "mongoose";
+import { Document } from "../utils/interfaces/Document";
 
-export async function createApi(apiData: IApi): Promise<IApi> {
+export async function createApi(apiData: IApi): Promise<IApi & Document> {
     logger.info(`Trying to create new api with data: `, apiData);
 
     try {

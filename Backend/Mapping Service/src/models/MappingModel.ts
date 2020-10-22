@@ -1,8 +1,8 @@
-import { Document, HookNextFunction, model, Model, Schema } from "mongoose";
+import { HookNextFunction, model, Model, Schema } from "mongoose";
 import { IDocumentToObjectOptions } from "../utils/interfaces/IDocumentToObjectOptions";
 import { ApiType } from "./ApiModel";
 import crypto from 'crypto';
-import { IJSONifyable } from "../utils/interfaces/IJSONifyable";
+import { Document } from "../utils/interfaces/Document";
 
 export enum MappingType {
     TRANSFORMATION,
@@ -14,7 +14,7 @@ export enum MappingDirection {
     INPUT, OUTPUT
 }
 
-export interface IMapping extends IJSONifyable {
+export interface IMapping {
     id: string
     createdBy: string
     apiType: ApiType
