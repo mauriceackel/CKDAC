@@ -9,7 +9,7 @@ metadata:
     {{- include "api-gateway.labels" $ | nindent 4 }}
 spec:
   ambassador_id: {{ $gatewayData.ambassadorId }}
-  hostname: {{ ($gatewayData.hostname | default "*") | quote }}
+  hostname: {{ (required "Gateway hostname required" $gatewayData.hostname) | quote }}
   acmeProvider:
     authority: none
   {{- if $gatewayData.hostSecretsName }}

@@ -11,7 +11,7 @@ internal-gateway:
 
 external-gateway:
   ambassadorId: gateway-ext
-  hostname: '*.ckdac.com'
+  hostname: 'ckdac.com'
   hostSecretsName: ssl-host
   tls:
     appHostname: '*.ckdac.com'
