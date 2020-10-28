@@ -5,6 +5,7 @@ import { ErrorResponse } from "../utils/responses/ApiResponse";
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_PRIV, AUTH_DETAILS_TOKEN_TTL } from "../config/Config";
 import { AuthType } from "../services/AuthenticationService";
+import { logger } from "../Service";
 
 /**
  * Checks an already authenticated request and checks for the access rights.
@@ -12,8 +13,8 @@ import { AuthType } from "../services/AuthenticationService";
  */
 export async function authorizeRequest(req: Request, res: Response, next: NextFunction) {
     //TODO: Determine better way of knowing if it is a user or a service
-    let userType : UserType;
-    switch(req.authType) {
+    let userType: UserType;
+    switch (req.authType) {
         case AuthType.BEARER: {
             userType = UserType.USER;
         } break;
@@ -23,16 +24,18 @@ export async function authorizeRequest(req: Request, res: Response, next: NextFu
         default: throw new Error("Unknown auth type");
     }
 
-    const claims = await AuthorizationService.checkPermissions(req.userId, userType, req.method, req.originalUrl);
+    try {
+        //This will throw an error if there are no matching activities, else it will return the user claims
+        const claims = await AuthorizationService.checkPermissions(req.userId, userType, req.method, req.originalUrl);
 
-    if (claims.length === 0) {
-        const response = new ErrorResponse(403);
-        return res.status(response.Code).json(response);
-    } else {
         const authDetailsToken = getAuthDetailsToken(userType, req.userId, claims);
-        
+
         res.header("auth-details", authDetailsToken);
         return next();
+    } catch (err) {
+        logger.error(`Error while authorizing ${userType} with id: ${req.userId}`, err);
+        const response = new ErrorResponse(403);
+        return res.status(response.Code).json(response);
     }
 }
 

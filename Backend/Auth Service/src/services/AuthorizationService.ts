@@ -1,5 +1,4 @@
 import { Role, IRole } from "../models/RoleModel";
-import { logger } from "../Service";
 import { Types } from "mongoose";
 import { UserType } from "../middleware/Authorization";
 
@@ -14,28 +13,23 @@ import { UserType } from "../middleware/Authorization";
  */
 export async function checkPermissions(userId: string, userType: UserType, method: string, url: string): Promise<string[]> {
 
-    try {
-        let roles: IRole[];
-        switch (userType) {
-            case UserType.USER: {
-                roles = await Role.find({ users: userId });
-            } break;
-            case UserType.SERVICE: {
-                roles = await Role.find({ services: userId });
-            } break;
-            default: throw new Error("Unknown user type");
-        }
-        roles = roles || [];
-
-        let activities = roles.flatMap(r => r.permissions).flatMap(p => p.activities);
-        let matchedActivities = activities.filter(a => (a.method == "*" || a.method == method) && new RegExp(a.url).test(url));
-        
-        if(matchedActivities.length > 0) {
-            return roles.flatMap(r => r.claims);
-        }
-        throw new Error("No matching activities.")
-    } catch (err) {
-        logger.error(`Error while authorizing ${userType} with id: ${userId}`, err);
-        return [];
+    let roles: IRole[];
+    switch (userType) {
+        case UserType.USER: {
+            roles = await Role.find({ users: userId });
+        } break;
+        case UserType.SERVICE: {
+            roles = await Role.find({ services: userId });
+        } break;
+        default: throw new Error("Unknown user type");
     }
+    roles = roles || [];
+
+    let activities = roles.flatMap(r => r.permissions).flatMap(p => p.activities);
+    let matchedActivities = activities.filter(a => (a.method == "*" || a.method == method) && new RegExp(a.url).test(url));
+
+    if (matchedActivities.length > 0) {
+        return roles.flatMap(r => r.claims);
+    }
+    throw new Error("No matching activities.")
 }

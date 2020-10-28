@@ -60,10 +60,11 @@ data:
     {"_id":{"$oid":"5e14d15c6ed91211d6b55de3"},"name":"getUser","activities":[{"$oid":"5e14c65d6ed91211d6b53f17"}]}
     {"_id":{"$oid":"5e14c89c6ed91211d6b54550"},"name":"listUsers","activities":[{"$oid":"5e14c7066ed91211d6b540d9"}]}
     {"_id":{"$oid":"5e14c89c6ed91211d6b54551"},"name":"createUser","activities":[{"$oid":"5e14c7416ed91211d6b5417f"}]}
-    {"_id":{"$oid":"5e14cc236ed91211d6b54f78"},"name":"manageApi","activities":[{"$oid":"5e14ca606ed91211d6b54a87"},{"$oid":"5e14cb326ed91211d6b54cdd"},{"$oid":"5e14cb576ed91211d6b54d59"},{"$oid":"5e14cbb46ed91211d6b54e37"}]}
+    {"_id":{"$oid":"5e14cc236ed91211d6b54f78"},"name":"manageApi","activities":[{"$oid":"5e14ca606ed91211d6b54a87"},{"$oid":"5e14cb576ed91211d6b54d59"},{"$oid":"5e14cbb46ed91211d6b54e37"}]}
     {"_id":{"$oid":"5e14cca76ed91211d6b550cf"},"name":"getApi","activities":[{"$oid":"5e14ca606ed91211d6b54a87"}]}
     {"_id":{"$oid":"5e14d2d26ed91211d6b56246"},"name":"listApis","activities":[{"$oid":"5e14c7066ed91211d6b540d9"}]}
-    {"_id":{"$oid":"5e14d0e76ed91211d6b55cb6"},"name":"manageMapping","activities":[{"$oid":"5e14cfdb9db771209adf830e"},{"$oid":"5e14cf5f9db771209adf8308"},{"$oid":"5e14cfe59db771209adf830f"},{"$oid":"5e14cffe9db771209adf8311"}]}
+    {"_id":{"$oid":"5e14c89c6ed91211d6b54552"},"name":"createApi","activities":[{"$oid":"5e14cb326ed91211d6b54cdd"}]}
+    {"_id":{"$oid":"5e14d0e76ed91211d6b55cb6"},"name":"manageMapping","activities":[{"$oid":"5e14cf5f9db771209adf8308"},{"$oid":"5e14cfe59db771209adf830f"},{"$oid":"5e14cffe9db771209adf8311"}]}
     {"_id":{"$oid":"5e14d0ff6ed91211d6b55cfc"},"name":"generateMapping","activities":[{"$oid":"5e14cffe9db771209adf8312"}]}
     {"_id":{"$oid":"5e14cd276ed91211d6b5523b"},"name":"createMapping","activities":[{"$oid":"5e14cfdb9db771209adf830e"}]}
     {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"getMapping","activities":[{"$oid":"5e14cf5f9db771209adf8308"}]}
@@ -77,7 +78,7 @@ data:
 
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=auth-service --collection=roles <<"ROLES"
     {"_id":{"$oid":"5dcad79be032c89c33eda9ff"},"name":"god","claims":["admin"],"users":[{"$oid":"5dcad79be032c89c33eda9f4"}],"services":[{{ range $idx, $val := .Values.database.services }}{{ if ne $idx 0 }},{{ end }}{{ .name | lower | quote }}{{ end }}],"permissions":[{"$oid":"5dcad79be032c89c33eda9fe"}]}
-    {"_id":{"$oid":"5dcad79be032c89c33edaa03"},"name":"standard","claims":[],"users":[],"services":[],"permissions":[]}
+    {"_id":{"$oid":"5dcad79be032c89c33edaa03"},"name":"standard","claims":[],"users":[],"services":[],"permissions":[{"$oid":"5e14c8826ed91211d6b54518"},{"$oid":"5e14c89c6ed91211d6b54551"},{"$oid":"5e14cc236ed91211d6b54f78"},{"$oid":"5e14d2d26ed91211d6b56246"},{"$oid":"5e14c89c6ed91211d6b54552"},{"$oid":"5e14d0e76ed91211d6b55cb6"},{"$oid":"5e14d0ff6ed91211d6b55cfc"},{"$oid":"5e14cd276ed91211d6b5523b"},{"$oid":"5e14cd916ed91211d6b55352"},{"$oid":"5e14d1776ed91211d6b55e4c"}]}
     ROLES
 
     mongo <<APIKEYS
