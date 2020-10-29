@@ -62,4 +62,8 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Updated chart repository"
-          git push
+          COUNTER=0
+          until [[ $(git push) || $COUNTER -gt 3 ]]; do
+            git pull
+            ((COUNTER=COUNTER+1))
+          done;
