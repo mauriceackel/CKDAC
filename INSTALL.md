@@ -15,4 +15,4 @@ helm install kubedb-catalog --version v0.13.0-rc.0 --namespace kube-system appsc
 
 ## Install application
 helm repo add ckdac https://mauriceackel.github.io/CKDAC/
-helm install ckdac ckdac/ckdac
+helm install ckdac ckdac/ckdac -f <path_to_values_file>
