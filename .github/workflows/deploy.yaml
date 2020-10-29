@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
+      # Checkout main branch
       - name: Checkout main branch
         uses: actions/checkout@v2
 

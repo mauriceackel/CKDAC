@@ -17,7 +17,7 @@ jobs:
         working-directory: "./main/Backend/User\ Service"
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
+      # Checkout main branch
       - name: Checkout main branch
         uses: actions/checkout@v2
         with:
@@ -63,7 +63,14 @@ jobs:
           git add .
           git commit -m "Updated chart repository"
           COUNTER=0
-          until [[ $(git push) || $COUNTER -gt 3 ]]; do
+          while [[ $(git push | echo $?) && $COUNTER -lt 3 ]]; do
+            git reset HEAD~1
+            git checkout index.yaml
+            git stash
             git pull
+            git checkout stash -- .
+            npm --prefix $GITHUB_WORKSPACE/main/Backend/User\ Service run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+            git add .
+            git commit -m "Updated chart repository"
             ((COUNTER=COUNTER+1))
           done;
