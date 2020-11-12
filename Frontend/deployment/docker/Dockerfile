@@ -8,4 +8,4 @@ COPY public /usr/share/nginx/html
 
 EXPOSE 8080
 
-CMD ["/bin/sh",  "-c",  "envsubst < /usr/share/nginx/html/assets/env.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]
+CMD ["/bin/sh",  "-c",  "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]
