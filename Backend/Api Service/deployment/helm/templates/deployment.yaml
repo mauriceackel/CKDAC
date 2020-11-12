@@ -65,8 +65,6 @@ spec:
                 secretKeyRef:
                   name: {{ required "Secret reference to api key required" .Values.environment.apiKeySecret }}
                   key: key
-            - name: MIN_PW_LEN
-              value: {{ .Values.environment.minPwLength | quote }}
             - name: LOG_PATH
               value: {{ .Values.environment.logPath | quote }}
           resources:

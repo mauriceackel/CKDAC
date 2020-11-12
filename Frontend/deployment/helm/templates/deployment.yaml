@@ -47,15 +47,6 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      initContainers:
-        - name: init-{{ .Chart.Name }}
-          image: bhgedigital/envsubst
-          env:
-            - name: API_URL
-              value: {{ .Values.backend.apiUrl }}
-            - name: AUTH_URL
-              value: {{ .Values.backend.authUrl }}
-          command: ['sh', '-c', "envsubst < /usr/share/nginx/html/assets/env.js > /usr/share/nginx/html/assets/env.js"]
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
