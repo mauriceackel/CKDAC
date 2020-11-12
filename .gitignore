@@ -19,3 +19,7 @@ git_exclude
 
 #MISC
 .DS_Store
+
+#CKDAC charts
+ckdac/charts
+ckdac/Chart.lock

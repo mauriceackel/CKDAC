@@ -13,6 +13,10 @@ apiGateway:
     id: gateway-ext
     hostname: app.ckdac.com
 
+backend:
+  apiUrl: ''
+  authUrl: ''
+
 routes:
   - name: web-app
     gatewayName:
