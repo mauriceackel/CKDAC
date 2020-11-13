@@ -5,7 +5,6 @@ import { environment } from '~/environments/environment';
 import { IUser } from '~/app/models/user-model';
 
 const host = environment.backendBaseUrl;
-const userUrl = `${host}/users`;
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +15,7 @@ export class UserService {
 
   public async getUser(userId: string) {
     try {
-      let response = await this.http.get<SingleUserResponse>(`${userUrl}/${userId}`).toPromise();
+      let response = await this.http.get<SingleUserResponse>(`${host}/users/${userId}`).toPromise();
       return response.result.user;
     } catch (err) {
       console.log(err);
@@ -26,7 +25,7 @@ export class UserService {
 
   public async updateUser(userData: IUser) {
     try {
-      let response = await this.http.put(`${userUrl}/${userData.id}`, userData).toPromise();
+      let response = await this.http.put(`${host}/users/${userData.id}`, userData).toPromise();
       return true;
     } catch (err) {
       console.log(err);

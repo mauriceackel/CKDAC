@@ -14,8 +14,6 @@ import { mappingPairsToTrans } from '../utils/mapping-pairs';
 import { ApiResponse } from '../utils/responses/api-response';
 
 const host = environment.backendBaseUrl;
-const mappingServiceUrl = `${host}/mappings`;
-const mappingGenerationUrl = `${mappingServiceUrl}/generate`;
 
 @Injectable({
   providedIn: 'root'
@@ -29,34 +27,34 @@ export class MappingService {
 
   // --------------- External Service Calls --------------- //
   public async getMappings(type?: MappingType): Promise<Array<IMapping>> {
-    const response = await this.httpClient.get<MappingResponse>(`${mappingServiceUrl}${type ? `?type=${type}` : ''}`).toPromise();
+    const response = await this.httpClient.get<MappingResponse>(`${host}/mappings${type ? `?type=${type}` : ''}`).toPromise();
 
     return response.result.mappings || [];
   }
 
   public async getMapping(mappingId: string): Promise<IMapping> {
-    const response = await this.httpClient.get<MappingResponse>(`${mappingServiceUrl}/${mappingId}`).toPromise();
+    const response = await this.httpClient.get<MappingResponse>(`${host}/mappings/${mappingId}`).toPromise();
 
     return response.result.mapping;
   }
 
   public async upsertMapping(mapping: Partial<IMapping>) {
     if (mapping.id) {
-      const response = await this.httpClient.put<ApiResponse>(`${mappingServiceUrl}/${mapping.id}`, mapping).toPromise();
+      const response = await this.httpClient.put<ApiResponse>(`${host}/mappings/${mapping.id}`, mapping).toPromise();
       return;
     }
 
-    const response = await this.httpClient.post<MappingResponse>(`${mappingServiceUrl}`, mapping).toPromise();
+    const response = await this.httpClient.post<MappingResponse>(`${host}/mappings`, mapping).toPromise();
     return;
   }
 
   public async deleteMapping(mappingId: string) {
-    const response = await this.httpClient.delete<ApiResponse>(`${mappingServiceUrl}/${mappingId}`).toPromise();
+    const response = await this.httpClient.delete<ApiResponse>(`${host}/mappings/${mappingId}`).toPromise();
     return;
   }
 
   public async generateMapping<T extends IOpenApiInterface | IAsyncApiInterface>(source: T, targets: { [key: string]: T }, direction?: MappingDirection): Promise<T extends IOpenApiInterface ? IOpenApiMapping : IAsyncApiMapping> {
-    const response = await this.httpClient.post<MappingResponse>(`${mappingGenerationUrl}`, {
+    const response = await this.httpClient.post<MappingResponse>(`${host}/mappings/generate`, {
       source,
       targets,
       direction
