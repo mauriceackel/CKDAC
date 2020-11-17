@@ -107,4 +107,8 @@ UserSchema.virtual('displayname').get(function (this: IUser): string {
     return `${this.firstname} ${this.lastname}`;
 });
 
+UserSchema.virtual('id').get(function (this: Document & IUser): string {
+    return this._id.toString();
+});
+
 export const User = model<IUser & Document, IUserModel>('User', UserSchema);

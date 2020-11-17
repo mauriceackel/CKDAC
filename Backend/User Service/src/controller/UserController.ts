@@ -6,9 +6,8 @@ import { ForbiddenError } from '../utils/errors/ForbiddenError';
 import { NoSuchElementError } from '../utils/errors/NoSuchElementError';
 import { ElementAlreadyExistsError } from '../utils/errors/ElementAlreadyExistsError';
 import { ApiResponse, ErrorResponse, SuccessResponse } from '../utils/responses/ApiResponse';
-import { UserResponse, MultiUserResponse, SingleUserResponse } from '../utils/responses/UserResponse';
+import { MultiUserResponse, SingleUserResponse } from '../utils/responses/UserResponse';
 import { userEndpoint } from '../config/Config';
-import { DocumentToObjectOptions } from 'mongoose';
 import { logger } from '../Service';
 
 const router: Router = Router();
@@ -27,6 +26,7 @@ async function createUser(req: Request, res: Response, next: NextFunction) {
         res.header('Location', `/${userEndpoint}/${user.id}`);
         response = new SuccessResponse(201);
     } catch (err) {
+        logger.error(err);
         if (err instanceof ElementAlreadyExistsError) {
             response = new ErrorResponse(409);
         } else {
@@ -53,6 +53,7 @@ async function getUsers(req: Request, res: Response, next: NextFunction) {
 
         response = new MultiUserResponse(200, undefined, users.map(u => u.toJSON({ claims: [...req.claims, ...(u.id === req.userId ? ['owner'] : [])] })));
     } catch (err) {
+        logger.error(err);
         response = new ErrorResponse(500);
     }
     res.status(response.Code).json(response);
@@ -69,12 +70,13 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
     try {
         const user = await UserService.getUserById(req.params.userId);
 
-        if (!getCondition(user.toObject(), req.userId)) {
+        if (!getCondition(user, req.userId)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
         response = new SingleUserResponse(200, undefined, user.toJSON({ claims: [...req.claims, ...(user.id === req.userId ? ['owner'] : [])] }));
     } catch (err) {
+        logger.error(err);
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
         } else {
@@ -98,7 +100,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
     try {
         const user = await UserService.getUserById(req.params.userId);
 
-        if (!updateCondition(user.toObject(), req.userId, userData)) {
+        if (!updateCondition(user, req.userId, userData)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
@@ -106,6 +108,7 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
 
         response = new SuccessResponse(200);
     } catch (err) {
+        logger.error(err);
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
         } else {
@@ -126,13 +129,14 @@ async function deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
         const user = await UserService.getUserById(req.params.userId);
 
-        if (!deleteCondition(user.toObject(), req.userId)) {
+        if (!deleteCondition(user, req.userId)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
         await UserService.deleteUser(req.params.userId);
         response = new SuccessResponse(204);
     } catch (err) {
+        logger.error(err);
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
         } else if (err instanceof ForbiddenError) {
