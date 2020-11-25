@@ -27,7 +27,7 @@ async function createApi(req: Request, res: Response, next: NextFunction) {
 
         const api = await ApiService.createApi(apiData);
 
-        response = new SingleApiResponse(200, undefined, api);
+        response = new SingleApiResponse(200, undefined, api.toJSON({ claims: [...req.claims, ...(api.createdBy === req.userId ? ['owner'] : [])] }));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);

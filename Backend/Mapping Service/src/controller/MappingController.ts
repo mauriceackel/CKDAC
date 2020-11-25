@@ -27,7 +27,7 @@ async function createMapping(req: Request, res: Response, next: NextFunction) {
 
         const mapping = await MappingService.createMapping(mappingData);
 
-        response = new SingleMappingResponse(200, undefined, mapping);
+        response = new SingleMappingResponse(200, undefined, mapping.toJSON({ claims: [...req.claims, ...(mapping.createdBy === req.userId ? ['owner'] : [])] }));
     } catch (err) {
         if (err instanceof NoSuchElementError) {
             response = new ErrorResponse(404);
