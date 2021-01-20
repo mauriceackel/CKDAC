@@ -30,6 +30,7 @@ environment:
   host: "0.0.0.0"
   port: 8080
   logPath: "./log"
+  tokenPath: "/etc/secrets-volume/access-token"
   storagePath: /tmp/adapter-generator
   apiKeySecret: secrets-api-keys-adapter-service
 

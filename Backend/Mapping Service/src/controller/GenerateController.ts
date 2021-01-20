@@ -23,7 +23,7 @@ async function generateMapping(req: Request, res: Response, next: NextFunction) 
 
         response = new SingleMappingResponse(200, undefined, mapping);
     } catch (err) {
-        response = new ErrorResponse(500);
+        response = new ErrorResponse(500, [err]);
     }
     res.status(response.Code).json(response);
 }

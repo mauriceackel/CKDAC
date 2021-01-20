@@ -29,6 +29,7 @@ environment:
   host: "0.0.0.0"
   port: 8080
   logPath: "./log"
+  tokenPath: "/etc/secrets-volume/access-token"
   apiKeySecret: secrets-api-keys-api-service
 
 database:

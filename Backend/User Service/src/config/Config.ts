@@ -7,7 +7,7 @@ export const DB_URL: string = process.env.DB_URL || "";
 export const DB_USER: string = process.env.DB_USER || "";
 export const DB_PW: string = process.env.DB_PW || "";
 
-export const ACCESS_TOKEN_PUB: Buffer = fs.readFileSync('/etc/secrets-volume/access-token/public-key');
+export const ACCESS_TOKEN_PUB: Buffer = fs.readFileSync(`${process.env.ACCESS_TOKEN_PATH || '/etc/secrets-volume/access-token'}/public-key`);
 
 export const API_KEY = process.env.API_KEY || "";
 

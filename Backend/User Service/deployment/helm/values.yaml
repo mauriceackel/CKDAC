@@ -36,6 +36,7 @@ environment:
   port: 8080
   minPwLength: 8
   logPath: "./log"
+  tokenPath: "/etc/secrets-volume/access-token"
   apiKeySecret: secrets-api-keys-user-service
 
 database:

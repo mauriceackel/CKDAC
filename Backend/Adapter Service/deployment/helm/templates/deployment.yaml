@@ -39,7 +39,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: access-token-keypair
-              mountPath: "/etc/secrets-volume/access-token"
+              mountPath: {{ .Values.environment.tokenPath }}
               readOnly: true
           env:
             - name: NODE_ENV
@@ -71,6 +71,8 @@ spec:
               value: {{ include "adapter-service.internalGatewayUrl" . }}
             - name: STORAGE_PATH
               value: {{ .Values.environment.storagePath }}
+            - name: ACCESS_TOKEN_PATH
+              value: {{ .Values.environment.tokenPath }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:

@@ -39,7 +39,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: access-token-keypair
-              mountPath: "/etc/secrets-volume/access-token"
+              mountPath: {{ .Values.environment.tokenPath }}
               readOnly: true
           env:
             - name: NODE_ENV
@@ -73,6 +73,8 @@ spec:
               value: {{ required "Password reset token TTL required" .Values.environment.passwordResetTokenTtl | quote }}
             - name: LOG_PATH
               value: {{ .Values.environment.logPath | quote }}
+            - name: ACCESS_TOKEN_PATH
+              value: {{ .Values.environment.tokenPath }}
             - name: AUTH_HOSTNAME
               value: {{ .Values.apiGateway.external.hostname }}
             - name: GATEWAY_INT_URL
