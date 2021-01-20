@@ -54,11 +54,15 @@ export class MappingService {
   }
 
   public async generateMapping<T extends IOpenApiInterface | IAsyncApiInterface>(source: T, targets: { [key: string]: T }, direction?: MappingDirection): Promise<T extends IOpenApiInterface ? IOpenApiMapping : IAsyncApiMapping> {
+    const start = Date.now();
     const response = await this.httpClient.post<MappingResponse>(`${host}/mappings/generate`, {
       source,
       targets,
       direction
     }).toPromise();
+    const end = Date.now();
+
+    console.log(end - start);
     return response.result.mapping as (T extends IOpenApiInterface ? IOpenApiMapping : IAsyncApiMapping);
   }
 
