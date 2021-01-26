@@ -1,0 +1,39 @@
+{
+  "name": "auth-service",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Maurice Ackel",
+  "main": "Service.js",
+  "dockerRepoPrefix": "mackel/ckdac-",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/Service.js",
+    "prestart": "npm run build",
+    "debug": "node --inspect ./bin/Service.js",
+    "predebug": "npm run build",
+    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-push": "docker push ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "open-cluster": "telepresence --mount=/tmp/tel_root --swap-deployment ${npm_package_name} --expose 8080 --method inject-tcp"
+  },
+  "dependencies": {
+    "axios": "^0.18.1",
+    "connect-timeout": "^1.9.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.1",
+    "express-session": "^1.15.6",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/connect-timeout": "0.0.34",
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.16.1",
+    "@types/node": "^11.11.0",
+    "@types/readline-sync": "^1.4.3",
+    "@typescript-eslint/eslint-plugin": "^2.10.0",
+    "@typescript-eslint/parser": "^2.10.0",
+    "eslint": "^6.7.2",
+    "eslint-config-google": "^0.14.0",
+    "readline-sync": "^1.4.9",
+    "typescript": "3.7.2"
+  }
+}
