@@ -1,6 +1,8 @@
+import { config } from "winston";
+import { MAPPINGS } from "../config/Config";
 import { logger } from "../Service";
 
-interface Mapping {
+export interface Mapping {
     host: string,
     hostRegex?: boolean,
     prefix: string,
@@ -15,35 +17,10 @@ interface Mapping {
     },
 }
 
-const mappings: Mapping[] = [
-    {
-        host: 'one.base-route.de',
-        prefix: '/foo',
-        target: 'full.target.de/path1',
-    },
-    {
-        host: 'one.base-route.de',
-        prefix: '/bar',
-        target: 'full.target.de/path2',
-    },
-    {
-        host: 'two.base-route.de',
-        prefix: '/x',
-        target: 'other.target.de/path3',
-    },
-    {
-        host: '.*\.ckdac\.com',
-        hostRegex: true,
-        bypassAuth: true,
-        prefix: '/api',
-        target: 'final.final.de/foobar',
-    },
-]
-
 export async function getRoutingTarget(hostname: string, path: string): Promise<{ bypassAuth: boolean, route: string } | undefined> {
     logger.info(`Searching for route for incoming request URL: ${hostname + path}`);
 
-    for (const mapping of mappings) {
+    for (const mapping of MAPPINGS) {
         const hostMatch = (!mapping.hostRegex && hostname === mapping.host) || (mapping.hostRegex && new RegExp(mapping.host).test(hostname));
 
         if (hostMatch) {
