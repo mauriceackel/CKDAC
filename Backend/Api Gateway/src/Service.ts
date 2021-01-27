@@ -2,6 +2,7 @@ import Express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import * as Config from './config/Config';
 import https from 'https';
+import http from 'http';
 import timeout from 'connect-timeout';
 import Winston, { format, transports, Logger } from 'winston';
 import { externalAuth } from './middleware/ExternalAuth';
@@ -20,7 +21,7 @@ export class Service {
         return this.instance || (this.instance = new this());
     }
 
-    private httpsServer?: https.Server;
+    private server?: https.Server | http.Server;
     private express: Application;
     private tlsCredentials: { key: string, cert: string };
 
@@ -48,13 +49,14 @@ export class Service {
             logger.info('Attempting start of api-gateway.');
 
             //Start http server
-            logger.info(`Trying to start https server at ${Config.HOST}:${Config.PORT}.`);
-            this.httpsServer = https.createServer(this.tlsCredentials, this.express).listen(Config.PORT, Config.HOST, (err: any) => {
+            logger.info(`Trying to start ${Config.SSL_ENABLED ? 'https' : 'http'} server at ${Config.HOST}:${Config.PORT}.`);
+            const srv = Config.SSL_ENABLED ? https.createServer(this.tlsCredentials, this.express) : http.createServer(this.express);
+            this.server = srv.listen(Config.PORT, Config.HOST, (err: any) => {
                 if (err) {
-                    logger.error('Https server creation failed: ', err);
+                    logger.error(`${Config.SSL_ENABLED ? 'Https' : 'Http'} server creation failed: `, err);
                     return process.exit(1);
                 }
-                return logger.info(`Https server creation successful. Listening on host ${Config.HOST}, port ${Config.PORT}.`);
+                return logger.info(`${Config.SSL_ENABLED ? 'Https' : 'Http'} server creation successful. Listening on host ${Config.HOST}, port ${Config.PORT}.`);
             });
 
             this.running = true;
@@ -71,10 +73,10 @@ export class Service {
 
             try {
                 //Stop http server if existing.
-                if (this.httpsServer) {
+                if (this.server) {
                     logger.info('Trying to stop https server.');
                     const httpPromise = new Promise<void>((resolve, reject) => {
-                        this.httpsServer!.close((err: any) => {
+                        this.server!.close((err: any) => {
                             if (err) {
                                 logger.error('Https server could not be stopped.');
                                 return reject(err);

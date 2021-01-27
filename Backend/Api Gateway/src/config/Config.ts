@@ -3,6 +3,7 @@ import fs from 'fs'
 export const PORT: number = Number.parseInt(process.env.PORT || "8443");
 export const HOST: string = process.env.HOST || "localhost";
 
+export const SSL_ENABLED: boolean = process.env.SSL_ENABLED === "true";
 export const TLS_KEY: string = fs.readFileSync(`${process.env.TLS_SECRETS_PATH || '/etc/secrets-volume/tls-secret'}/key`, 'utf8');
 export const TLS_CERT: string = fs.readFileSync(`${process.env.TLS_SECRETS_PATH || '/etc/secrets-volume/tls-secret'}/cert`, 'utf8');
 
