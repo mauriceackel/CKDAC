@@ -1,0 +1,8 @@
+version: 0.1
+env:
+  - name: ACCESS_TOKEN_PATH
+    value: $(volumeMounts:access-token-keypair)
+  - name: NODE_ENV
+    value: "development"
+  - name: DB_URL
+    value: mongodb://$(services:ckdac-database)/adapter-service
