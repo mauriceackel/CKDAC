@@ -63,14 +63,14 @@ async function getUsers(req: Request, res: Response, next: NextFunction) {
  * Get a specific user by his userId
  */
 router.get('/:userId', getUser)
-const getCondition = (user: IUser, userId: string) => user.id === userId;
+const getCondition = (user: IUser, userId: string, claims: string[]) => claims.includes('admin') || (user.id === userId);
 async function getUser(req: Request, res: Response, next: NextFunction) {
 
     let response: ApiResponse;
     try {
         const user = await UserService.getUserById(req.params.userId);
 
-        if (!getCondition(user, req.userId)) {
+        if (!getCondition(user, req.userId, req.claims)) {
             throw new ForbiddenError("Insufficient right, permission denied");
         }
 
