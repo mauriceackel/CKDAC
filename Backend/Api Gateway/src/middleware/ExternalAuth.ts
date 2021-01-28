@@ -6,7 +6,7 @@ import { logger } from "../Service";
 import { ErrorResponse } from "../utils/responses/ApiResponse";
 
 export async function externalAuth(req: Request, res: Response, next: NextFunction) {
-    const { headers, body } = req;
+    const { headers, body, method, originalUrl } = req;
 
     if(req.bypassAuth) {
         next();
@@ -15,15 +15,14 @@ export async function externalAuth(req: Request, res: Response, next: NextFuncti
     
     // Call auth service, pass headers and body
     try {
-        const authResponse = await axios.post(
-            `http://${Config.AUTH_SERVICE_URL}/`,
-            body,
-            { 
-                headers,
-                // Don't fail for return values we actually expect. This lets us only catch hard errors in catch
-                validateStatus: (status) => (status >= 200 && status < 300) || status === 401 || status === 403
-            }
-        );
+        const authResponse = await axios.request({
+            url:  `http://${Config.AUTH_SERVICE_URL}${originalUrl}`,
+            data: body,
+            method,
+            headers,
+            // Don't fail for return values we actually expect. This lets us only catch hard errors in catch
+            validateStatus: (status) => (status >= 200 && status < 300) || status === 401 || status === 403
+        });
 
         // Check auth result
         const { status, headers: authHeaders } = authResponse;
