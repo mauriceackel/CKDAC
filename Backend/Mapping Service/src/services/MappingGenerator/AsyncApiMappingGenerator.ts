@@ -180,11 +180,11 @@ function performMessageMapping(input: { [targetId: string]: { [key: string]: str
 
         //For each entry in the mapping, try to replace a key from the input with a value from the input
         for (const key in mapping) {
-            subresult[key] = mapping[key].replace(simpleRegex, (match) => input[targetIds[i]][match]);
-            subresult[key] = subresult[key].replace(extendedRegex, (match) => {
+            subresult[key] = mapping[key].replace(extendedRegex, (match) => {
                 const resultingKey = match.split('.').slice(1).map(v => v.slice(1, -1)).join('.')
                 return input[targetIds[i]][resultingKey];
             });
+            subresult[key] = subresult[key].replace(simpleRegex, (match) => input[targetIds[i]][match]);
         }
 
         result[targetIds[i]] = subresult;
