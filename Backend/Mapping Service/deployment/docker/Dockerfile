@@ -14,4 +14,4 @@ COPY --chown=node:node ./bin .
 
 EXPOSE 8080
 
-CMD [ "node", "Service.js" ]
+CMD [ "node", "--stack-size=10000", "Service.js" ]
