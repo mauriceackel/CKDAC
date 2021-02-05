@@ -65,6 +65,8 @@ spec:
                 secretKeyRef:
                   name: {{ required "Secret reference to api key required" .Values.environment.apiKeySecret }}
                   key: key
+            - name: AUTH_DETAILS_TOKEN_TTL
+              value: {{ .Values.environment.authDetailsTokenTtl }}
             - name: ACCESS_TOKEN_TTL
               value: {{ required "Access token TTL required" .Values.environment.accessTokenTtl | quote }}
             - name: REFRESH_TOKEN_TTL

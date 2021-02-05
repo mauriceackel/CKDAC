@@ -10,7 +10,7 @@ export const DB_PW: string = process.env.DB_PW || "";
 export const ACCESS_TOKEN_PUB: Buffer = fs.readFileSync(`${process.env.ACCESS_TOKEN_PATH || '/etc/secrets-volume/access-token'}/public-key`);
 export const ACCESS_TOKEN_PRIV: Buffer = fs.readFileSync(`${process.env.ACCESS_TOKEN_PATH || '/etc/secrets-volume/access-token'}/private-key`);
 
-export const AUTH_DETAILS_TOKEN_TTL: number = Number.parseInt(process.env.AUTH_DETAILS_TOKEN_TTL || "30000"); //30 sec
+export const AUTH_DETAILS_TOKEN_TTL: number = Number.parseInt(process.env.AUTH_DETAILS_TOKEN_TTL || "300000"); //5 min
 export const PW_TOKEN_TTL: number = Number.parseInt(process.env.PW_TOKEN_TTL || "120000"); //2 min
 export const ACCESS_TOKEN_TTL: number = Number.parseInt(process.env.ACCESS_TOKEN_TTL || "300000"); //5 min
 export const REFRESH_TOKEN_TTL: number = Number.parseInt(process.env.REFRESH_TOKEN_TTL || "3600000"); //1 h
