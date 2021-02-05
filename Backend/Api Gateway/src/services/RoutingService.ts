@@ -17,7 +17,7 @@ export interface Mapping {
     },
 }
 
-export async function getRoutingTarget(hostname: string, path: string): Promise<{ bypassAuth: boolean, route: string } | undefined> {
+export async function getRoutingTarget(hostname: string, path: string): Promise<{ bypassAuth: boolean, targetPath: string, targetHost: string } | undefined> {
     logger.info(`Searching for route for incoming request URL: ${hostname + path}`);
 
     for (const mapping of MAPPINGS) {
@@ -25,15 +25,20 @@ export async function getRoutingTarget(hostname: string, path: string): Promise<
 
         if (hostMatch) {
             if (path.startsWith(mapping.prefix)) {
-                let targetPath = path;
+                let rewrittenPath = path;
                 if (mapping.rewrite) {
                     // Replace first occurance
-                    targetPath = targetPath.replace(mapping.prefix, mapping.rewrite);
+                    rewrittenPath = rewrittenPath.replace(mapping.prefix, mapping.rewrite);
                 }
 
-                const route = mapping.target + targetPath
-                logger.info(`Found route "${route}" for incoming request URL "${hostname + path}"`);
-                return { bypassAuth: mapping.bypassAuth || false, route };
+                const route = mapping.target + rewrittenPath;
+
+                const seperatingIndex = route.indexOf('/', 8);
+                const targetHost = route.substr(0, seperatingIndex);
+                const targetPath = route.substr(seperatingIndex);
+
+                logger.info(`Found route "${targetHost + targetPath}" for incoming request URL "${hostname + path}"`);
+                return { bypassAuth: mapping.bypassAuth || false, targetHost, targetPath };
             }
         }
     }

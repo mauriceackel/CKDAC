@@ -8,7 +8,8 @@ declare global {
     namespace Express {
         interface Request {
             bypassAuth: boolean
-            targetRoute: string
+            targetPath: string
+            targetHost: string
         }
     }
 }
@@ -26,8 +27,9 @@ export async function targetLookup(req: Request, res: Response, next: NextFuncti
             return;
         }
 
-        const { bypassAuth, route: targetRoute } = routeData;
-        req.targetRoute = targetRoute;
+        const { bypassAuth, targetHost, targetPath } = routeData;
+        req.targetPath = targetPath;
+        req.targetHost = targetHost;
         req.bypassAuth = bypassAuth;
 
         next();
