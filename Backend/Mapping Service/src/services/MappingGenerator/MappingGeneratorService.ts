@@ -16,11 +16,20 @@ export async function generateMapping(source: IOperation, targets: { [key: strin
         throw new Error("Mapings can only be generated between mappings of the same type");
     }
 
+    const start = Date.now();
     switch (type) {
-        case ApiType.OPEN_API: return OpenApiGeneratorService.generateMapping(source as IOpenApiOperation, targets as { [key: string]: IOpenApiOperation });
+        case ApiType.OPEN_API: {
+            const result = OpenApiGeneratorService.generateMapping(source as IOpenApiOperation, targets as { [key: string]: IOpenApiOperation });
+            const end = Date.now();
+            console.log("Duration (ms):", end - start);
+            return result;
+        };
         case ApiType.ASYNC_API: {
             if (direction === undefined) throw new Error("Parameter 'direction' is mandatory for async api");
-            return AsyncApiGeneratorService.generateMapping(source as IAsyncApiOperation, targets as { [key: string]: IAsyncApiOperation }, direction);
+            const result = AsyncApiGeneratorService.generateMapping(source as IAsyncApiOperation, targets as { [key: string]: IAsyncApiOperation }, direction);
+            const end = Date.now();
+            console.log("Duration (ms):", end - start);
+            return result;
         }
         default: throw new Error("Unknown mapping type while building mapping");
     }
