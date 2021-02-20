@@ -1,0 +1,48 @@
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.main-page {
+  margin-top: 4rem;
+  min-height: calc(100vh - 4rem);
+}
+
+.content-page {
+  width: 100%;
+  max-width: 800px;
+}
+
+button:focus {
+  outline: none;
+}
+
+.button {
+  @apply px-4 py-2 rounded shadow-lg;
+}
+
+.input {
+  margin-bottom: 2px;
+  font-size: 16px;
+  @apply border rounded p-3 leading-tight w-full;
+}
+
+.input:focus {
+  border-bottom-width: 3px;
+  @apply outline-none mb-0 border-red-900;
+}
+
+.jsoneditor {
+  @apply border rounded;
+  @apply  border-gray-200 !important;
+}
+
+.jsoneditor-text {
+  @apply rounded p-1;
+}

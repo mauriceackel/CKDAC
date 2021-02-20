@@ -1,0 +1,78 @@
+{
+  "name": "order-with-james",
+  "description": "Order and pay digitally with James!",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@hookform/resolvers": "^1.3.2",
+    "axios": "^0.21.1",
+    "fast-deep-equal": "^3.1.3",
+    "file-saver": "^2.0.5",
+    "jsoneditor": "^9.1.10",
+    "jsoneditor-react": "^3.1.0",
+    "jwt-decode": "^3.1.2",
+    "react": "^16.13.0",
+    "react-collapse": "^5.1.0",
+    "react-dom": "^16.13.0",
+    "react-dropdown": "^1.9.2",
+    "react-hook-form": "^6.14.2",
+    "react-markdown": "^5.0.3",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "4.0.1",
+    "react-select": "^4.1.0",
+    "react-tiny-popover": "^6.0.4",
+    "yup": "^0.32.8"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "cypress": "cypress open --config-file cypress/cypress.json",
+    "format": "prettier --write src/**/*.ts{,x}",
+    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@craco/craco": "^6.0.0",
+    "@types/file-saver": "^2.0.1",
+    "@types/node": "^12.12.24",
+    "@types/react": "^16.9.17",
+    "@types/react-collapse": "^5.0.0",
+    "@types/react-dom": "^16.9.4",
+    "@types/react-router": "^5.1.4",
+    "@types/react-router-dom": "^5.1.3",
+    "@types/react-select": "^4.0.13",
+    "@typescript-eslint/eslint-plugin": "^4.14.0",
+    "@typescript-eslint/parser": "^4.14.0",
+    "autoprefixer": "^10.2.3",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-typescript": "^12.0.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-cypress": "^2.11.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.3",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "postcss": "^8.2.4",
+    "postcss-cli": "^8.3.1",
+    "prettier": "^2.2.1",
+    "tailwindcss": "^2.0.2",
+    "typescript": "3.8.3"
+  }
+}
