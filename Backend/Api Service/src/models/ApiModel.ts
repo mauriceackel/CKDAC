@@ -1,7 +1,6 @@
 import { model, Model, Schema } from "mongoose";
 import { Document } from "../utils/interfaces/Document";
 import { IDocumentToObjectOptions } from "../utils/interfaces/IDocumentToObjectOptions";
-import { IJSONifyable } from "../utils/interfaces/IJSONifyable";
 
 export enum ApiType {
     OPEN_API, ASYNC_API
@@ -37,7 +36,7 @@ const ApiSchema = new Schema({
             required: false
         },
         keywords: {
-            type: [String],
+            type: String,
             required: false
         }
     },

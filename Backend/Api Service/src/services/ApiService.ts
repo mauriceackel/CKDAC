@@ -24,11 +24,15 @@ export async function createApi(apiData: IApi): Promise<IApi & Document> {
     }
 }
 
-export async function getApi(apiId: string): Promise<IApi & Document> {
+export async function getApi(apiId: string, onlyMetaData: boolean = false): Promise<IApi & Document> {
     logger.info(`Trying to retrieve api with id ${apiId}`);
 
     try {
-        const api = await Api.findById(apiId);
+        let query = Api.findById(apiId);
+        if (onlyMetaData) {
+            query = query.select('-apiSpec');
+        }
+        const api = await query;
         if (api !== null) {
             return api;
         } else {
@@ -40,11 +44,23 @@ export async function getApi(apiId: string): Promise<IApi & Document> {
     }
 }
 
-export async function getApis(type?: ApiType): Promise<Array<IApi & Document>> {
+export async function getApis(type?: ApiType, onlyMetaData: boolean = false, createdBy?: string): Promise<Array<IApi & Document>> {
     logger.info(`Trying to retrieve all apis${type ? ` with type ${type}` : ''}`);
 
     try {
-        const apis = await Api.find(type ? { type } : {});
+        const filter: { type?: ApiType, createdBy?: string } = {};
+        if(type !== undefined) {
+            filter.type = type;
+        }
+        if(createdBy !== undefined) {
+            filter.createdBy = createdBy;
+        }
+
+        let query = Api.find(filter);
+        if (onlyMetaData) {
+            query = query.select('-apiSpec');
+        }
+        const apis = await query;
         return apis || [];
     } catch (err) {
         logger.error(`Error while retrieving all apis${type ? ` with type ${type}` : ''} from database: `, err);

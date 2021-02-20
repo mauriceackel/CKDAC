@@ -4,7 +4,7 @@ import { NoSuchElementError } from '../utils/errors/NoSuchElementError';
 import { ApiResponse, ErrorResponse, SuccessResponse } from '../utils/responses/ApiResponse';
 import * as ApiService from '../services/ApiService'
 import { ForbiddenError } from '../utils/errors/ForbiddenError';
-import { IApi } from '../models/ApiModel';
+import { ApiType, IApi } from '../models/ApiModel';
 import { MultiApiResponse, SingleApiResponse } from '../utils/responses/ApiDataResponse';
 
 //Reference to express
@@ -49,7 +49,12 @@ async function getApis(req: Request, res: Response, next: NextFunction) {
 
     let response: ApiResponse;
     try {
-        const apis = await ApiService.getApis(req.query.type);
+
+        const onlyMetaData: boolean = req.query.onlyMetaData === 'true';
+        const apiType: ApiType | undefined = req.query.type !== undefined ? Number.parseInt(req.query.type) : undefined;
+        const createdBy: string | undefined = req.query.createdBy;
+        
+        const apis = await ApiService.getApis(apiType, onlyMetaData, createdBy);
 
         if (apis.some(api => !listCondition(api.toObject(), req.userId))) {
             throw new ForbiddenError("Insufficient right, permission denied");
@@ -77,7 +82,8 @@ async function getApi(req: Request, res: Response, next: NextFunction) {
 
     let response: ApiResponse;
     try {
-        const api = await ApiService.getApi(req.params.apiId);
+        const onlyMetaData: boolean = req.query.onlyMetaData === 'true';
+        const api = await ApiService.getApi(req.params.apiId, onlyMetaData);
 
         if (!getCondition(api.toObject(), req.userId)) {
             throw new ForbiddenError("Insufficient right, permission denied");
