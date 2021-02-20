@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { NextFunction } from 'connect'
-import { IUser } from '../models/UserModel';
+import { IUser, UserType } from '../models/UserModel';
 import * as RegisterService from '../services/RegisterService';
 import * as TokenService from '../services/TokenService';
 import { NoSuchElementError } from '../utils/errors/NoSuchElementError';
@@ -17,6 +17,7 @@ const router: Router = Router();
 router.post('/', registerUser);
 async function registerUser(req: Request, res: Response, next: NextFunction) {
     let userData = req.body as IUser;
+    userData.type = UserType.STANDARD;
 
     let response: ApiResponse;
     try {
