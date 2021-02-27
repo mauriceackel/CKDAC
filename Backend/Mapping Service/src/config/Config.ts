@@ -16,3 +16,4 @@ export const LOG_PATH: string = process.env.LOG_PATH || "";
 //All REST API endpoints are specified here
 export const mappingEndpoint: string = "mappings";
 export const generateEndpoint: string = `${mappingEndpoint}/generate`;
+export const operationsEndpoint: string = `${mappingEndpoint}/mapped-operations`;

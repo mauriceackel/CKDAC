@@ -1,4 +1,6 @@
-import { IMapping } from "../models/MappingModel";
+import { Document } from "mongoose";
+import { ApiType } from "../models/ApiModel";
+import { IMapping, Mapping, MappingDirection } from "../models/MappingModel";
 
 export type Tree<T> = { node: T, children?: Tree<T>[] }
 
@@ -13,11 +15,12 @@ export type Tree<T> = { node: T, children?: Tree<T>[] }
    * @param mappings A list of all existing mappings
    * @param visitedApis A list of APIs (i.e. vertices) that were already visited
    */
-export function treeSearch<T extends IMapping>(sourceId: string, finalTragetId: string, mappings: { [key: string]: T[] }, visitedApis: Array<string> = []): Tree<T>[] {
+export async function treeSearch(apiType: ApiType, sourceId: string, finalTragetId: string, direction: MappingDirection | undefined, visitedApis: Array<string> = []): Promise<Tree<IMapping & Document>[]> {
     //From all mappings, get the ones that match the source ID and that have not yet been visited
-    const sources = mappings[sourceId] || [];
+    const query = apiType === ApiType.ASYNC_API ? { apiType: apiType, direction, sourceId: sourceId } : { apiType: apiType, sourceId: sourceId };
+    const sources = await Mapping.find(query);
 
-    const result: Tree<T>[] = [];
+    const result: Tree<IMapping & Document>[] = [];
     //This double loop makes it so that each 1:n mapping is treated somewhat like a 1:1 mapping
     for (let i = 0; i < sources.length; i++) {
         const source = sources[i];
@@ -29,7 +32,7 @@ export function treeSearch<T extends IMapping>(sourceId: string, finalTragetId: 
                 result.push({ node: source });
             } else if (!(visitedApis.includes(targetId) || sourceId === targetId)) {
                 //If the target ID does not yet match the final target, we execute the recursion step, resulting in a DFS
-                const children = treeSearch(targetId, finalTragetId, mappings, [...visitedApis, sourceId]);
+                const children = await treeSearch(apiType, targetId, finalTragetId, direction, [...visitedApis, sourceId]);
                 //We only add a node to the final tree, if we have found any children that lead to the target. If not, we ignore this branch.
                 //This makes it so that in the final tree all leafs end in the target API
                 if (children.length > 0) {

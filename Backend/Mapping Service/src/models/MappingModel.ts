@@ -23,6 +23,17 @@ export interface IMapping {
     targetIds: string[]
 }
 
+export enum MappingPairType {
+    MANUAL, ATTRIBUTE, MAPPING, SYNTAX
+}
+
+export interface IMappingPair {
+    creationType: MappingPairType
+    providedAttributeIds: string[]
+    requiredAttributeId: string
+    mappingTransformation: string
+}
+
 export interface IMappingModel extends Model<IMapping & Document> {
 }
 
@@ -157,3 +168,46 @@ const OpenApiMappingSchema = new Schema({
 });
 OpenApiMappingSchema.pre('validate', buildOpenApiChecksum);
 export const OpenApiMapping = Mapping.discriminator<IOpenApiMapping & Document>('OpenApiMapping', OpenApiMappingSchema);
+
+
+/// -------- Attribute Mapping ---------- ///
+export interface IAttributeNode {
+    attributeId: string
+    component: string[]
+    edges: IAttributeEdge[]
+}
+
+export interface IAttributeEdge {
+    source: string;
+    target: string;
+    transformation: string;
+}
+
+const AttributeNodeSchema = new Schema({
+    attributeId: {
+        type: String,
+        required: true
+    },
+    component: {
+        type: [String],
+        required: true
+    },
+    edges: {
+        type: [{
+            source: {
+                type: String,
+                required: true
+            },
+            target: {
+                type: String,
+                required: true
+            },
+            transformation: {
+                type: String,
+                required: true
+            },
+        }],
+        required: true
+    }
+});
+export const AttributeNode = model<IAttributeNode & Document>('AttributeNode', AttributeNodeSchema);

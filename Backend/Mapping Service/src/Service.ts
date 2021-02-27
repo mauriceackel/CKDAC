@@ -8,6 +8,7 @@ import Winston, { format, transports, Logger } from 'winston';
 import { ErrorResponse } from './utils/responses/ApiResponse';
 import MappingController from './controller/MappingController';
 import GenerateController from './controller/GenerateController';
+import OperationController from './controller/OperationController';
 import { getAuthDetails } from './middleware/Auth';
 import { getDatabaseUrl } from './utils/databaseUrl';
 
@@ -177,6 +178,7 @@ export class Service {
 
             //Register controllers
             this.express.use(`/${Config.generateEndpoint}`, GenerateController);
+            this.express.use(`/${Config.operationsEndpoint}`, OperationController);
             this.express.use(`/${Config.mappingEndpoint}`, MappingController);
 
             // Catch all other routes and return the index file

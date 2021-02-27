@@ -1,79 +1,25 @@
 import { ApiType } from "../../models/ApiModel";
 import { flatten, unflatten } from "flat";
-import { IOpenApiMapping, MappingType } from "../../models/MappingModel";
+import { IMapping, IMappingPair, IOpenApiMapping, MappingType } from "../../models/MappingModel";
 import { IOpenApiOperation } from "../../models/OperationModel";
-import * as MappingService from "../MappingService";
 import { Tree, treeSearch } from "../../utils/tree-search";
 import { getSourceResponseBody, getTargetRequestBodies } from "../../utils/body-helpers";
 import { operatorsRegex } from "../../utils/jsonata-helpers";
+import { transToMappingPairs } from "../../utils/jsonata-to-mapping-pairs";
+import { Document } from "mongoose";
 const getinputs = require('../../utils/get-inputs/get-inputs');
 
 type ParsedOpenApiMapping = Omit<IOpenApiMapping, "requestMapping" | "responseMapping"> & { requestMapping: { [key: string]: string }, requestMappingInputKeys: { [key: string]: string[] }, responseMapping: { [key: string]: string }, responseMappingInputKeys: { [key: string]: string[] } }
-type OpenApiTree = Tree<ParsedOpenApiMapping>;
 
 
-export async function generateMapping(source: IOpenApiOperation, targets: { [key: string]: IOpenApiOperation }): Promise<IOpenApiMapping> {
+export async function generateMapping(source: IOpenApiOperation, targets: { [key: string]: IOpenApiOperation }): Promise<{ request: IMappingPair[], response: IMappingPair[]}> {
     const sourceId = `${source.api.id}_${source.operationId}_${source.responseId}`;
     const targetIds = Object.keys(targets);
 
-    const mappings: { [key: string]: ParsedOpenApiMapping[] } = (await MappingService.getMappings({ apiType: ApiType.OPEN_API })).reduce((obj, m) => {
-        const mapping = m.toObject() as IOpenApiMapping;
-        const flatRequestMapping: { [key: string]: string } = flatten(JSON.parse(mapping.requestMapping));
-
-        const requestMapping: { [key: string]: string } = {};
-        const requestMappingInputKeys: { [key: string]: string[] } = {};
-        for (const key in flatRequestMapping) {
-            const value = flatRequestMapping[key];
-            requestMapping[key] = operatorsRegex.test(value) ? `(${value})` : value;
-            requestMappingInputKeys[key] = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
-        }
-
-        const flatResponseMapping: { [key: string]: string } = flatten(JSON.parse(mapping.responseMapping));
-
-        const responseMapping: { [key: string]: string } = {};
-        const responseMappingInputKeys: { [key: string]: string[] } = {};
-
-        const mappingPointsToTarget = targetIds.some(tId => mapping.targetIds.includes(tId));
-        if (mappingPointsToTarget) {
-            for (const key in flatResponseMapping) {
-                const value = flatResponseMapping[key];
-                const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
-
-                responseMappingInputKeys[key] = inputs;
-
-                if (inputs.every(input => targetIds.some(tId => input.indexOf(tId) === 0))) {
-                    responseMapping[key] = operatorsRegex.test(value) ? `(${value})` : value;
-                }
-            }
-        } else {
-            for (const key in flatResponseMapping) {
-                const value = flatResponseMapping[key];
-                responseMappingInputKeys[key] = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
-                responseMapping[key] = operatorsRegex.test(value) ? `(${value})` : value;
-            }
-        }
-
-        const parsedMapping: ParsedOpenApiMapping = {
-            ...mapping,
-            requestMapping,
-            requestMappingInputKeys,
-            responseMapping,
-            responseMappingInputKeys
-        };
-
-        return {
-            ...obj,
-            [parsedMapping.sourceId]: [...(obj[parsedMapping.sourceId] || []), parsedMapping]
-        }
-    }, {} as { [key: string]: ParsedOpenApiMapping[] });
-
     //For each of the target APIs, create trees that start at the source API and end at the specific target API.
     //Finally, flat-map all those trees into one array
-    let mappingTrees: OpenApiTree[] = [];
-    for (let i = 0; i < targetIds.length; i++) {
-        const result = treeSearch(sourceId, targetIds[i], mappings) as OpenApiTree[];
-        mappingTrees = [...mappingTrees, ...result];
-    }
+    const rawMappingTrees = await Promise.all(targetIds.map((targetId) => treeSearch(ApiType.OPEN_API, sourceId, targetId, undefined)));
+    const mappingTrees = rawMappingTrees.flatMap((trees) => trees);
 
     let responseMapping: { [key: string]: string } = {};
     let requestMapping: { [key: string]: string } = {};
@@ -85,7 +31,7 @@ export async function generateMapping(source: IOpenApiOperation, targets: { [key
 
     //Now we build the final mappings by executing each identified mapping tree. The results get merged together into one request and response mapping.
     for (let i = 0; i < mappingTrees.length; i++) {
-        const { requestMapping: reqMap, responseMapping: resMap, break: breakLoop } = executeMappingTree(mappingTrees[i], requiredSourceKeys, requiredTargetKeys);
+        const { requestMapping: reqMap, responseMapping: resMap, break: breakLoop } = executeMappingTree(mappingTrees[i], targetIds, requiredSourceKeys, requiredTargetKeys);
         responseMapping = { ...responseMapping, ...resMap };
         requestMapping = { ...requestMapping, ...reqMap };
         if (breakLoop) break;
@@ -102,15 +48,67 @@ export async function generateMapping(source: IOpenApiOperation, targets: { [key
     responseMapping = unflatten(responseMapping);
 
     return {
-        id: 'automatically-generated',
-        apiType: ApiType.OPEN_API,
-        createdBy: 'automatically-generated',
-        sourceId: `${source.api.id}_${source.operationId}_${source.responseId}`,
-        targetIds: Object.keys(targets),
-        type: MappingType.AUTO,
-        requestMapping: JSON.stringify(requestMapping),
-        responseMapping: JSON.stringify(responseMapping)
+        request: transToMappingPairs(requestMapping),
+        response: transToMappingPairs(responseMapping)
     }
+}
+
+function parseOpenApiMapping(m: IMapping & Document, targetIds: string[]): ParsedOpenApiMapping {
+    const mapping = m.toObject() as IOpenApiMapping;
+    
+    // Request mapping
+    const flatRequestMapping: { [key: string]: string } = flatten(JSON.parse(mapping.requestMapping));
+
+    const requestMapping: { [key: string]: string } = {};
+    const requestMappingInputKeys: { [key: string]: string[] } = {};
+    for (const key in flatRequestMapping) {
+        const value = flatRequestMapping[key];
+        const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
+
+        if (inputs.length === 0) {
+            // ignore mappings with static values
+            continue;
+        }
+
+        // Escape mappings that have operators in them
+        requestMapping[key] = operatorsRegex.test(value) ? `(${value})` : value;
+        // Extract used keys of mapping
+        requestMappingInputKeys[key] = inputs;
+    }
+
+    // Response mapping
+    const flatResponseMapping: { [key: string]: string } = flatten(JSON.parse(mapping.responseMapping));
+
+    const responseMapping: { [key: string]: string } = {};
+    const responseMappingInputKeys: { [key: string]: string[] } = {};
+
+    const mappingPointsToTarget = targetIds.some(tId => mapping.targetIds.includes(tId));
+    for (const key in flatResponseMapping) {
+        const value = flatResponseMapping[key];
+        const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
+
+        if (inputs.length === 0) {
+            // Ignore static mappings
+            continue;
+        }
+
+        responseMappingInputKeys[key] = inputs;
+
+        // If the mapping is 1:n, filter out all targets that do not belong to the selected targets 
+        if (!mappingPointsToTarget || inputs.every(input => targetIds.some(tId => input.indexOf(tId) === 0))) {
+            responseMapping[key] = operatorsRegex.test(value) ? `(${value})` : value;
+        }
+    }
+
+    const parsedMapping: ParsedOpenApiMapping = {
+        ...mapping,
+        requestMapping,
+        requestMappingInputKeys,
+        responseMapping,
+        responseMappingInputKeys
+    };
+
+    return parsedMapping;
 }
 
 /**
@@ -121,8 +119,10 @@ export async function generateMapping(source: IOpenApiOperation, targets: { [key
   * @param targetIds The IDs of all target APIs, required for filtering
   * @param requestInput The processed request mapping so far (required, as it needs to be passed downards the tree)
   */
-function executeMappingTree(mappingTree: OpenApiTree, requiredSourceKeys: string[], requiredTargetKeys: string[], requestInput?: { [key: string]: string }): { responseMapping: { [key: string]: string }, requestMapping: { [key: string]: string }, break?: boolean } {
+function executeMappingTree(mappingTree: Tree<IMapping & Document>, targetIds: string[], requiredSourceKeys: string[], requiredTargetKeys: string[], requestInput?: { [key: string]: string }): { responseMapping: { [key: string]: string }, requestMapping: { [key: string]: string }, break?: boolean } {
     const { node, children } = mappingTree;
+
+    const parsedMapping = parseOpenApiMapping(node, targetIds);
 
     //The request mapping that is passed back from the leafs to the root
     let requestMapping = {};
@@ -131,23 +131,23 @@ function executeMappingTree(mappingTree: OpenApiTree, requiredSourceKeys: string
 
     if (requestInput === undefined) {
         //If it is the first step and request input is undefined, we set the first request mapping as input
-        newRequestInput = node.requestMapping;
+        newRequestInput = parsedMapping.requestMapping;
     } else {
         //If there is already a request input set, we apply the current mapping on the input
-        newRequestInput = performRequestMapping(requestInput, node.requestMapping);
+        newRequestInput = performRequestMapping(requestInput, parsedMapping.requestMapping);
     }
 
     //The combined input (i.e. mappings) from all children
     if (children === undefined) {
         //Current element is a leaf, so we use the response mapping as an input
         //We don't need to sanitize the response mapping here, because we already remove all mappings that point to 3rd APIs when we parse the mapping
-        return { responseMapping: node.responseMapping, requestMapping: newRequestInput };
+        return { responseMapping: parsedMapping.responseMapping, requestMapping: newRequestInput };
     }
 
     let responseInput: { [key: string]: string } = {};
     //Current element is not a leaf, so we continue the recursion
     for (let i = 0; i < children.length; i++) {
-        const result = executeMappingTree(children[i], requiredSourceKeys, requiredTargetKeys, newRequestInput);
+        const result = executeMappingTree(children[i], targetIds, requiredSourceKeys, requiredTargetKeys, newRequestInput);
         if (result.break) {
             return result;
         }
@@ -163,7 +163,7 @@ function executeMappingTree(mappingTree: OpenApiTree, requiredSourceKeys: string
     }
 
     //Finally, we apply the current response mapping the the response input (i.e. the merged inputs from all children)
-    const responseMapping = performResponseMapping(responseInput, node.responseMapping, node.responseMappingInputKeys);
+    const responseMapping = performResponseMapping(responseInput, parsedMapping.responseMapping, parsedMapping.responseMappingInputKeys);
 
     const providedSourceKeys = Object.keys(responseMapping);
     const providedTargetKeys = Object.keys(requestMapping);
@@ -190,7 +190,7 @@ function executeMappingTree(mappingTree: OpenApiTree, requiredSourceKeys: string
  */
 function performResponseMapping(input: { [key: string]: string }, mapping: { [key: string]: string }, mappingInputKeys: { [key: string]: string[] }) {
     const inputKeys = Object.keys(input);
-    const simpleRegex = new RegExp(inputKeys.join('|'), 'g');
+    const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
     const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
     const extendedRegex = new RegExp(extendedInputKeys.join('|'), 'g');
 
@@ -228,7 +228,7 @@ function performResponseMapping(input: { [key: string]: string }, mapping: { [ke
  */
 function performRequestMapping(input: { [key: string]: string }, mapping: { [key: string]: string }) {
     const inputKeys = Object.keys(input);
-    const simpleRegex = new RegExp(inputKeys.join('|'), 'g');
+    const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
     const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
     const extendedRegex = new RegExp(extendedInputKeys.join('|'), 'g');
 

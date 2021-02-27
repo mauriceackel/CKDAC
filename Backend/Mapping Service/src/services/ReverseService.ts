@@ -1,7 +1,9 @@
-import { IAsyncApiMapping, IMapping, IOpenApiMapping, MappingType } from "../models/MappingModel";
+import { IAsyncApiMapping, IAttributeEdge, IMapping, IOpenApiMapping, MappingType } from "../models/MappingModel";
 import { flatten, unflatten } from 'flat';
 import { buildJSONataKey } from "../utils/jsonata-helpers";
 import { ApiType } from "../models/ApiModel";
+import jsonata from 'jsonata';
+const getinputs = require('../utils/get-inputs/get-inputs');
 
 /**
    * Creates a symmetrical, "reversed" mapping for a mapping that is about to be stored in the database.
@@ -23,8 +25,8 @@ function buildOpenApiReverseMappings(mapping: Omit<IOpenApiMapping, "id">): Arra
         targetIds: [mapping.sourceId],
         createdBy: mapping.createdBy,
         type: MappingType.REVERSE,
-        requestMapping: reverseTransformation([targetId, mapping.sourceId], mapping.requestMapping),
-        responseMapping: reverseTransformation([targetId, mapping.sourceId], mapping.responseMapping)
+        requestMapping: revertTransformationObject([targetId, mapping.sourceId], mapping.requestMapping),
+        responseMapping: revertTransformationObject([targetId, mapping.sourceId], mapping.responseMapping)
     }));
 }
 
@@ -47,7 +49,7 @@ function buildAsyncApiReverseMappings(mapping: Omit<IAsyncApiMapping, "id">): Ar
                 [mapping.sourceId]: mapping.servers.source
             }
         },
-        messageMappings: { [mapping.sourceId]: reverseTransformation([targetId, mapping.sourceId], mapping.messageMappings[targetId]) },
+        messageMappings: { [mapping.sourceId]: revertTransformationObject([targetId, mapping.sourceId], mapping.messageMappings[targetId]) },
         direction: mapping.direction
     }));
 }
@@ -58,31 +60,130 @@ function buildAsyncApiReverseMappings(mapping: Omit<IAsyncApiMapping, "id">): Ar
    * @param prefixes The relevant source and or target IDs, used to filter out mappings
    * @param transformation The JSONata mapping that should be reverted
    */
-function reverseTransformation(prefixes: string[], transformation: string): string {
+function revertTransformationObject(prefixes: string[], transformation: string): string {
     //Flatten out the parsed JSONata transformation
     const transformationObject: { [key: string]: string } = flatten(JSON.parse(transformation));
 
     //Loop over each entry in the JSONata mapping
     const reversedMapping = Object.entries(transformationObject).reduce((reversed, [key, value]) => {
-        const simple = value.match(/(^\$(\."(\w|-)+")+$)|(^(\w|\.)*$)/g) && !(value === "true" || value === "false" || !Number.isNaN(Number.parseFloat(value)));
+        // Don't allow transformations that use more than one attribute as input
+        const keys = getinputs(value).getInputs({}) as string[];
+        if(keys.length !== 1) return reversed;
+
+        // If the used key is not in the relevant keys (i.e prefixes), skip
+        const relevant = prefixes.some(p => keys[0].startsWith(p)) && prefixes.some(p => key.startsWith(p));
+        if (!relevant) return reversed;
+        
+        const [simple] = isSimple(jsonata(value).ast());
         if (!simple) return reversed;
 
-        //Deconstruct escaped keys
-        if (value.startsWith('$')) {
-            value = value.split('.').slice(1).map(v => v.slice(1, -1)).join('.')
-        }
-        //The mapping is only relevant if both that key and the value side of the mapping refer to an API inside the prefixes
-        const relevant = prefixes.some(p => key.startsWith(p)) && prefixes.some(p => value.startsWith(p));
-        //A mapping is only simple, if it containes no logic at all so it simply maps one key to another one
-        //We only revert mapping entries that are simpel and relevant
-        if (!relevant) return reversed;
-
+        const reverted = revertSingleTransformation(buildJSONataKey(key.split('.')), value);
+        // TODO: Test if this works or has to be escaped somehow
         return {
             ...reversed,
-            [value]: buildJSONataKey(key.split('.')),
+            [keys[0]]: reverted,
         }
 
     }, {});
 
     return JSON.stringify(unflatten(reversedMapping));
+}
+
+// All allowed operands in a simple mapping including their reverse operation
+const REVERSE = {
+    '+': '-',
+    '-': '+',
+    '*': '/',
+    '/': '*',
+}
+
+// Checks if the mapping transformation is simple,
+// meaning that it may only be a number or a path
+// or any combination of the two using the allowed operators
+// Returns [isSimple, hasPathReference]
+export function isSimple(ast: any): [boolean, boolean] {
+    switch (ast.type) {
+        case 'number': return [true, false];
+        case 'path': return [true, true];
+        case 'block': {
+            if (ast.expressions.length > 1) {
+                return [false, false];
+            }
+            return isSimple(ast.expressions[0]);
+        };
+        case 'unary': {
+            if (ast.value === '-') {
+                return isSimple(ast.expression);
+            }
+            return [false, false];
+        };
+        case 'binary': {
+            if (!Object.keys(REVERSE).includes(ast.value)) {
+                return [false, false];
+            }
+            const [simpleLeft, pathLeft] = isSimple(ast.lhs);
+            const [simpleRight, pathRight] = isSimple(ast.rhs);
+            return [simpleLeft && simpleRight && !(pathLeft && pathRight), pathLeft || pathRight];
+        };
+        default: return [false, false];
+    }
+}
+
+export function revertEdge(edge: IAttributeEdge): IAttributeEdge {
+    return {
+        source: edge.target,
+        target: edge.source,
+        transformation: revertSingleTransformation(buildJSONataKey(edge.target.split('.')), edge.transformation)
+    };
+}
+
+// Reverts a transformation including basic arithmetics
+// AttributeId is the id of the providing attribute
+// i.e. <attributeId> = some.path + 10 -> some.path = attributeId - 10
+function revertSingleTransformation(attributeId: string, transformation: string): string {
+    let ast: { [key: string]: any, value: keyof typeof REVERSE } | undefined = jsonata(transformation).ast();
+    let newAst: any = { type: 'path', steps: attributeId.split('.') };
+
+    while (ast !== undefined) {
+      switch (ast.type) {
+        case 'binary': {
+          const leftHasPath = isSimple(ast.lhs)[1];
+          if (leftHasPath) {
+            newAst = { type: 'binary', value: REVERSE[ast.value], lhs: newAst, rhs: ast.rhs };
+            ast = ast.lhs;
+          } else {
+            newAst = { type: 'binary', value: REVERSE[ast.value], lhs: newAst, rhs: ast.lhs };
+            ast = ast.rhs;
+          }
+        }; break;
+        case 'unary': {
+          newAst = { type: 'unary', value: REVERSE[ast.value], expression: newAst };
+          ast = ast.expression;
+        }; break;
+        case 'block': {
+          ast = ast.expressions[0];
+        }; break;
+        case 'path': {
+          ast = undefined;
+        }
+      }
+    }
+
+    return stringifyAst(newAst);
+}
+
+function stringifyAst(ast: any): string {
+    switch (ast.type) {
+        case 'binary': return `(${stringifyAst(ast.lhs)} ${ast.value} ${stringifyAst(ast.rhs)})`;
+        case 'unary': {
+            if (ast.value === '+') {
+                return stringifyAst(ast.expression);
+            }
+            return `${ast.value}(${stringifyAst(ast.expression)})`
+        };
+        case 'path': return `${ast.steps.join('.')}`;
+        case 'number': return ast.value;
+        case 'block': return `(${stringifyAst(ast.expressions[0])})`;
+        default: return '';
+    }
 }

@@ -2,6 +2,8 @@ import { IAsyncApiOperation, IOpenApiOperation } from "../models/OperationModel"
 import { getMessageSchema } from "./asyncapi-parser";
 import { getResponseSchema, getRequestSchema } from "./swagger-parser";
 
+
+// Special helpers for the use in the transitive mapping generators. Not for general use.
 export async function getSourceResponseBody(source: IOpenApiOperation) {
     const { api: srcApi, ...srcOperation } = source;
     return {

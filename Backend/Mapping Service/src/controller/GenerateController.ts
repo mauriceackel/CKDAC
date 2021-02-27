@@ -5,6 +5,7 @@ import * as GeneratorService from '../services/MappingGenerator/MappingGenerator
 import { SingleMappingResponse } from '../utils/responses/MappingResponse';
 import { MappingDirection } from '../models/MappingModel';
 import { IOperation } from '../models/OperationModel';
+import { MappingGenerationResponse } from '../utils/responses/MappingGenerationResponse';
 
 //Reference to express
 const router: Router = Router();
@@ -21,7 +22,7 @@ async function generateMapping(req: Request, res: Response, next: NextFunction) 
     try {
         const mapping = await GeneratorService.generateMapping(source, targets, direction);
 
-        response = new SingleMappingResponse(200, undefined, mapping);
+        response = new MappingGenerationResponse(200, undefined, mapping);
     } catch (err) {
         response = new ErrorResponse(500, [err]);
     }

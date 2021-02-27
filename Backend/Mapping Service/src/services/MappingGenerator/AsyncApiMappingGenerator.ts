@@ -1,4 +1,4 @@
-import { IAsyncApiMapping, IMapping, MappingDirection, MappingType } from "../../models/MappingModel";
+import { IAsyncApiMapping, IMapping, IMappingPair, MappingDirection, MappingType } from "../../models/MappingModel";
 import * as MappingService from "../MappingService";
 import { IAsyncApiOperation } from "../../models/OperationModel";
 import { ApiType } from "../../models/ApiModel";
@@ -6,44 +6,16 @@ import { flatten, unflatten } from "flat";
 import { operatorsRegex } from "../../utils/jsonata-helpers";
 import { getSourceMessageBody, getTargetMessageBodies } from "../../utils/body-helpers";
 import { Tree, treeSearch } from "../../utils/tree-search";
+import { transToMappingPairs } from "../../utils/jsonata-to-mapping-pairs";
+import { Document } from "mongoose";
 const getinputs = require('../../utils/get-inputs/get-inputs');
 
 type ParsedAsyncApiMapping = Omit<IAsyncApiMapping, "messageMappings"> & { messageMappings: { [targetId: string]: { [key: string]: string } }, messageMappingsInputKeys: { [targetId: string]: { [key: string]: string[] } } }
-type AsyncApiTree = Tree<ParsedAsyncApiMapping>;
 
 
-export async function generateMapping(source: IAsyncApiOperation, targets: { [key: string]: IAsyncApiOperation }, direction: MappingDirection): Promise<IAsyncApiMapping> {
+export async function generateMapping(source: IAsyncApiOperation, targets: { [key: string]: IAsyncApiOperation }, direction: MappingDirection): Promise<IMappingPair[]> {
     const sourceId = `${source.api.id}_${source.operationId}`;
     const targetIds = Object.keys(targets);
-
-    const mappings: { [key: string]: ParsedAsyncApiMapping[] } = (await MappingService.getMappings({ apiType: ApiType.ASYNC_API, direction })).reduce((obj, m) => {
-        const mapping = m.toObject() as IAsyncApiMapping;
-
-        const messageMappings: { [targetId: string]: { [key: string]: string } } = {};
-        const messageMappingsInputKeys: { [targetId: string]: { [key: string]: string[] } } = {};
-        for (const targetId in mapping.messageMappings) {
-            const flattened = flatten(JSON.parse(mapping.messageMappings[targetId])) as { [key: string]: string };
-            messageMappings[targetId] = {};
-            messageMappingsInputKeys[targetId] = {};
-
-            for (const key in flattened) {
-                const value = flattened[key];
-                messageMappings[targetId][key] = operatorsRegex.test(value) ? `(${value})` : value;
-                messageMappingsInputKeys[targetId][key] = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
-            }
-        }
-
-        const parsedMapping: ParsedAsyncApiMapping = {
-            ...mapping,
-            messageMappings,
-            messageMappingsInputKeys
-        };
-
-        return {
-            ...obj,
-            [parsedMapping.sourceId]: [...(obj[parsedMapping.sourceId] || []), parsedMapping]
-        }
-    }, {} as { [key: string]: ParsedAsyncApiMapping[] });
 
     const [requiredSourceKeys, requiredTargetKeys] = await Promise.all([
         getSourceMessageBody(source).then(b => flatten(b)).then(f => Object.keys(f)),
@@ -55,7 +27,7 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
     //For each of the target APIs, create trees that start at the source API and end at the specific target API.
     //Finally, flat-map all those trees into one array
     for (let i = 0; i < targetIds.length; i++) {
-        const mappingTrees = treeSearch(sourceId, targetIds[i], mappings) as AsyncApiTree[];
+        const mappingTrees = await treeSearch(ApiType.ASYNC_API, sourceId, targetIds[i], direction);
 
         let subresult: { [key: string]: string } = {}
         if (direction === MappingDirection.INPUT) {
@@ -93,31 +65,49 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
         messageMappings[targetId] = unflatten(messageMappings[targetId]);
     }
 
-    return {
-        id: 'automatically-generated',
-        apiType: ApiType.ASYNC_API,
-        createdBy: 'automatically-generated',
-        sourceId: `${source.api.id}_${source.operationId}`,
-        targetIds: Object.keys(targets),
-        type: MappingType.AUTO,
-        direction,
-        topics: {
-            source: '',
-            targets: {}
-        },
-        servers: {
-            source: '',
-            targets: {}
-        },
-        messageMappings: Object.entries(messageMappings).reduce((obj, [key, value]) => ({ ...obj, [key]: JSON.stringify(value) }), {} as { [targetId: string]: string }),
-    };
+    const mappingPairs: Array<IMappingPair> = [];
+    for (const targetId in messageMappings) {
+      const singleMapping: Record<string, any> = unflatten(messageMappings[targetId]);
+      const pairs = transToMappingPairs(singleMapping);
+      mappingPairs.push(...pairs);
+    }
+
+    return mappingPairs;
 }
 
-function executeMappingTreeSubscribe(mappingTree: AsyncApiTree, requiredKeys: string[]): { messageMappings: { [targetId: string]: { [key: string]: string } }, break?: boolean } {
+function parseAsyncApiMapping(m: IMapping & Document): ParsedAsyncApiMapping {
+    const mapping = m.toObject() as IAsyncApiMapping;
+
+    const messageMappings: { [targetId: string]: { [key: string]: string } } = {};
+    const messageMappingsInputKeys: { [targetId: string]: { [key: string]: string[] } } = {};
+    for (const targetId in mapping.messageMappings) {
+        const flattened = flatten(JSON.parse(mapping.messageMappings[targetId])) as { [key: string]: string };
+        messageMappings[targetId] = {};
+        messageMappingsInputKeys[targetId] = {};
+
+        for (const key in flattened) {
+            const value = flattened[key];
+            messageMappings[targetId][key] = operatorsRegex.test(value) ? `(${value})` : value;
+            messageMappingsInputKeys[targetId][key] = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
+        }
+    }
+
+    const parsedMapping: ParsedAsyncApiMapping = {
+        ...mapping,
+        messageMappings,
+        messageMappingsInputKeys
+    };
+
+    return parsedMapping
+}
+
+function executeMappingTreeSubscribe(mappingTree: Tree<IMapping & Document>, requiredKeys: string[]): { messageMappings: { [targetId: string]: { [key: string]: string } }, break?: boolean } {
     const { node, children } = mappingTree;
 
+    const parsedMaping = parseAsyncApiMapping(node);
+
     if (children === undefined) {
-        return { messageMappings: node.messageMappings };
+        return { messageMappings: parsedMaping.messageMappings };
     }
 
     const messageMappings: { [targetId: string]: { [key: string]: string } } = {};
@@ -128,7 +118,7 @@ function executeMappingTreeSubscribe(mappingTree: AsyncApiTree, requiredKeys: st
         if (result.break) {
             return result;
         }
-        const msgMappings = performMessageMapping(result.messageMappings, node.messageMappings[child.node.sourceId]);
+        const msgMappings = performMessageMapping(result.messageMappings, parsedMaping.messageMappings[child.node.sourceId]);
         for (const targetId in msgMappings) {
             messageMappings[targetId] = { ...(messageMappings[targetId] || {}), ...msgMappings[targetId] };
         }
@@ -141,11 +131,13 @@ function executeMappingTreeSubscribe(mappingTree: AsyncApiTree, requiredKeys: st
     return { messageMappings, break: messageMappingValid };
 }
 
-function executeMappingTreePublish(mappingTree: AsyncApiTree, finalTargetId: string, requiredKeys: string[]): { messageMapping: { [key: string]: string }, break?: boolean } {
+function executeMappingTreePublish(mappingTree: Tree<IMapping & Document>, finalTargetId: string, requiredKeys: string[]): { messageMapping: { [key: string]: string }, break?: boolean } {
     const { node, children } = mappingTree;
 
+    const parsedMaping = parseAsyncApiMapping(node);
+
     if (children === undefined) {
-        return { messageMapping: node.messageMappings[finalTargetId] };
+        return { messageMapping: parsedMaping.messageMappings[finalTargetId] };
     }
 
     let messageMapping: { [key: string]: string } = {};
@@ -156,7 +148,7 @@ function executeMappingTreePublish(mappingTree: AsyncApiTree, finalTargetId: str
         if (result.break) {
             return result;
         }
-        const msgMappings = performRequestMapping(node.messageMappings[child.node.sourceId], result.messageMapping);
+        const msgMappings = performRequestMapping(parsedMaping.messageMappings[child.node.sourceId], result.messageMapping);
         messageMapping = { ...messageMapping, ...msgMappings };
     }
 
@@ -172,7 +164,7 @@ function performMessageMapping(input: { [targetId: string]: { [key: string]: str
 
     for (let i = 0; i < targetIds.length; i++) {
         const inputKeys = Object.keys(input[targetIds[i]]);
-        const simpleRegex = new RegExp(inputKeys.join('|'), 'g');
+        const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
         const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
         const extendedRegex = new RegExp(extendedInputKeys.join('|'), 'g');
 
@@ -208,7 +200,7 @@ function performMessageMapping(input: { [targetId: string]: { [key: string]: str
  */
 function performRequestMapping(input: { [key: string]: string }, mapping: { [key: string]: string }) {
     const inputKeys = Object.keys(input);
-    const simpleRegex = new RegExp(inputKeys.join('|'), 'g');
+    const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
     const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
     const extendedRegex = new RegExp(extendedInputKeys.join('|'), 'g');
 
