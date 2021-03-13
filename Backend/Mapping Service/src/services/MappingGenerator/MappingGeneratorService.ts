@@ -62,3 +62,31 @@ export async function generateMapping(source: IOperation, targets: { [key: strin
         default: throw new Error("Unknown mapping type while building mapping");
     }
 }
+
+export async function generateAttributeMappingOnly(source: IOperation, targets: { [key: string]: IOperation }, mappingPairs: IMappingPair[], direction?: MappingDirection): Promise<MappingGenerationResult> {
+    const type = source.api.type;
+    if (Object.values(targets).some(target => target.api.type !== type)) {
+        throw new Error("Mappings can only be generated between mappings of the same type");
+    }
+
+    switch (type) {
+        case ApiType.OPEN_API: {
+            const attributeMappingResult = await AttributeGeneratorService.generateMappingForOpenApi(source as IOpenApiOperation, targets as { [key: string]: IOpenApiOperation }, mappingPairs);
+            
+            return {
+                type: ApiType.OPEN_API,
+                mappingPairs: attributeMappingResult
+            };
+        };
+        case ApiType.ASYNC_API: {
+            if (direction === undefined) throw new Error("Parameter 'direction' is mandatory for async api");
+            const attributeMappingResult = await AttributeGeneratorService.generateMappingForAsyncApi(source as IAsyncApiOperation, targets as { [key: string]: IAsyncApiOperation }, direction, mappingPairs);
+            
+            return {
+                type: ApiType.ASYNC_API,
+                mappingPairs: attributeMappingResult
+            };
+        }
+        default: throw new Error("Unknown mapping type while building mapping");
+    }
+}

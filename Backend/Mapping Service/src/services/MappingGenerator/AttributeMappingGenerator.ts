@@ -1,10 +1,12 @@
 import flatten from "flat";
-import { AttributeNode, IAttributeEdge, IMappingPair, MappingDirection, MappingPairType } from "../../models/MappingModel";
+import { AttributeNode, IAttributeEdge, IAttributeNode, IMappingPair, MappingDirection, MappingPairType } from "../../models/MappingModel";
 import { IAsyncApiOperation, IOpenApiOperation } from "../../models/OperationModel";
 import { getMessageSchema } from "../../utils/asyncapi-parser";
 import { getRequestSchema, getResponseSchema } from "../../utils/swagger-parser";
+import { isValid } from "../MappingService";
+import { revertEdge } from "../ReverseService";
 
-export async function generateMappingForOpenApi(source: IOpenApiOperation, targets: { [key: string]: IOpenApiOperation }): Promise<{ request: IMappingPair[], response: IMappingPair[] }> {
+export async function generateMappingForOpenApi(source: IOpenApiOperation, targets: { [key: string]: IOpenApiOperation }, mappingPairs?: IMappingPair[]): Promise<{ request: IMappingPair[], response: IMappingPair[] }> {
     // Request direction (i.e. target = required)
     const sourceRequestBody = {
         [`${source.api.id}_${source.operationId}_${source.responseId}`]: await getRequestSchema(source)
@@ -45,6 +47,8 @@ export async function generateMappingForOpenApi(source: IOpenApiOperation, targe
          [key]: schema
     }), {} as Record<string, any>));
     
+    const localKnowledgeGraph = mappingPairs ? buildLocalKnowledgeGraph(mappingPairs) : undefined;
+
     // TODO: Filter already mapped
     const requiredResponseKeys = Object.keys(flatten(sourceResponseBody));
     const providedResponseKeys = Object.keys(flatten(targetResponseBodies));
@@ -52,7 +56,7 @@ export async function generateMappingForOpenApi(source: IOpenApiOperation, targe
     const responseMappingPairPromises: Promise<IMappingPair | undefined>[] = [];
     for(const requiredKey of requiredResponseKeys) {
         for(const providedKey of providedResponseKeys) {
-            responseMappingPairPromises.push(generateSingleMapping(providedKey, requiredKey))
+            responseMappingPairPromises.push(generateSingleMapping(providedKey, requiredKey, localKnowledgeGraph))
         }
     }
     const responseMappingPairs = (await Promise.all(responseMappingPairPromises)).filter((mp): mp is IMappingPair => mp !== undefined);
@@ -63,7 +67,7 @@ export async function generateMappingForOpenApi(source: IOpenApiOperation, targe
     }
 }
 
-export async function generateMappingForAsyncApi(source: IAsyncApiOperation, targets: { [key: string]: IAsyncApiOperation }, direction: MappingDirection) {
+export async function generateMappingForAsyncApi(source: IAsyncApiOperation, targets: { [key: string]: IAsyncApiOperation }, direction: MappingDirection, mappingPairs?: IMappingPair[]) {
     let providedSchema: Record<string, any>;
     let requiredSchema: Record<string, any>;
 
@@ -100,6 +104,8 @@ export async function generateMappingForAsyncApi(source: IAsyncApiOperation, tar
         }
     }
 
+    const localKnowledgeGraph = mappingPairs ? buildLocalKnowledgeGraph(mappingPairs) : undefined;
+
     // TODO: Filter already mapped
     const requiredResponseKeys = Object.keys(flatten(requiredSchema));
     const providedResponseKeys = Object.keys(flatten(providedSchema));
@@ -107,28 +113,30 @@ export async function generateMappingForAsyncApi(source: IAsyncApiOperation, tar
     const mappingPairPromises: Promise<IMappingPair | undefined>[] = [];
     for(const requiredKey of requiredResponseKeys) {
         for(const providedKey of providedResponseKeys) {
-            mappingPairPromises.push(generateSingleMapping(providedKey, requiredKey))
+            mappingPairPromises.push(generateSingleMapping(providedKey, requiredKey, localKnowledgeGraph))
         }
     }
-    const mappingPairs = (await Promise.all(mappingPairPromises)).filter((mp): mp is IMappingPair => mp !== undefined);
+    const result = (await Promise.all(mappingPairPromises)).filter((mp): mp is IMappingPair => mp !== undefined);
 
-    return mappingPairs;
+    return result;
 }
 
-export async function generateSingleMapping(providedAttributeId: string, requiredAttributeId: string): Promise<IMappingPair | undefined> {
+export async function generateSingleMapping(providedAttributeId: string, requiredAttributeId: string, knowledgeGraph?: Map<string, IAttributeNode>): Promise<IMappingPair | undefined> {
     const attribute = await AttributeNode.findOne({ attributeId: providedAttributeId });
+    const localAttribute = knowledgeGraph?.get(providedAttributeId);
 
     // No attribute mapping exists
-    if(!attribute) {
+    if(!attribute && !localAttribute) {
         return undefined;
     }
 
     // Attribute mapping exists but there is no way to get to provided attribute
-    if(!attribute.component.includes(requiredAttributeId)) {
+    const combinedComponent = [...(attribute?.component || []), ...(localAttribute?.component || [])];
+    if(!combinedComponent.includes(requiredAttributeId)) {
         return undefined;
     }
 
-    const mappingChain = await shortestPath(providedAttributeId, requiredAttributeId);
+    const mappingChain = await shortestPath(providedAttributeId, requiredAttributeId, knowledgeGraph);
 
     const mappingPair: IMappingPair = {
         creationType: MappingPairType.ATTRIBUTE,
@@ -140,7 +148,7 @@ export async function generateSingleMapping(providedAttributeId: string, require
     return mappingPair;
 }
 
-async function shortestPath(sourceId: string, targetId: string): Promise<IAttributeEdge[]> {
+async function shortestPath(sourceId: string, targetId: string, knowledgeGraph?: Map<string, IAttributeNode>): Promise<IAttributeEdge[]> {
     if (sourceId === targetId) return [{ source: sourceId, target: targetId, transformation: targetId }];
 
     const initialEdge: IAttributeEdge = { source: 'dummy', target: sourceId, transformation: '' };
@@ -154,7 +162,9 @@ async function shortestPath(sourceId: string, targetId: string): Promise<IAttrib
       visited.push(lastEdge.target);
 
       const node = await AttributeNode.findOne({ attributeId: lastEdge.target });
-      const edges = node?.edges || [];
+      const localNode = knowledgeGraph?.get(lastEdge.target);
+
+      const edges = [...(node?.edges || []), ...(localNode?.edges || [])];
       for (let i = 0; i < edges.length; i++) {
         const edge = edges[i];
 
@@ -185,4 +195,74 @@ function performTransformations(edges: IAttributeEdge[]): string {
         return result
     }, finalEdge.transformation);
     return joined;
+}
+
+export function buildLocalKnowledgeGraph(mappingPairs: IMappingPair[]) {
+    const knowledgeGraph = new Map<string, IAttributeNode>();
+    
+    for(const mappingPair of mappingPairs) {
+        if(!isValid(mappingPair)) {
+            continue;
+        }
+
+        addLocalAttributeNode(knowledgeGraph, mappingPair.providedAttributeIds[0], mappingPair.requiredAttributeId, mappingPair.mappingTransformation)
+    }
+
+    return knowledgeGraph;
+}
+
+function addLocalAttributeNode(knowledgeGraph: Map<string, IAttributeNode>, sourceId: string, targetId: string, transformation: string) {
+    const [sourceNode, targetNode] = [
+        knowledgeGraph.get(sourceId),
+        knowledgeGraph.get(targetId),
+    ];
+  
+    // Add edges
+    const forwardEdge: IAttributeEdge = {
+        source: sourceId,
+        target: targetId,
+        transformation: transformation
+    };
+    const backwardEdge = revertEdge(forwardEdge);
+
+    // Build new component with all unique attribute ids. This always includes source and target id
+    const joinedComponentSet = new Set<string>([sourceId, targetId]);
+    sourceNode?.component.forEach((c) => joinedComponentSet.add(c));
+    targetNode?.component.forEach((c) => joinedComponentSet.add(c));
+    const joinedComponent = [...joinedComponentSet];
+    
+    if (sourceNode?.component.includes(targetId)) {
+        console.log("Already exists");
+        return;
+    }
+
+    // Upsert source node
+    knowledgeGraph.set(sourceId, {
+        attributeId: sourceId,
+        edges: [...(sourceNode?.edges || []), forwardEdge],
+        component: joinedComponent
+    });
+
+    // Upsert target node
+    knowledgeGraph.set(targetId, {
+        attributeId: targetId,
+        edges: [...(targetNode?.edges || []), backwardEdge],
+        component: joinedComponent
+    });
+
+
+    // Update all nodes in the combined component with the new component
+    for(const attributeId of joinedComponent) {
+        const node = knowledgeGraph.get(attributeId);
+        
+        if(!node) {
+            continue;
+        }
+
+        knowledgeGraph.set(attributeId, {
+            attributeId: node.attributeId,
+            edges: node.edges,
+            component: joinedComponent
+        });
+    }
 }

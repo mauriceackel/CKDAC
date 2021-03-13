@@ -118,17 +118,21 @@ function createAttributeNodesFromMapping(mapping: IMapping) {
         }
     }
 
-    const validMappingPairs = mappingPairs.filter((mappingPair) => {
-        if (mappingPair.providedAttributeIds.length !== 1) {
-            return false;
-        }
-        return isSimple(jsonata(mappingPair.mappingTransformation).ast())[0];
-    }); 
+    const validMappingPairs = mappingPairs.filter(isValid);
     
     const promises = validMappingPairs.map((mappingPair) => 
         createAttributeNode(mappingPair.providedAttributeIds[0], mappingPair.requiredAttributeId, mappingPair.mappingTransformation)
     );
     return Promise.all(promises);
+}
+
+// Tests if a mapping pair is valid for an attribute mapping
+export function isValid(mappingPair: IMappingPair): boolean {
+    if (mappingPair.providedAttributeIds.length !== 1) {
+        return false;
+    }
+    
+    return isSimple(jsonata(mappingPair.mappingTransformation).ast())[0];
 }
 
 async function createAttributeNode(sourceId: string, targetId: string, transformation: string) {
