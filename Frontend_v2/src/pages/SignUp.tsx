@@ -56,7 +56,7 @@ function SignUp(): ReactElement {
       <form
         noValidate
         onSubmit={handleSubmit(handleSignUp)}
-        className="mt-4 flex flex-col shadow-lg p-8 rounded"
+        className="mt-4 flex flex-col shadow-lg p-8 rounded small-form"
       >
         <p className="font-bold text-sm">First Name</p>
         <ValidatedInput name="firstname" register={register} errors={errors}>
@@ -87,7 +87,10 @@ function SignUp(): ReactElement {
           <p className="text-sm text-red-600">{errors.signup.message}</p>
         )}
 
-        <button type="submit" className="mt-4 button bg-red-900 text-white">
+        <button
+          type="submit"
+          className="mt-4 button shadow-lg bg-red-900 text-white"
+        >
           Sign Up
         </button>
       </form>

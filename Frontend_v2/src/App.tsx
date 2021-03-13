@@ -8,6 +8,7 @@ import {
   Switch,
   BrowserRouter as Router,
   NavLink,
+  Redirect,
 } from 'react-router-dom';
 import { AuthProvider } from 'services/auth/authcontext';
 import ChevronRightIcon from 'components/Icons/ChevronRightIcon';
@@ -19,12 +20,13 @@ import SignUp from 'pages/SignUp';
 import AccountPopover from 'components/AccountPopover';
 import Account from 'pages/Account';
 import InterfaceEditor from 'pages/InterfaceEditor';
+import MappingCreator from 'pages/MappingCreator';
 
 export default function App(): ReactElement {
   return (
     <AuthProvider>
       <Router>
-        <header className="fixed top-0 left-0 right-0 h-14 shadow-md flex items-center justify-between px-4 bg-red-900 text-white">
+        <header className="fixed z-40 top-0 left-0 right-0 h-14 shadow-md flex items-center justify-between px-4 bg-red-900 text-white">
           <h1 className="text-xl mr-2">SYMBIOTE</h1>
 
           <NavLink
@@ -98,6 +100,13 @@ export default function App(): ReactElement {
           <Switch>
             <Route strict exact path="/">
               <Home />
+            </Route>
+
+            <Route exact strict path={['/openapi/', '/asyncapi/']}>
+              <Redirect to="./create" />
+            </Route>
+            <Route strict exact path="/:mode/create">
+              <MappingCreator />
             </Route>
             <Route strict exact path="/:mode/apis">
               <InterfaceEditor />

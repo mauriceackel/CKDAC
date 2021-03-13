@@ -42,8 +42,9 @@ function AccountPopover(props: AccountPopoverProps): ReactElement {
       isOpen={isOpen}
       onClickOutside={() => setIsOpen(false)}
       align="end"
+      containerClassName="z-50"
       positions={['bottom']}
-      content={AccountPopoverContent}
+      content={<AccountPopoverContent />}
     >
       {React.cloneElement(child, { onClick: handleClick })}
     </Popover>
@@ -79,7 +80,7 @@ function AccountPopoverContent(): ReactElement {
       <div className="flex mt-2">
         <button
           type="button"
-          className="flex items-center button bg-white text-green-800 mr-1"
+          className="flex items-center button shadow-lg bg-white text-green-800 mr-1"
           onClick={() => history.push('/account/')}
         >
           <SettingsIcon className="w-5 h-5 mr-2" />
@@ -87,7 +88,7 @@ function AccountPopoverContent(): ReactElement {
         </button>
         <button
           type="button"
-          className="flex items-center button bg-white text-green-800 ml-1"
+          className="flex items-center button shadow-lg bg-white text-green-800 ml-1"
           onClick={handleSignOut}
         >
           <LogoutIcon className="w-5 h-5 mr-2" />

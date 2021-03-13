@@ -57,7 +57,7 @@ function SignIn(): ReactElement {
       <form
         noValidate
         onSubmit={handleSubmit(handleSignIn)}
-        className="mt-4 flex flex-col shadow-lg p-8 rounded"
+        className="mt-4 flex flex-col shadow-lg p-8 rounded small-form"
       >
         <p className="font-bold text-sm">Email</p>
         <ValidatedInput name="email" register={register} errors={errors}>
@@ -72,13 +72,16 @@ function SignIn(): ReactElement {
           <p className="text-sm text-red-600">{errors.signin.message}</p>
         )}
 
-        <button type="submit" className="mt-4 button bg-red-900 text-white">
+        <button
+          type="submit"
+          className="mt-4 button shadow-lg bg-red-900 text-white"
+        >
           Sign In
         </button>
 
         <Link
           to={`/signup/${location.search ?? ''}`}
-          className="mt-4 text-center button bg-red-900 text-white"
+          className="mt-4 text-center button shadow-lg bg-red-900 text-white"
         >
           Sign Up
         </Link>

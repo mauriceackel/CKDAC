@@ -5,9 +5,11 @@ const { JsonEditor: Editor } = require('jsoneditor-react');
 
 interface JsonEditorProps {
   value: any;
-  onChange: (data: any) => void;
+  onChange?: (data: any) => void;
+  readonly?: boolean;
 }
-function JsonEditor({ value, onChange }: JsonEditorProps): ReactElement {
+function JsonEditor(props: JsonEditorProps): ReactElement {
+  const { value, onChange = () => {}, readonly = false } = props;
   const editorRef = useRef<any>(null);
 
   useEffect(() => {
@@ -17,10 +19,9 @@ function JsonEditor({ value, onChange }: JsonEditorProps): ReactElement {
   return (
     <Editor
       ref={editorRef}
-      value={{ foo: 'bar' }}
       onChange={onChange}
-      mode="text"
-      allowedMode={['text']}
+      mode={readonly ? 'view' : 'text'}
+      allowedMode={[readonly ? 'view' : 'text']}
       navigationBar={false}
       statusBar={false}
       mainMenuBar={false}

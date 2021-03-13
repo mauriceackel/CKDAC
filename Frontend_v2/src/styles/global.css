@@ -19,18 +19,26 @@ body {
   max-width: 800px;
 }
 
+.divider {
+  @apply w-full flex items-center justify-center p-2 bg-red-900 rounded shadow-lg font-bold text-lg text-white;
+}
+
 button:focus {
   outline: none;
 }
 
 .button {
-  @apply px-4 py-2 rounded shadow-lg;
+  @apply px-4 py-2 rounded;
 }
 
 .input {
   margin-bottom: 2px;
   font-size: 16px;
   @apply border rounded p-3 leading-tight w-full;
+}
+
+.chip {
+  @apply rounded-full border py-1 px-4 flex items-center flex-shrink-0;
 }
 
 .input:focus {
@@ -45,4 +53,48 @@ button:focus {
 
 .jsoneditor-text {
   @apply rounded p-1;
+}
+
+.small-form {
+  width: 20rem;
+  max-width: 100%;
+}
+
+.hoverable .show-hover {
+  visibility: hidden;
+}
+
+.hoverable:hover .show-hover {
+  visibility: visible;
+}
+
+.ReactCollapse--collapse {
+  transition: height 200ms ease-in-out;
+}
+
+.rtl {
+  direction: rtl;
+}
+
+.transformation-editor-modal {
+  top: 15%;
+  min-height: 20rem;
+  @apply absolute left-1/2 transform -translate-x-1/2 w-11/12 md:w-3/4 bg-white p-4 border rounded-lg shadow-lg;
+}
+
+.transformation-editor-modal:focus {
+  @apply outline-none;
+}
+
+.spin {
+  animation: custom-spin 1s linear infinite;
+}
+
+@keyframes custom-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

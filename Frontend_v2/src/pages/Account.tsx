@@ -108,7 +108,10 @@ function SignIn(): ReactElement {
           <p className="text-sm text-green-600">{errors.success.message}</p>
         )}
 
-        <button type="submit" className="mt-4 button bg-red-900 text-white">
+        <button
+          type="submit"
+          className="mt-4 button shadow-lg bg-red-900 text-white"
+        >
           Update Data
         </button>
       </form>

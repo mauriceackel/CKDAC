@@ -11,42 +11,25 @@ import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Select from 'react-select';
-import { ApiModel, ApiType } from 'models/ApiModel';
+import { ApiType } from 'models/ApiModel';
 import { getApi, getApis, upsertApi } from 'services/apiservice';
 import { useParams } from 'react-router';
 import ValidatedInput from 'components/ValidatedInput';
 import { AuthContext } from 'services/auth/authcontext';
 import JsonEditor from 'components/JsonEditor';
+import { ApiOption, optionFilter } from 'utils/helpers/apiSelection';
 
 // #region Form Validation
 const ApiSchema = yup.object({
   name: yup.string().required('Name is required'),
   metadata: yup.object({
-    company: yup.string().required('First name is required'),
-    keywords: yup.string().required('Last name is required'),
+    company: yup.string(),
+    keywords: yup.string(),
   }),
   apiSpec: yup.mixed().required(),
 });
 type ApiData = yup.InferType<typeof ApiSchema>;
 // #endregion
-
-type ApiOption = {
-  value: ApiModel;
-  label: string;
-};
-
-const optionFilter = (option: any, searchText: string | undefined) => {
-  const lowerSearch = searchText?.toLowerCase();
-
-  const { value: api } = option as { value: ApiModel };
-
-  return (
-    !lowerSearch ||
-    api.name.toLowerCase().includes(lowerSearch) ||
-    (api.metadata?.company?.toLowerCase().includes(lowerSearch) ?? false) ||
-    (api.metadata?.keywords?.toLowerCase().includes(lowerSearch) ?? false)
-  );
-};
 
 function InterfaceEditor(): ReactElement {
   const { user } = useContext(AuthContext).authState;
@@ -63,11 +46,16 @@ function InterfaceEditor(): ReactElement {
     }
   }, [mode]);
 
-  const { control, register, handleSubmit, errors, reset: resetForm } = useForm(
-    {
-      resolver: yupResolver(ApiSchema),
-    },
-  );
+  const {
+    control,
+    register,
+    handleSubmit,
+    errors,
+    reset: resetForm,
+    setError,
+  } = useForm({
+    resolver: yupResolver(ApiSchema),
+  });
 
   // #region Load Apis
   const [apiOptions, setApiOptions] = useState<ApiOption[]>();
@@ -135,7 +123,7 @@ function InterfaceEditor(): ReactElement {
 
   // #region Upsert Api
   async function handleUpsert(apiData: ApiData) {
-    if (!apiType) {
+    if (apiType === undefined) {
       return;
     }
 
@@ -149,6 +137,11 @@ function InterfaceEditor(): ReactElement {
       });
 
       loadApis(apiType);
+
+      setError('success', {
+        type: 'manual',
+        message: 'API was updated successfully.',
+      });
     } catch (err) {
       console.log(err);
     }
@@ -217,9 +210,15 @@ function InterfaceEditor(): ReactElement {
           )}
         </div>
 
-        <button type="submit" className="mt-4 button bg-red-900 text-white">
+        <button
+          type="submit"
+          className="mt-4 button shadow-lg bg-red-900 text-white"
+        >
           Save
         </button>
+        {errors.success && (
+          <p className="text-sm text-green-600">{errors.success.message}</p>
+        )}
       </form>
     </div>
   );
