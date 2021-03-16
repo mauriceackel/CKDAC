@@ -49,7 +49,9 @@ async function getMappings(req: Request, res: Response, next: NextFunction) {
 
     let response: ApiResponse;
     try {
-        const mappings = await MappingService.getMappings(req.query.type);
+        const { apiType: rawApiType, createdBy } = req.query as Record<string, any>;
+
+        const mappings = await MappingService.getMappings({ apiType: rawApiType ? Number.parseInt(rawApiType): undefined, createdBy });
 
         if (mappings.some(mapping => !listCondition(mapping, req.userId))) {
             throw new ForbiddenError("Insufficient right, permission denied");

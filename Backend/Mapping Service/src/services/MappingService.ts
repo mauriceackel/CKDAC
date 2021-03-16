@@ -61,7 +61,7 @@ export async function getMapping(mappingId: string): Promise<IMapping & Document
     }
 }
 
-export async function getMappings(conditions: { type?: MappingType, apiType?: ApiType, direction?: MappingDirection } = {}): Promise<Array<IMapping & Document>> {
+export async function getMappings(conditions: { type?: MappingType, apiType?: ApiType, direction?: MappingDirection, createdBy?: string } = {}): Promise<Array<IMapping & Document>> {
     logger.info(`Trying to retrieve all mappings with conditions ${JSON.stringify(conditions)}`);
 
     try {
