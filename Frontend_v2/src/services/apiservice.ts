@@ -25,11 +25,11 @@ export async function getApis(
   return response.data.result.apis || [];
 }
 
-export async function getApi(
+export async function getApi<T extends ApiModel>(
   apiId: string,
   onlyMetaData = true,
-): Promise<ApiModel> {
-  const response = await axios.get<ApiResponse<{ api: ApiModel }>>(
+): Promise<T> {
+  const response = await axios.get<ApiResponse<{ api: T }>>(
     `${BACKEND_BASE_URL}/apis/${apiId}?onlyMetaData=${onlyMetaData}`,
   );
 

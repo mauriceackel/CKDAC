@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import AddIcon from 'components/Icons/AddIcon';
-import CheckIcon from 'components/Icons/CheckIcon';
 import ClearIcon from 'components/Icons/ClearIcon';
 import MappingContainer from 'components/MappingContainer';
 import { MappingContextProvider } from 'contexts/MappingContext';
-import { ApiModel, ApiType } from 'models/ApiModel';
+import { ApiType, OpenApiModel } from 'models/ApiModel';
 import {
   MappingPair,
   MappingType,
@@ -18,7 +17,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useParams } from 'react-router';
 import Select from 'react-select';
 import { getApi, getApis } from 'services/apiservice';
 import { AuthContext } from 'services/auth/authcontext';
@@ -32,7 +30,7 @@ import {
 } from 'services/mappingservice';
 import {
   ApiOption,
-  CodeOption,
+  ResponseOption,
   OperationOption,
   optionFilter,
 } from 'utils/helpers/apiSelection';
@@ -43,33 +41,19 @@ import {
   OpenApiOperation,
   getRequestSchema,
   getResponseSchema,
-  Schema,
 } from 'utils/helpers/swaggerParser';
 import { flatten } from 'flat';
 import MappingTest from 'components/MappingTest';
-import Spinner from 'components/Spinner';
 import generateAdapter from 'services/adapterservice';
 import downloadFile from 'utils/helpers/download';
 import InfoModal from 'components/InfoModal';
+import ActionBar from 'components/ActionBar';
+import { Schema } from 'utils/helpers/schemaHelpers';
 
-function MappingCreator(): ReactElement {
+function OpenApiMappingCreator(): ReactElement {
   const { authState } = useContext(AuthContext);
 
   const [error, setError] = useState<string>();
-
-  // #region Api mode
-  const { mode } = useParams<{ mode: string }>();
-  const apiType = useMemo(() => {
-    switch (mode) {
-      case 'openapi':
-        return ApiType.OPEN_API;
-      case 'asyncapi':
-        return ApiType.ASYNC_API;
-      default:
-        return undefined;
-    }
-  }, [mode]);
-  // #endregion
 
   // #region Load Apis
   const [apiOptions, setApiOptions] = useState<ApiOption[]>([]);
@@ -90,10 +74,8 @@ function MappingCreator(): ReactElement {
   }, []);
 
   useEffect(() => {
-    if (apiType !== undefined) {
-      loadApis(apiType);
-    }
-  }, [apiType, loadApis]);
+    loadApis(ApiType.OPEN_API);
+  }, [loadApis]);
   // #endregion
 
   // #region Operation selections
@@ -139,23 +121,29 @@ function MappingCreator(): ReactElement {
     return [requestSchema, responseSchema];
   }, [sourceOperation]);
 
-  const [targetRequestSchema, targetResponseSchema] = useMemo(() => {
+  const [targetRequestSchema, targetResponseSchema] = useMemo<
+    [Record<string, Schema>, Record<string, Schema>]
+  >(() => {
     if (!targetOperations) {
-      return [undefined, undefined];
+      return [{}, {}];
     }
 
     return Object.entries(targetOperations).reduce<
       [Record<string, Schema>, Record<string, Schema>]
     >(
       ([requestSchema, responseSchema], [key, operation]) => {
-        const { api, operationId, responseId: code } = operation;
+        const { api, operationId, responseId } = operation;
 
         if (!api.apiObject) {
           return [requestSchema, responseSchema];
         }
 
         const reqSchema = getRequestSchema(api.apiObject, operationId);
-        const respSchema = getResponseSchema(api.apiObject, operationId, code);
+        const respSchema = getResponseSchema(
+          api.apiObject,
+          operationId,
+          responseId,
+        );
 
         if (!reqSchema || !respSchema) {
           return [requestSchema, responseSchema];
@@ -218,10 +206,8 @@ function MappingCreator(): ReactElement {
         targetOperations,
       );
 
-      if (mappingResult.type === ApiType.OPEN_API) {
-        setRequestMappingPairs(mappingResult.mappingPairs.request);
-        setResponseMappingPairs(mappingResult.mappingPairs.response);
-      }
+      setRequestMappingPairs(mappingResult.mappingPairs.request);
+      setResponseMappingPairs(mappingResult.mappingPairs.response);
     }
 
     initializeMapping();
@@ -244,51 +230,49 @@ function MappingCreator(): ReactElement {
       combinedMappingPairs,
     );
 
-    if (result.type === ApiType.OPEN_API) {
-      setUpdatedRequestMappingPairState((currentState) => {
-        const currentMappingPairs = currentState.mappingPairs;
+    setUpdatedRequestMappingPairState((currentState) => {
+      const currentMappingPairs = currentState.mappingPairs;
 
-        const currentMappingPairAttributeIds = currentMappingPairs.map(
-          (mappingPair) => mappingPair.requiredAttributeId,
-        );
+      const currentMappingPairAttributeIds = currentMappingPairs.map(
+        (mappingPair) => mappingPair.requiredAttributeId,
+      );
 
-        // Filter out all already existing mapping pairs
-        const filteredMappingPairs = result.mappingPairs.request.filter(
-          (mappingPair) => {
-            return !currentMappingPairAttributeIds.includes(
-              mappingPair.requiredAttributeId,
-            );
-          },
-        );
+      // Filter out all already existing mapping pairs
+      const filteredMappingPairs = result.mappingPairs.request.filter(
+        (mappingPair) => {
+          return !currentMappingPairAttributeIds.includes(
+            mappingPair.requiredAttributeId,
+          );
+        },
+      );
 
-        return {
-          mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
-          preventUpdate: true,
-        };
-      });
+      return {
+        mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
+        preventUpdate: true,
+      };
+    });
 
-      setUpdatedResponseMappingPairState((currentState) => {
-        const currentMappingPairs = currentState.mappingPairs;
+    setUpdatedResponseMappingPairState((currentState) => {
+      const currentMappingPairs = currentState.mappingPairs;
 
-        const currentMappingPairAttributeIds = currentMappingPairs.map(
-          (mappingPair) => mappingPair.requiredAttributeId,
-        );
+      const currentMappingPairAttributeIds = currentMappingPairs.map(
+        (mappingPair) => mappingPair.requiredAttributeId,
+      );
 
-        // Filter out all already existing mapping pairs
-        const filteredMappingPairs = result.mappingPairs.response.filter(
-          (mappingPair) => {
-            return !currentMappingPairAttributeIds.includes(
-              mappingPair.requiredAttributeId,
-            );
-          },
-        );
+      // Filter out all already existing mapping pairs
+      const filteredMappingPairs = result.mappingPairs.response.filter(
+        (mappingPair) => {
+          return !currentMappingPairAttributeIds.includes(
+            mappingPair.requiredAttributeId,
+          );
+        },
+      );
 
-        return {
-          mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
-          preventUpdate: true,
-        };
-      });
-    }
+      return {
+        mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
+        preventUpdate: true,
+      };
+    });
   }, [
     requestMappingPairs,
     responseMappingPairs,
@@ -528,63 +512,16 @@ function MappingCreator(): ReactElement {
       />
 
       {/* Bottom bar */}
-      <div className="mt-6 flex">
-        <label
-          htmlFor="cbx-strict"
-          className="flex mr-2 items-center button checkbox bg-yellow-600 text-white cursor-pointer"
-        >
-          <div className="w-6 h-6 mr-2 rounded border">
-            {strictEnabled && <CheckIcon className="w-6 h-6" />}
-          </div>
-          <input
-            id="cbx-strict"
-            type="checkbox"
-            className="hidden"
-            checked={strictEnabled}
-            readOnly
-            onClick={() => setStrictEnabled((curr) => !curr)}
-          />
-          Strict Mode
-        </label>
-        <button
-          type="button"
-          className="mr-2 button hover:bg-red-600 hover:text-white"
-          onClick={handleClear}
-        >
-          Clear
-        </button>
-        <div className="flex-1" />
-        <button
-          type="button"
-          disabled={adapterCreating}
-          className="mr-2 inline-flex items-center button bg-gray-900 text-white disabled:opacity-40"
-          onClick={handleCreateAdapter}
-        >
-          {adapterCreating ? (
-            <>
-              <Spinner />
-              Creating...
-            </>
-          ) : (
-            'Create Adapter'
-          )}
-        </button>
-        <button
-          type="button"
-          disabled={saving || !strictEnabled || !isValid}
-          className="button inline-flex items-center bg-green-800 text-white disabled:opacity-40"
-          onClick={handleSaveMapping}
-        >
-          {saving ? (
-            <>
-              <Spinner />
-              Saving...
-            </>
-          ) : (
-            'Save Mapping'
-          )}
-        </button>
-      </div>
+      <ActionBar
+        adapterCreating={adapterCreating}
+        saving={saving}
+        mappingValid={isValid}
+        strict={strictEnabled}
+        toggleStrict={() => setStrictEnabled((curr) => !curr)}
+        onClear={handleClear}
+        onSave={handleSaveMapping}
+        onCreateAdapter={handleCreateAdapter}
+      />
     </div>
   );
 }
@@ -602,7 +539,7 @@ function SingleSelection(props: SingleSelectionProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   // #region Selected parts
-  const [selectedApi, setSelectedApi] = useState<ApiModel>();
+  const [selectedApi, setSelectedApi] = useState<OpenApiModel>();
   const [selectedOperation, setSelectedOperation] = useState<string>();
   const [selectedResponse, setSelectedResponse] = useState<string>();
   // #endregion
@@ -618,20 +555,22 @@ function SingleSelection(props: SingleSelectionProps) {
   const [
     selectedResponseOption,
     setSelectedResponseOption,
-  ] = useState<CodeOption | null>(null);
+  ] = useState<ResponseOption | null>(null);
   // #endregion
 
   // #region Selection options
   const [operationOptions, setOperationOptions] = useState<OperationOption[]>(
     [],
   );
-  const [responseOptions, setResponseOptions] = useState<CodeOption[]>([]);
+  const [responseOptions, setResponseOptions] = useState<ResponseOption[]>([]);
   // #endregion
 
   // #region Load options
-  const loadFullApi = useCallback(async (apiId: string) => {
+  const loadFullApi = useCallback(async (apiId: string): Promise<
+    OpenApiModel | undefined
+  > => {
     try {
-      const apiData = await getApi(apiId, false);
+      const apiData = await getApi<OpenApiModel>(apiId, false);
       apiData.apiObject = await parseApiSpec(apiData.apiSpec);
 
       return apiData;
@@ -642,7 +581,7 @@ function SingleSelection(props: SingleSelectionProps) {
   }, []);
 
   const loadOperationOptions = useCallback(
-    async (api: ApiModel, srcOperation?: OpenApiOperation) => {
+    async (api: OpenApiModel, srcOperation?: OpenApiOperation) => {
       if (!api.apiObject) {
         return [];
       }
@@ -692,15 +631,15 @@ function SingleSelection(props: SingleSelectionProps) {
   );
 
   const loadResponseOptions = useCallback(
-    (api: ApiModel, operationId: string) => {
+    (api: OpenApiModel, operationId: string) => {
       if (!api.apiObject) {
         return [];
       }
 
       const responseCodes = getResponseCodes(api.apiObject, operationId);
-      const options = responseCodes.map<CodeOption>((responseCode) => ({
+      const options = responseCodes.map<ResponseOption>((responseCode) => ({
         label: responseCode,
-        value: { code: responseCode },
+        value: { responseId: responseCode },
       }));
 
       return options;
@@ -732,7 +671,7 @@ function SingleSelection(props: SingleSelectionProps) {
 
       let api = selectedApi;
       let operOptions: OperationOption[] = operationOptions;
-      let respOptions: CodeOption[] = responseOptions;
+      let respOptions: ResponseOption[] = responseOptions;
 
       if (selectedApi !== operation.api) {
         const apiOption = apiOptions.find(
@@ -762,7 +701,7 @@ function SingleSelection(props: SingleSelectionProps) {
 
       if (selectedResponse !== operation.responseId) {
         const responseOption = respOptions.find(
-          (option) => option.value.code === operation.responseId,
+          (option) => option.value.responseId === operation.responseId,
         );
 
         setSelectedResponse(operation.responseId);
@@ -839,7 +778,7 @@ function SingleSelection(props: SingleSelectionProps) {
       return;
     }
 
-    setSelectedResponse(selectedResponseOption?.value.code);
+    setSelectedResponse(selectedResponseOption?.value.responseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResponseOption]);
   // #endregion
@@ -1088,4 +1027,4 @@ function operationEquals(a?: OpenApiOperation, b?: OpenApiOperation) {
 }
 // #endregion
 
-export default MappingCreator;
+export default OpenApiMappingCreator;

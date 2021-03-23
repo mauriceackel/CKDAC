@@ -1,3 +1,4 @@
+import { AsyncAPIDocument } from '@asyncapi/parser';
 import { OpenAPI } from 'openapi-types';
 
 export enum ApiType {
@@ -11,9 +12,19 @@ export interface ApiModel {
   name: string;
   type: ApiType;
   apiSpec: string;
-  apiObject?: OpenAPI.Document;
+  apiObject?: OpenAPI.Document | AsyncAPIDocument;
   metadata: {
     company?: string;
     keywords?: string;
   };
+}
+
+export interface OpenApiModel extends ApiModel {
+  type: ApiType.OPEN_API;
+  apiObject?: OpenAPI.Document;
+}
+
+export interface AsyncApiModel extends ApiModel {
+  type: ApiType.ASYNC_API;
+  apiObject?: AsyncAPIDocument;
 }

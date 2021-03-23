@@ -26,7 +26,7 @@ export type OperationOption = {
   label: string;
 };
 
-export type CodeOption = {
-  value: { code: string };
+export type ResponseOption = {
+  value: { responseId: string };
   label: string;
 };

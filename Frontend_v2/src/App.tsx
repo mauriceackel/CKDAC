@@ -20,7 +20,9 @@ import SignUp from 'pages/SignUp';
 import AccountPopover from 'components/AccountPopover';
 import Account from 'pages/Account';
 import InterfaceEditor from 'pages/InterfaceEditor';
-import MappingCreator from 'pages/MappingCreator';
+import OpenApiMappingCreator from 'pages/OpenApiMappingCreator';
+import MappingEditor from 'pages/MappingEditor';
+import PrivateRoute from 'components/PrivateRoute';
 
 export default function App(): ReactElement {
   return (
@@ -105,12 +107,15 @@ export default function App(): ReactElement {
             <Route exact strict path={['/openapi/', '/asyncapi/']}>
               <Redirect to="./create" />
             </Route>
-            <Route strict exact path="/:mode/create">
-              <MappingCreator />
-            </Route>
-            <Route strict exact path="/:mode/apis">
+            <PrivateRoute strict exact path="/openapi/create">
+              <OpenApiMappingCreator />
+            </PrivateRoute>
+            <PrivateRoute strict exact path="/:mode/edit">
+              <MappingEditor />
+            </PrivateRoute>
+            <PrivateRoute strict exact path="/:mode/apis">
               <InterfaceEditor />
-            </Route>
+            </PrivateRoute>
 
             <Route strict exact path="/signin/">
               <SignIn />
@@ -118,9 +123,9 @@ export default function App(): ReactElement {
             <Route strict exact path="/signup/">
               <SignUp />
             </Route>
-            <Route strict exact path="/account/">
+            <PrivateRoute strict exact path="/account/">
               <Account />
-            </Route>
+            </PrivateRoute>
           </Switch>
         </div>
       </Router>
