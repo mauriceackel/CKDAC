@@ -10,12 +10,9 @@ import jsonata from 'jsonata';
 import { pairs2Trans } from 'services/mappingservice';
 import stringified2Jsonata from 'utils/helpers/stringIfiedToJsonata';
 import axios from 'axios';
-import {
-  getRequestUrl,
-  OpenApiOperation,
-  Schema,
-} from 'utils/helpers/swaggerParser';
+import { getRequestUrl, OpenApiOperation } from 'utils/helpers/swaggerParser';
 import { Collapse } from 'react-collapse';
+import { Schema } from 'utils/helpers/schemaHelpers';
 import JsonEditor from './JsonEditor';
 import ChevronRightIcon from './Icons/ChevronRightIcon';
 

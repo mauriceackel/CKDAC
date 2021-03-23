@@ -2,7 +2,7 @@
 import { MappingContext } from 'contexts/MappingContext';
 import React, { ReactElement, useMemo, useState, useContext } from 'react';
 import { Collapse } from 'react-collapse';
-import { Schema } from 'utils/helpers/swaggerParser';
+import { Schema } from 'utils/helpers/schemaHelpers';
 import { buildNodes, JsonTreeNode } from 'utils/helpers/toTree';
 import ChevronRightIcon from './Icons/ChevronRightIcon';
 

@@ -3,7 +3,7 @@ import { MappingPair, MappingPairType } from 'models/MappingModel';
 import React, { ReactElement, useContext, useState, useEffect } from 'react';
 import { Collapse } from 'react-collapse';
 import escapeJsonata from 'utils/helpers/escapeJsonata';
-import { Schema } from 'utils/helpers/swaggerParser';
+import { Schema } from 'utils/helpers/schemaHelpers';
 import ChevronRightIcon from './Icons/ChevronRightIcon';
 import MappingArea from './MappingArea';
 import SchemaTree from './SchemaTree';

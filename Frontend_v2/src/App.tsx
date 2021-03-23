@@ -23,6 +23,7 @@ import InterfaceEditor from 'pages/InterfaceEditor';
 import OpenApiMappingCreator from 'pages/OpenApiMappingCreator';
 import MappingEditor from 'pages/MappingEditor';
 import PrivateRoute from 'components/PrivateRoute';
+import AsyncApiMappingCreator from 'pages/AsyncApiMappingCreator';
 
 export default function App(): ReactElement {
   return (
@@ -109,6 +110,9 @@ export default function App(): ReactElement {
             </Route>
             <PrivateRoute strict exact path="/openapi/create">
               <OpenApiMappingCreator />
+            </PrivateRoute>
+            <PrivateRoute strict exact path="/asyncapi/create">
+              <AsyncApiMappingCreator />
             </PrivateRoute>
             <PrivateRoute strict exact path="/:mode/edit">
               <MappingEditor />
