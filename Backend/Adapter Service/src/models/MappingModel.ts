@@ -21,15 +21,6 @@ export interface IMapping {
 
 export interface IAsyncApiMapping extends IMapping {
     direction: MappingDirection //If input, source & targets are subscribers. If output, providers.
-    // The key is the id of the target
-    topics: {
-        source: string,
-        targets: { [targetId: string]: string }
-    }
-    servers: {
-        source: string,
-        targets: { [targetId: string]: string }
-    }
     messageMappings: { [key: string]: string } //JSONata mappings
 }
 
