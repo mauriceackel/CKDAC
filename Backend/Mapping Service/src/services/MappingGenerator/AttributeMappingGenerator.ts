@@ -73,7 +73,7 @@ export async function generateMappingForAsyncApi(source: IAsyncApiOperation, tar
 
     switch(direction) {
         case MappingDirection.OUTPUT: {
-            // Source is provided
+            // Target is required, Source is provided
             providedSchema = {
                 [`${source.api.id}_${source.operationId}`]: await getMessageSchema(source)
             }
@@ -88,7 +88,7 @@ export async function generateMappingForAsyncApi(source: IAsyncApiOperation, tar
             }), {} as Record<string, any>));
         }; break;
         case MappingDirection.INPUT: {
-            // Target is provided
+            // Target is provided, Source is required
             requiredSchema = {
                 [`${source.api.id}_${source.operationId}`]: await getMessageSchema(source)
             }

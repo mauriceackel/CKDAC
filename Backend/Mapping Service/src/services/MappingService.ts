@@ -77,7 +77,15 @@ export async function updateMapping(mappingData: IMapping) {
     logger.info(`Trying to update mapping with id ${mappingData.id}`);
 
     try {
-        const mapping = await Mapping.findByIdAndUpdate(mappingData.id, mappingData);
+        let mapping = null;
+        switch(mappingData.apiType) {
+            case ApiType.ASYNC_API: {
+                mapping = await AsyncApiMapping.findByIdAndUpdate(mappingData.id, { $set: mappingData });
+            }; break;
+            case ApiType.OPEN_API: {
+                mapping = await OpenApiMapping.findByIdAndUpdate(mappingData.id, { $set: mappingData });
+            }; break;
+        }
         if (mapping !== null) {
             logger.info(`Mapping "${mappingData.id}" was updated successfully.`);
         } else {
