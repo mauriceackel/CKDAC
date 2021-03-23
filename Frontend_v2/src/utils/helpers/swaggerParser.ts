@@ -1,20 +1,15 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import SwaggerParser from '@apidevtools/swagger-parser';
-import { ApiModel } from 'models/ApiModel';
+import { OpenApiModel } from 'models/ApiModel';
 import { OpenAPI, OpenAPIV2, OpenAPIV3 } from 'openapi-types';
+import { flattenSchema, removeTypes, Schema } from './schemaHelpers';
 
 // #region Types & constants
 export type OpenApiOperation = {
-  api: ApiModel;
+  api: OpenApiModel;
   operationId: string;
   responseId: string;
 };
-
-export type Schema =
-  | {
-      [key: string]: string | Schema;
-    }
-  | [Schema];
 
 export const httpMethods = [
   'get',
@@ -321,44 +316,6 @@ function getV3ResponseBody(
     | undefined;
 
   return response?.content?.['application/json'].schema;
-}
-// #endregion
-
-// #region Schema helpers
-function removeTypes(schema: any): Schema {
-  if (schema.type === 'object') {
-    return Object.entries(schema.properties).reduce(
-      (obj, [key, value]) => ({
-        ...obj,
-        [key]: removeTypes(value),
-      }),
-      {},
-    );
-  }
-
-  if (schema.type === 'array') {
-    return [removeTypes(schema.items)];
-  }
-
-  return schema.type;
-}
-
-function flattenSchema(schema: any) {
-  if (schema.allOf !== undefined) {
-    const combinedObject = {
-      type: 'object',
-      properties: schema.allOf.reduce(
-        (obj: any, subSchema: any) => ({
-          ...obj,
-          ...flattenSchema(subSchema).properties,
-        }),
-        {},
-      ),
-    };
-
-    return combinedObject;
-  }
-  return schema;
 }
 // #endregion
 
