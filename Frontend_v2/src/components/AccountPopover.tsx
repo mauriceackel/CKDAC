@@ -24,7 +24,7 @@ function AccountPopover(props: AccountPopoverProps): ReactElement {
 
   function handleClick() {
     if (!user && !pathname.startsWith('/signin/')) {
-      history.push(`/signin/?${encodeURIComponent(pathname)}`);
+      history.push(`/signin/?returnUrl=${encodeURIComponent(pathname)}`);
       return;
     }
 
