@@ -3,9 +3,8 @@ import MappingContainer from 'components/MappingContainer';
 import Spinner from 'components/Spinner';
 import { MappingContextProvider } from 'contexts/MappingContext';
 import flatten from 'flat';
-import { ApiModel, ApiType } from 'models/ApiModel';
+import { ApiType, AsyncApiModel, OpenApiModel } from 'models/ApiModel';
 import {
-  AsyncApiMappingModel,
   MappingModel,
   MappingPair,
   OpenApiMappingModel,
@@ -28,12 +27,16 @@ import {
   trans2Pairs,
   updateMapping,
 } from 'services/mappingservice';
+import { Schema } from 'utils/helpers/schemaHelpers';
 import {
   getRequestSchema,
   getResponseSchema,
-  parseApiSpec,
-  Schema,
+  parseApiSpec as parseOpenApiSpec,
 } from 'utils/helpers/swaggerParser';
+import {
+  getMessageSchema,
+  parseApiSpec as parseAsyncApiSpec,
+} from 'utils/helpers/asyncApiParser';
 
 type MappingOption = {
   value: MappingModel;
@@ -103,7 +106,7 @@ function MappingEditor(): ReactElement {
   }>();
 
   useEffect(() => {
-    async function loadMappingData() {
+    async function loadOpenApiMappingData() {
       if (!selectedMapping) {
         return;
       }
@@ -114,13 +117,15 @@ function MappingEditor(): ReactElement {
         targetId.split('_'),
       );
 
-      const [sourceApi, ...targetApis] = await Promise.all<ApiModel>(
+      const [sourceApi, ...targetApis] = await Promise.all<OpenApiModel>(
         [
-          getApi(sourceIdData[0], false),
-          ...targetIdData.map((idData) => getApi(idData[0], false)),
+          getApi<OpenApiModel>(sourceIdData[0], false),
+          ...targetIdData.map((idData) =>
+            getApi<OpenApiModel>(idData[0], false),
+          ),
         ].map(async (apiPromise) => {
           const api = await apiPromise;
-          const apiObject = await parseApiSpec(api.apiSpec);
+          const apiObject = await parseOpenApiSpec(api.apiSpec);
           return {
             ...api,
             apiObject,
@@ -201,7 +206,74 @@ function MappingEditor(): ReactElement {
       });
     }
 
-    loadMappingData();
+    async function loadAsyncApiMappingData() {
+      if (!selectedMapping) {
+        return;
+      }
+
+      // [apiId, operationId]
+      const sourceIdData = selectedMapping.sourceId.split('_');
+      const targetIdData = selectedMapping.targetIds.map((targetId) =>
+        targetId.split('_'),
+      );
+
+      const [sourceApi, ...targetApis] = await Promise.all<AsyncApiModel>(
+        [
+          getApi<AsyncApiModel>(sourceIdData[0], false),
+          ...targetIdData.map((idData) =>
+            getApi<AsyncApiModel>(idData[0], false),
+          ),
+        ].map(async (apiPromise) => {
+          const api = await apiPromise;
+          const apiObject = await parseAsyncApiSpec(api.apiSpec);
+          return {
+            ...api,
+            apiObject,
+          };
+        }),
+      );
+
+      const sourceMessageSchema = {
+        [sourceIdData.join('_')]:
+          getMessageSchema(sourceApi.apiObject!, sourceIdData[1]) ?? {},
+      };
+
+      const targetMessageSchema = targetIdData.reduce<Record<string, Schema>>(
+        (schema, idData) => {
+          const targetApi = targetApis.find((api) => api.id === idData[0]);
+          const requestSchema = getMessageSchema(
+            targetApi!.apiObject!,
+            idData[1],
+          );
+
+          if (!requestSchema) {
+            return schema;
+          }
+
+          return {
+            ...schema,
+            [idData.join('_')]: requestSchema,
+          };
+        },
+        {},
+      );
+
+      const messageMappingPairs = trans2Pairs(
+        JSON.parse((selectedMapping as OpenApiMappingModel).requestMapping),
+      );
+
+      setRequestData({
+        mappingPairs: messageMappingPairs,
+        sourceSchema: sourceMessageSchema,
+        targetSchema: targetMessageSchema,
+      });
+    }
+
+    if (selectedMapping?.apiType === ApiType.ASYNC_API) {
+      loadAsyncApiMappingData();
+    } else if (selectedMapping?.apiType === ApiType.OPEN_API) {
+      loadOpenApiMappingData();
+    }
   }, [selectedMapping]);
   // #endregion
 
@@ -332,7 +404,11 @@ function MappingEditor(): ReactElement {
           {requestData && (
             <MappingContextProvider>
               <MappingContainer
-                title="Request"
+                title={
+                  selectedMapping.apiType === ApiType.OPEN_API
+                    ? 'Request'
+                    : 'Message'
+                }
                 required="target"
                 strict={false}
                 mappingPairs={requestData.mappingPairs}
