@@ -104,15 +104,6 @@ export const Mapping = model<IMapping & Document, IMappingModel>('Mapping', Mapp
 /// -------- AsyncApi Mapping ---------- ///
 export interface IAsyncApiMapping extends IMapping {
     direction: MappingDirection //If input, source & targets are subscribers. If output, providers.
-    // The key is the id of the target
-    topics: {
-        source: string,
-        targets: { [targetId: string]: string }
-    }
-    servers: {
-        source: string,
-        targets: { [targetId: string]: string }
-    }
     messageMappings: { [key: string]: string } //JSONata mappings
 }
 
@@ -120,26 +111,6 @@ const AsyncApiMappingSchema = new Schema({
     direction: {
         type: MappingDirection,
         required: true
-    },
-    topics: {
-        source: {
-            type: String,
-            required: true
-        },
-        targets: {
-            type: Schema.Types.Mixed,
-            required: true
-        }
-    },
-    servers: {
-        source: {
-            type: String,
-            required: true
-        },
-        targets: {
-            type: Schema.Types.Mixed,
-            required: true
-        }
     },
     messageMappings: {
         type: Schema.Types.Mixed,

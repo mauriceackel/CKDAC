@@ -37,18 +37,6 @@ function buildAsyncApiReverseMappings(mapping: Omit<IAsyncApiMapping, "id">): Ar
         targetIds: [mapping.sourceId],
         createdBy: mapping.createdBy,
         type: MappingType.REVERSE,
-        topics: {
-            source: mapping.topics.targets[targetId],
-            targets: {
-                [mapping.sourceId]: mapping.topics.source
-            }
-        },
-        servers: {
-            source: mapping.servers.targets[targetId],
-            targets: {
-                [mapping.sourceId]: mapping.servers.source
-            }
-        },
         messageMappings: { [mapping.sourceId]: revertTransformationObject([targetId, mapping.sourceId], mapping.messageMappings[targetId]) },
         direction: mapping.direction
     }));
