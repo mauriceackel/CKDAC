@@ -1,13 +1,5 @@
-import { MappingPair } from 'models/MappingModel';
-import React, {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ReactElement } from 'react';
 import Modal from 'react-modal';
-import escapeJsonata from 'utils/helpers/escapeJsonata';
 import ClearIcon from './Icons/ClearIcon';
 
 Modal.setAppElement('#root');
@@ -22,10 +14,7 @@ function InfoModal(props: InfoModalProps): ReactElement {
   const { isOpen, onDismiss, header, message } = props;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      className="transformation-editor-modal flex flex-col"
-    >
+    <Modal isOpen={isOpen} className="modal flex flex-col">
       <div className="flex-shrink-0 flex items-center justify-between">
         <h2 className="text-2xl font-bold">{header}</h2>
         <button

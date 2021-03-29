@@ -137,6 +137,8 @@ function InterfaceEditor(): ReactElement {
       });
 
       loadApis(apiType);
+      setSelectedApiOption(undefined);
+      resetForm({});
 
       setError('success', {
         type: 'manual',

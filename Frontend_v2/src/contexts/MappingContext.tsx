@@ -2,7 +2,6 @@ import { MappingPair } from 'models/MappingModel';
 import React, {
   PropsWithChildren,
   ReactElement,
-  useEffect,
   useMemo,
   useReducer,
 } from 'react';
