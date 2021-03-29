@@ -346,14 +346,6 @@ function AsyncApiMappingCreator(): ReactElement {
         (attributeId) => !flatMapping.includes(attributeId),
       );
 
-      console.log(
-        clusteredMappingPairs,
-        targetId,
-        flatMapping,
-        flatRequiredSchema,
-        missing,
-      );
-
       return missing.length === 0;
     });
 

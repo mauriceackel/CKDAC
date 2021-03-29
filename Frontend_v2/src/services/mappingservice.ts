@@ -83,7 +83,7 @@ export async function generateMapping<
   >(`${BACKEND_BASE_URL}/mappings/generate`, {
     source: sourceOperation,
     targets: targetOperations,
-    ...(direction ? { direction } : null),
+    ...(direction !== undefined ? { direction } : null),
   });
 
   return response.data.result;
@@ -122,7 +122,7 @@ export async function recomputeAttributeMapping<
   >(`${BACKEND_BASE_URL}/mappings/generate/attribute`, {
     source: sourceOperation,
     targets: targetOperations,
-    ...(direction ? { direction } : null),
+    ...(direction !== undefined ? { direction } : null),
     mappingPairs,
   });
 
