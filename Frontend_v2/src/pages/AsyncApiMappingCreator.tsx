@@ -46,6 +46,7 @@ import { Schema } from 'utils/helpers/schemaHelpers';
 import Select from 'react-select';
 import ClearIcon from 'components/Icons/ClearIcon';
 import AddIcon from 'components/Icons/AddIcon';
+import CheckIcon from 'components/Icons/CheckIcon';
 
 function AsyncApiMappingCreator(): ReactElement {
   const { authState } = useContext(AuthContext);
@@ -246,39 +247,7 @@ function AsyncApiMappingCreator(): ReactElement {
   const [strictEnabled, setStrictEnabled] = useState<boolean>(true);
   // #endregion
 
-  // #region Determine current mapping validity
-  const isValid = useMemo(() => {
-    if (!targetMessageSchema || !sourceMessageSchema) {
-      return false;
-    }
-
-    if (
-      updatedMessageMappingPairState.mappingPairs.some(
-        (mappingPair) => !mappingPair.mappingTransformation,
-      )
-    ) {
-      return false;
-    }
-
-    // TODO: Filter based on whcih side is required and wihich side is provided
-    const flatTargetRequest = Object.keys(flatten(targetMessageSchema));
-    const flatRequestMapping = Object.keys(
-      flatten(pairs2Trans(updatedMessageMappingPairState.mappingPairs)),
-    );
-
-    const missing = flatTargetRequest.filter(
-      (attributeId) => !flatRequestMapping.includes(attributeId),
-    );
-
-    return missing.length === 0;
-  }, [
-    sourceMessageSchema,
-    targetMessageSchema,
-    updatedMessageMappingPairState.mappingPairs,
-  ]);
-  // #endregion
-
-  // #region Interaction handlers
+  // #region Mapping pair clustering
   const clusterMappingPairs = useCallback(
     (mappingPairs: MappingPair[]) => {
       // For AsyncApi, we need to build one jsonata mapping for each target.
@@ -288,7 +257,7 @@ function AsyncApiMappingCreator(): ReactElement {
         // target is provided
         return mappingPairs.reduce<Record<string, MappingPair[]>>(
           (cluster, mappingPair) => {
-            const [apiId] = mappingPair.providedAttributeIds[0].split('_');
+            const [apiId] = mappingPair.providedAttributeIds[0].split('.');
 
             if (
               mappingPair.providedAttributeIds.some(
@@ -340,7 +309,65 @@ function AsyncApiMappingCreator(): ReactElement {
     },
     [clusterMappingPairs],
   );
+  // #endregion
 
+  // #region Determine current mapping validity
+  const isValid = useMemo(() => {
+    if (!targetMessageSchema || !sourceMessageSchema) {
+      return false;
+    }
+
+    if (
+      updatedMessageMappingPairState.mappingPairs.some(
+        (mappingPair) => !mappingPair.mappingTransformation,
+      )
+    ) {
+      return false;
+    }
+
+    const clusteredMappingPairs = clusterMappingPairs(
+      updatedMessageMappingPairState.mappingPairs,
+    );
+
+    const valid = Object.keys(targetMessageSchema).every((targetId) => {
+      // Check for every target
+      const flatRequiredSchema = Object.keys(
+        flatten(
+          mappingDirection === MappingDirection.INPUT
+            ? sourceMessageSchema
+            : { [targetId]: targetMessageSchema[targetId] }, // Extract a single target
+        ),
+      );
+      const flatMapping = Object.keys(
+        flatten(pairs2Trans(clusteredMappingPairs[targetId] ?? [])),
+      );
+
+      const missing = flatRequiredSchema.filter(
+        (attributeId) => !flatMapping.includes(attributeId),
+      );
+
+      console.log(
+        clusteredMappingPairs,
+        targetId,
+        flatMapping,
+        flatRequiredSchema,
+        missing,
+      );
+
+      return missing.length === 0;
+    });
+
+    return valid;
+  }, [
+    sourceMessageSchema,
+    targetMessageSchema,
+    updatedMessageMappingPairState.mappingPairs,
+    mappingDirection,
+    clusterMappingPairs,
+  ]);
+  // #endregion
+
+  // #region Interaction handlers
   const [saving, setSaving] = useState<boolean>(false);
   const handleSaveMapping = useCallback(async () => {
     if (
@@ -446,7 +473,12 @@ function AsyncApiMappingCreator(): ReactElement {
         <div className="w-1/2 px-1 flex flex-col justify-between">
           <p className="font-bold">Source</p>
           <div>
-            <label htmlFor="cbx-direction">
+            <label htmlFor="cbx-direction" className="flex">
+              <div className="w-6 h-6 mr-2 rounded border">
+                {mappingDirection === MappingDirection.INPUT && (
+                  <CheckIcon className="w-6 h-6" />
+                )}
+              </div>
               Is Required
               <input
                 id="cbx-direction"
@@ -474,8 +506,8 @@ function AsyncApiMappingCreator(): ReactElement {
           <MultiSelection
             operationType={
               mappingDirection === MappingDirection.INPUT
-                ? 'subscribe'
-                : 'publish'
+                ? 'publish'
+                : 'subscribe'
             }
             apiOptions={apiOptions}
             operations={targetOperations}
@@ -499,6 +531,11 @@ function AsyncApiMappingCreator(): ReactElement {
               mappingPairs,
             });
           }}
+          noMixed
+          allowMultiMapping
+          // If the target side is the provided side, require a selection in order
+          // to be able to differentiate where a static value mapping belongs to
+          requireProvided={mappingDirection === MappingDirection.INPUT}
           sourceSchema={sourceMessageSchema}
           targetSchema={targetMessageSchema}
         />
@@ -623,6 +660,10 @@ function SingleSelection(props: SingleSelectionProps) {
     },
     [operationType],
   );
+
+  useEffect(() => {
+    setSelectedOperationOption(null);
+  }, [operationType]);
   // #endregion
 
   // #region Handle operation prop change
@@ -700,7 +741,7 @@ function SingleSelection(props: SingleSelectionProps) {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceOperation, selectedApi]);
+  }, [sourceOperation, selectedApi, operationType]);
   // #endregion
 
   // #region Handle manual operation change
@@ -745,7 +786,7 @@ function SingleSelection(props: SingleSelectionProps) {
         filterOption={optionFilter}
       />
       <Select
-        className="w-full"
+        className="w-full mt-2"
         value={selectedOperationOption}
         isSearchable
         onChange={(value) => setSelectedOperationOption(value ?? null)}

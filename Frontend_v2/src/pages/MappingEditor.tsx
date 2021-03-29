@@ -5,6 +5,8 @@ import { MappingContextProvider } from 'contexts/MappingContext';
 import flatten from 'flat';
 import { ApiType, AsyncApiModel, OpenApiModel } from 'models/ApiModel';
 import {
+  AsyncApiMappingModel,
+  MappingDirection,
   MappingModel,
   MappingPair,
   OpenApiMappingModel,
@@ -91,6 +93,14 @@ function MappingEditor(): ReactElement {
     () => selectedMappingOption && selectedMappingOption.value,
     [selectedMappingOption],
   );
+
+  const mappingDirection = useMemo<MappingDirection | undefined>(() => {
+    if (selectedMapping?.apiType === ApiType.ASYNC_API) {
+      return (selectedMapping as AsyncApiMappingModel).direction;
+    }
+
+    return undefined;
+  }, [selectedMapping]);
   // #endregion
 
   // #region Mapping data
@@ -404,13 +414,16 @@ function MappingEditor(): ReactElement {
           {requestData && (
             <MappingContextProvider>
               <MappingContainer
-                title={
-                  selectedMapping.apiType === ApiType.OPEN_API
-                    ? 'Request'
-                    : 'Message'
+                title="Request"
+                required={
+                  mappingDirection === MappingDirection.INPUT
+                    ? 'source'
+                    : 'target' // Will be target if mapping direction is undefined (i.e. OpenApi mapping)
                 }
-                required="target"
                 strict={false}
+                noMixed={apiType === ApiType.ASYNC_API}
+                allowMultiMapping={apiType === ApiType.ASYNC_API}
+                requireProvided={mappingDirection === MappingDirection.INPUT}
                 mappingPairs={requestData.mappingPairs}
                 sourceSchema={requestData.sourceSchema}
                 targetSchema={requestData.targetSchema}

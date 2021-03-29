@@ -7,17 +7,30 @@ import { buildNodes, JsonTreeNode } from 'utils/helpers/toTree';
 import ChevronRightIcon from './Icons/ChevronRightIcon';
 
 interface SchemaTreeProps {
-  required: boolean;
+  required: boolean; // If true, this is the required side
+  noMixed?: boolean; // If true, provided attributes have to be from the same api
+  allowMultiMapping?: boolean; // If true, required attribute can be mapped more than once
   schema: Record<string, Schema>;
 }
 function SchemaTree(props: SchemaTreeProps): ReactElement {
-  const { schema, required } = props;
+  const {
+    schema,
+    required,
+    noMixed = false,
+    allowMultiMapping = false,
+  } = props;
   const nodes = useMemo(() => buildNodes(schema), [schema]);
 
   return (
     <div>
       {nodes.map((node) => (
-        <TreeNode key={node.key} node={node} required={required} />
+        <TreeNode
+          key={node.key}
+          node={node}
+          noMixed={noMixed}
+          allowMultiMapping={allowMultiMapping}
+          required={required}
+        />
       ))}
     </div>
   );
@@ -26,10 +39,12 @@ function SchemaTree(props: SchemaTreeProps): ReactElement {
 // #region Tree node
 interface TreeNodeProps {
   required: boolean;
+  noMixed: boolean;
+  allowMultiMapping: boolean;
   node: JsonTreeNode;
 }
 function TreeNode(props: TreeNodeProps): ReactElement {
-  const { required, node } = props;
+  const { required, noMixed, allowMultiMapping, node } = props;
 
   const [expanded, setExpanded] = useState(true);
   const { mappingState, dispatch } = useContext(MappingContext);
@@ -42,13 +57,28 @@ function TreeNode(props: TreeNodeProps): ReactElement {
 
   // #region Compute state
   const disabled = useMemo(() => {
-    return (
+    const alreadyMapped =
       required &&
+      !allowMultiMapping &&
       mappingPairs.some(
         (mappingPair) => mappingPair.requiredAttributeId === node.key,
-      )
-    );
-  }, [mappingPairs, node, required]);
+      );
+
+    const [apiId] = node.key.split('_');
+    const notMixable =
+      noMixed &&
+      !required && // Only relevant for provider side as we can only du multi-select here
+      (providedSelection?.some((id) => !id.startsWith(apiId)) ?? false);
+
+    return alreadyMapped || notMixable;
+  }, [
+    mappingPairs,
+    noMixed,
+    node.key,
+    providedSelection,
+    required,
+    allowMultiMapping,
+  ]);
 
   const highlighted = useMemo(() => {
     if (hoveredMappingPair === undefined) {
@@ -118,6 +148,8 @@ function TreeNode(props: TreeNodeProps): ReactElement {
               <TreeNode
                 key={childNode.key}
                 node={childNode}
+                noMixed={noMixed}
+                allowMultiMapping={allowMultiMapping}
                 required={required}
               />
             ))}
