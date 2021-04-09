@@ -152,7 +152,7 @@ function MappingTest(props: MappingTestProps): ReactElement {
               Logs:
               <br />
               {logs.map((line) => (
-                <Fragment key="line">
+                <Fragment key={line}>
                   {line}
                   <br />
                 </Fragment>
