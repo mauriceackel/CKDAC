@@ -47,7 +47,7 @@ function getOperation(
           operation: channel.publish(),
         });
       }
-      if (mode !== 'publish' && channel.hasPublish()) {
+      if (mode !== 'publish' && channel.hasSubscribe()) {
         result.push({
           pathUrl: path,
           channel,
