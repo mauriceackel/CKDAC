@@ -90,7 +90,9 @@ function InterfaceEditor(): ReactElement {
   // #endregion
 
   // #region Api Selection
-  const [selectedApiOption, setSelectedApiOption] = useState<ApiOption>();
+  const [selectedApiOption, setSelectedApiOption] = useState<ApiOption | null>(
+    null,
+  );
   const selectedApi = useMemo(() => {
     return selectedApiOption?.value;
   }, [selectedApiOption]);
@@ -137,8 +139,8 @@ function InterfaceEditor(): ReactElement {
       });
 
       loadApis(apiType);
-      setSelectedApiOption(undefined);
       resetForm({});
+      setSelectedApiOption(null);
 
       setError('success', {
         type: 'manual',
@@ -160,10 +162,10 @@ function InterfaceEditor(): ReactElement {
         <p className="font-bold text-sm">APIs</p>
         <Select
           className="w-full"
-          defaultValue={selectedApiOption}
+          value={selectedApiOption}
           isSearchable
           isClearable
-          onChange={(value) => setSelectedApiOption(value ?? undefined)}
+          onChange={(value) => setSelectedApiOption(value)}
           options={apiOptions}
           filterOption={optionFilter}
         />
