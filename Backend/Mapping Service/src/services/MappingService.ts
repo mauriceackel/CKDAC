@@ -118,12 +118,12 @@ function createAttributeNodesFromMapping(mapping: IMapping) {
     switch(mapping.apiType) {
         case ApiType.ASYNC_API: {
             mappingPairs = transToMappingPairs((mapping as IAsyncApiMapping).messageMappings)
-        };
+        }; break;
         case ApiType.OPEN_API: {
             const requestMappingPairs = transToMappingPairs(JSON.parse((mapping as IOpenApiMapping).requestMapping));
             const responseMappingPairs = transToMappingPairs(JSON.parse((mapping as IOpenApiMapping).responseMapping));
             mappingPairs = requestMappingPairs.concat(responseMappingPairs);
-        }
+        }; break;
     }
 
     const validMappingPairs = mappingPairs.filter(isValid);
@@ -216,9 +216,13 @@ export async function getMappedOperations(apiType: ApiType, sourceId: string, ta
             const [apiId, operationId] = targetId.split('_');
 
             if (targetApiId === apiId) {
-                //If one target ID matches our final target API, we add the mapping without any children to the tree
+                // We have found a mapping from the source to the target.
                 mappedOperations.push({ apiId, operationId });
-            } else if (!(visitedApis.includes(targetId) || sourceId === targetId)) {
+            } 
+            
+            // Move on if we have not found any match
+            // If we have sound a match, make one more go nevertheless and see if the targetApi has mappings to itself
+            if(!(visitedApis.includes(targetId) || sourceId === targetId)) {
                 //If the target ID does not yet match the final target, we execute the recursion step, resulting in a DFS
                 const result = await getMappedOperations(apiType, targetId, targetApiId, [...visitedApis, sourceId]);
                 mappedOperations.push(...result);
