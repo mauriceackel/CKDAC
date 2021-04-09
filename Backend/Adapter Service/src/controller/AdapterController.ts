@@ -6,6 +6,7 @@ import * as AdapterService from '../services/Adapter/AdapterService'
 import { logger } from '../Service';
 import { IMapping } from '../models/MappingModel';
 import { AdapterResponse } from '../utils/responses/AdapterResponse';
+import { AdapterType } from '../utils/enums/AdapterTypes';
 
 //Reference to express
 const router: Router = Router();
@@ -17,7 +18,7 @@ async function createAdapter(req: Request, res: Response, next: NextFunction) {
     let response: ApiResponse;
     if (mapping) {
         try {
-            const fileId = await AdapterService.createAdapter(req.params.adapterType, mapping, req.userId);
+            const fileId = await AdapterService.createAdapter(req.params.adapterType as AdapterType, mapping, req.userId);
 
             response = new AdapterResponse(200, undefined, fileId);
         } catch (err) {

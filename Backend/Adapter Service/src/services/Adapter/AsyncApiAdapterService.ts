@@ -148,6 +148,7 @@ async function createJavaScriptAdapter(
         templateParams: {
           server: target.server,
         },
+        forceWrite: true,
       }
     );
     const targetPath = `${filePath}/targets/${target.apiId}/apiSpec.json`;
@@ -180,6 +181,7 @@ async function createJavaScriptAdapter(
         mappingDirection: mapping.direction.toString(),
         targets,
       },
+      forceWrite: true,
     }
   );
   await generator.generateFromFile(`${filePath}/source/apiSpec.json`);
@@ -191,13 +193,7 @@ async function getOperationInfo(
 ): Promise<{ url: string; server: string } | undefined> {
   const apiObject = await AsyncApiParser.parse(apiSpec);
 
-  const server = apiObject.servers()[0];
-  const serverUrl = Object.entries(server.variables() || []).reduce(
-    (url, [varname, value]) =>
-      url.replace(new RegExp(`{${varname}}`, "g"), value.defaultValue()),
-    server.url()
-  );
-
+  const serverName = Object.keys(apiObject.servers())[0];
   const urls = apiObject.channelNames();
 
   for (let i = 0; i < urls.length; i += 1) {
@@ -205,11 +201,11 @@ async function getOperationInfo(
     const channel = apiObject.channel(url);
 
     if (channel.hasPublish() && channel.publish().id() === operationId) {
-      return { url, server: serverUrl };
+      return { url, server: serverName };
     }
 
     if (channel.hasSubscribe() && channel.subscribe().id() === operationId) {
-      return { url, server: serverUrl };
+      return { url, server: serverName };
     }
   }
 
