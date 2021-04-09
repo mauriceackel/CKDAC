@@ -6,7 +6,8 @@
   "main": "Service.js",
   "dockerRepoPrefix": "mackel/ckdac-",
   "scripts": {
-    "build": "ncp ./assets ./bin && tsc",
+    "build-generator": "npm i --prefix assets/asyncapi-generator/source-template && npm i --prefix assets/asyncapi-generator/target-template",
+    "build": "npm run build-generator && ncp ./assets ./bin && tsc",
     "start": "node ./bin/Service.js",
     "prestart": "npm run build",
     "debug": "node --inspect ./bin/Service.js",
