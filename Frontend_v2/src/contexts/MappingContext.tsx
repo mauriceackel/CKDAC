@@ -36,7 +36,7 @@ type SetMappingPairsAction = {
 type AddMappingPairAction = {
   type: 'addMappingPair';
   payload: {
-    mappingPair: MappingPair;
+    mappingPair: MappingPair | MappingPair[];
   };
 };
 type UpdateMappingPairAction = {
@@ -125,6 +125,16 @@ function mappingReducer(
       };
     }
     case 'addMappingPair': {
+      if (Array.isArray(action.payload.mappingPair)) {
+        return {
+          ...currentState,
+          mappingPairs: [
+            ...currentState.mappingPairs,
+            ...action.payload.mappingPair,
+          ],
+        };
+      }
+
       return {
         ...currentState,
         mappingPairs: [
