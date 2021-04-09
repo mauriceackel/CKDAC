@@ -27,6 +27,7 @@ interface MappingContainerProps {
   noMixed?: boolean; // If set to true, does not allow to select provided properties from different apis
   allowMultiMapping?: boolean; // If true, required attribute can be mapped more than once
   requireProvided?: boolean; // If true, user always has to be select a provided attribute (this will be enforced by a dialog if needed)
+  addMappingInterceptor?: (mappingPair: MappingPair) => Promise<MappingPair[]>; // Function that is executed on every change of the internal mapping pairs. It can return new mapping pairs generated from the current state
   mappingPairs: MappingPair[];
   onMappingPairsChange?: (mappingPairs: MappingPair[]) => void;
   required: 'source' | 'target';
@@ -42,11 +43,15 @@ function MappingContainer(props: MappingContainerProps): ReactElement {
     requireProvided = false,
     mappingPairs,
     onMappingPairsChange = () => {},
+    addMappingInterceptor = () => [],
     sourceSchema,
     targetSchema,
     required,
   } = props;
 
+  const [expanded, setExpanded] = useState<boolean>(false);
+
+  // #region Contexts
   const {
     mappingState: {
       mappingPairs: internalMappingPairs,
@@ -55,13 +60,16 @@ function MappingContainer(props: MappingContainerProps): ReactElement {
     },
     dispatch,
   } = useContext(MappingContext);
+  // #endregion
 
+  // #region Mapping Association prompt
+  // This is required for asyncApi mapping sif th user wants to set a required attribute to a static value
   const [openPrompt, Prompt] = usePrompt<
     string,
     React.ComponentProps<typeof ApiAssociationPrompt>,
     typeof ApiAssociationPrompt
   >(ApiAssociationPrompt);
-  const [expanded, setExpanded] = useState<boolean>(false);
+  // #endregion
 
   // #region Create mapping pair
   useEffect(() => {
@@ -108,10 +116,22 @@ function MappingContainer(props: MappingContainerProps): ReactElement {
             : '',
       };
 
+      // Get additional attribute mappings
+      const additionalMappingPairs = await addMappingInterceptor(mappingPair);
+      const currentMappingPairs = [...internalMappingPairs, mappingPair];
+      const currentMappingPairAttributeIds = currentMappingPairs.map(
+        (mP) => mP.requiredAttributeId,
+      );
+
+      // Filter out all already existing mapping pairs
+      const filteredMappingPairs = additionalMappingPairs.filter((mP) => {
+        return !currentMappingPairAttributeIds.includes(mP.requiredAttributeId);
+      });
+
       dispatch({
         type: 'addMappingPair',
         payload: {
-          mappingPair,
+          mappingPair: [...filteredMappingPairs, mappingPair],
         },
       });
 

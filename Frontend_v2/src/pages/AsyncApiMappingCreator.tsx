@@ -47,6 +47,10 @@ import Select from 'react-select';
 import ClearIcon from 'components/Icons/ClearIcon';
 import AddIcon from 'components/Icons/AddIcon';
 import CheckIcon from 'components/Icons/CheckIcon';
+import {
+  clusterMappingPairs,
+  computeMessageMapping,
+} from 'utils/helpers/mappingHelpers';
 
 function AsyncApiMappingCreator(): ReactElement {
   const { authState } = useContext(AuthContext);
@@ -165,15 +169,9 @@ function AsyncApiMappingCreator(): ReactElement {
     [],
   );
 
-  const [
-    updatedMessageMappingPairState,
-    setUpdatedMessageMappingPairState,
-  ] = useState<{
-    mappingPairs: MappingPair[];
-    preventUpdate?: boolean;
-  }>({
-    mappingPairs: [],
-  });
+  const [updatedMessageMappingPairs, setUpdatedMessageMappingPairs] = useState<
+    MappingPair[]
+  >([]);
   // #endregion
 
   // #region Mapping initialization
@@ -197,9 +195,9 @@ function AsyncApiMappingCreator(): ReactElement {
   // #endregion
 
   // #region Attribute mapping recomputation
-  const updateAttributeMapping = useCallback(async () => {
+  const handleAddMappingPair = useCallback(async () => {
     if (!sourceOperation || !targetOperations) {
-      return;
+      return [];
     }
 
     const result = await recomputeAttributeMapping(
@@ -209,106 +207,17 @@ function AsyncApiMappingCreator(): ReactElement {
       mappingDirection,
     );
 
-    setUpdatedMessageMappingPairState((currentState) => {
-      const currentMappingPairs = currentState.mappingPairs;
-
-      const currentMappingPairAttributeIds = currentMappingPairs.map(
-        (mappingPair) => mappingPair.requiredAttributeId,
-      );
-
-      // Filter out all already existing mapping pairs
-      const filteredMappingPairs = result.mappingPairs.filter((mappingPair) => {
-        return !currentMappingPairAttributeIds.includes(
-          mappingPair.requiredAttributeId,
-        );
-      });
-
-      return {
-        mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
-        preventUpdate: true,
-      };
-    });
+    return result.mappingPairs;
   }, [
     messageMappingPairs,
     sourceOperation,
     targetOperations,
     mappingDirection,
   ]);
-
-  useEffect(() => {
-    if (!updatedMessageMappingPairState.preventUpdate) {
-      updateAttributeMapping();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatedMessageMappingPairState]);
   // #endregion
 
   // #region Strict mode
   const [strictEnabled, setStrictEnabled] = useState<boolean>(true);
-  // #endregion
-
-  // #region Mapping pair clustering
-  const clusterMappingPairs = useCallback(
-    (mappingPairs: MappingPair[]) => {
-      // For AsyncApi, we need to build one jsonata mapping for each target.
-      // Hence, we need to cluster all mapping pairs that belong to the same target.
-
-      if (mappingDirection === MappingDirection.INPUT) {
-        // target is provided
-        return mappingPairs.reduce<Record<string, MappingPair[]>>(
-          (cluster, mappingPair) => {
-            const [apiId] = mappingPair.providedAttributeIds[0].split('.');
-
-            if (
-              mappingPair.providedAttributeIds.some(
-                (id) => !id.startsWith(apiId),
-              )
-            ) {
-              // Ignore mapping pairs that combine attributes from different target
-              // This should never happen due to the restrictions in the mapping container
-              return cluster;
-            }
-
-            return {
-              ...cluster,
-              [apiId]: [...(cluster[apiId] ?? []), mappingPair],
-            };
-          },
-          {},
-        );
-      }
-
-      // target is required
-      return mappingPairs.reduce<Record<string, MappingPair[]>>(
-        (cluster, mappingPair) => {
-          const [apiId] = mappingPair.requiredAttributeId.split('_');
-
-          return {
-            ...cluster,
-            [apiId]: [...(cluster[apiId] ?? []), mappingPair],
-          };
-        },
-        {},
-      );
-    },
-    [mappingDirection],
-  );
-
-  const computeMessageMapping = useCallback(
-    (mappingPairs: MappingPair[]) => {
-      const clusteredMappingPairs = clusterMappingPairs(mappingPairs);
-
-      return Object.entries(clusteredMappingPairs).reduce<
-        Record<string, string>
-      >((mapping, [targetId, mPairs]) => {
-        return {
-          ...mapping,
-          [targetId]: JSON.stringify(pairs2Trans(mPairs)),
-        };
-      }, {});
-    },
-    [clusterMappingPairs],
-  );
   // #endregion
 
   // #region Determine current mapping validity
@@ -318,7 +227,7 @@ function AsyncApiMappingCreator(): ReactElement {
     }
 
     if (
-      updatedMessageMappingPairState.mappingPairs.some(
+      updatedMessageMappingPairs.some(
         (mappingPair) => !mappingPair.mappingTransformation,
       )
     ) {
@@ -326,7 +235,8 @@ function AsyncApiMappingCreator(): ReactElement {
     }
 
     const clusteredMappingPairs = clusterMappingPairs(
-      updatedMessageMappingPairState.mappingPairs,
+      updatedMessageMappingPairs,
+      mappingDirection,
     );
 
     const valid = Object.keys(targetMessageSchema).every((targetId) => {
@@ -353,13 +263,18 @@ function AsyncApiMappingCreator(): ReactElement {
   }, [
     sourceMessageSchema,
     targetMessageSchema,
-    updatedMessageMappingPairState.mappingPairs,
+    updatedMessageMappingPairs,
     mappingDirection,
-    clusterMappingPairs,
   ]);
   // #endregion
 
   // #region Interaction handlers
+  const handleClear = useCallback(() => {
+    setPartialSourceOperation(undefined);
+    setTargetOperations(undefined);
+    setMessageMappingPairs([]);
+  }, []);
+
   const [saving, setSaving] = useState<boolean>(false);
   const handleSaveMapping = useCallback(async () => {
     if (
@@ -382,7 +297,8 @@ function AsyncApiMappingCreator(): ReactElement {
       targetIds: Object.keys(targetOperations),
       direction: mappingDirection,
       messageMappings: computeMessageMapping(
-        updatedMessageMappingPairState.mappingPairs,
+        updatedMessageMappingPairs,
+        mappingDirection,
       ),
     };
 
@@ -393,15 +309,16 @@ function AsyncApiMappingCreator(): ReactElement {
       setError('An error occurred');
     } finally {
       setSaving(false);
+      handleClear();
     }
   }, [
     isValid,
     strictEnabled,
     authState.user,
     sourceOperation,
+    handleClear,
     targetOperations,
-    computeMessageMapping,
-    updatedMessageMappingPairState.mappingPairs,
+    updatedMessageMappingPairs,
     mappingDirection,
   ]);
 
@@ -421,7 +338,8 @@ function AsyncApiMappingCreator(): ReactElement {
       targetIds: Object.keys(targetOperations),
       direction: mappingDirection,
       messageMappings: computeMessageMapping(
-        updatedMessageMappingPairState.mappingPairs,
+        updatedMessageMappingPairs,
+        mappingDirection,
       ),
     };
 
@@ -437,18 +355,11 @@ function AsyncApiMappingCreator(): ReactElement {
     }
   }, [
     authState,
-    computeMessageMapping,
     sourceOperation,
     targetOperations,
     mappingDirection,
-    updatedMessageMappingPairState.mappingPairs,
+    updatedMessageMappingPairs,
   ]);
-
-  const handleClear = useCallback(() => {
-    setPartialSourceOperation(undefined);
-    setTargetOperations(undefined);
-    setMessageMappingPairs([]);
-  }, []);
   // #endregion
 
   return (
@@ -471,7 +382,7 @@ function AsyncApiMappingCreator(): ReactElement {
                   <CheckIcon className="w-6 h-6" />
                 )}
               </div>
-              Is Required
+              Publish Operations (Source is required)
               <input
                 id="cbx-direction"
                 type="checkbox"
@@ -518,11 +429,8 @@ function AsyncApiMappingCreator(): ReactElement {
           }
           strict={strictEnabled}
           mappingPairs={messageMappingPairs}
-          onMappingPairsChange={(mappingPairs) => {
-            setUpdatedMessageMappingPairState({
-              mappingPairs,
-            });
-          }}
+          onMappingPairsChange={setUpdatedMessageMappingPairs}
+          addMappingInterceptor={handleAddMappingPair}
           noMixed
           allowMultiMapping
           // If the target side is the provided side, require a selection in order

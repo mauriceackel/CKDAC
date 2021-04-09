@@ -173,25 +173,14 @@ function OpenApiMappingCreator(): ReactElement {
     MappingPair[]
   >([]);
 
-  const [
-    updatedRequestMappingPairState,
-    setUpdatedRequestMappingPairState,
-  ] = useState<{
-    mappingPairs: MappingPair[];
-    preventUpdate?: boolean;
-  }>({
-    mappingPairs: [],
-  });
+  const [updatedRequestMappingPairs, setUpdatedRequestMappingPairs] = useState<
+    MappingPair[]
+  >([]);
 
   const [
-    updatedResponseMappingPairState,
-    setUpdatedResponseMappingPairState,
-  ] = useState<{
-    mappingPairs: MappingPair[];
-    preventUpdate?: boolean;
-  }>({
-    mappingPairs: [],
-  });
+    updatedResponseMappingPairs,
+    setUpdatedResponseMappingPairs,
+  ] = useState<MappingPair[]>([]);
   // #endregion
 
   // #region Mapping initialization
@@ -215,84 +204,61 @@ function OpenApiMappingCreator(): ReactElement {
   // #endregion
 
   // #region Attribute mapping recomputation
-  const updateAttributeMapping = useCallback(async () => {
-    if (!sourceOperation || !targetOperations) {
-      return;
-    }
+  const handleAddRequestMappingPair = useCallback(
+    async (addedMappingPair: MappingPair) => {
+      if (!sourceOperation || !targetOperations) {
+        return [];
+      }
 
-    const combinedMappingPairs = [
-      ...requestMappingPairs,
-      ...responseMappingPairs,
-    ];
-    const result = await recomputeAttributeMapping(
+      const combinedMappingPairs = [
+        ...requestMappingPairs,
+        ...responseMappingPairs,
+        addedMappingPair,
+      ];
+
+      const result = await recomputeAttributeMapping(
+        sourceOperation,
+        targetOperations,
+        combinedMappingPairs,
+      );
+
+      return result.mappingPairs.request;
+    },
+    [
+      requestMappingPairs,
+      responseMappingPairs,
       sourceOperation,
       targetOperations,
-      combinedMappingPairs,
-    );
+    ],
+  );
 
-    setUpdatedRequestMappingPairState((currentState) => {
-      const currentMappingPairs = currentState.mappingPairs;
+  const handleAddResponseMappingPair = useCallback(
+    async (addedMappingPair: MappingPair) => {
+      if (!sourceOperation || !targetOperations) {
+        return [];
+      }
 
-      const currentMappingPairAttributeIds = currentMappingPairs.map(
-        (mappingPair) => mappingPair.requiredAttributeId,
+      const combinedMappingPairs = [
+        ...requestMappingPairs,
+        ...responseMappingPairs,
+        addedMappingPair,
+      ];
+
+      const result = await recomputeAttributeMapping(
+        sourceOperation,
+        targetOperations,
+        combinedMappingPairs,
       );
 
-      // Filter out all already existing mapping pairs
-      const filteredMappingPairs = result.mappingPairs.request.filter(
-        (mappingPair) => {
-          return !currentMappingPairAttributeIds.includes(
-            mappingPair.requiredAttributeId,
-          );
-        },
-      );
-
-      return {
-        mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
-        preventUpdate: true,
-      };
-    });
-
-    setUpdatedResponseMappingPairState((currentState) => {
-      const currentMappingPairs = currentState.mappingPairs;
-
-      const currentMappingPairAttributeIds = currentMappingPairs.map(
-        (mappingPair) => mappingPair.requiredAttributeId,
-      );
-
-      // Filter out all already existing mapping pairs
-      const filteredMappingPairs = result.mappingPairs.response.filter(
-        (mappingPair) => {
-          return !currentMappingPairAttributeIds.includes(
-            mappingPair.requiredAttributeId,
-          );
-        },
-      );
-
-      return {
-        mappingPairs: [...currentMappingPairs, ...filteredMappingPairs],
-        preventUpdate: true,
-      };
-    });
-  }, [
-    requestMappingPairs,
-    responseMappingPairs,
-    sourceOperation,
-    targetOperations,
-  ]);
-
-  useEffect(() => {
-    if (!updatedRequestMappingPairState.preventUpdate) {
-      updateAttributeMapping();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatedRequestMappingPairState]);
-
-  useEffect(() => {
-    if (!updatedResponseMappingPairState.preventUpdate) {
-      updateAttributeMapping();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatedResponseMappingPairState]);
+      return result.mappingPairs.response;
+    },
+    [
+      requestMappingPairs,
+      responseMappingPairs,
+      sourceOperation,
+      targetOperations,
+    ],
+  );
   // #endregion
 
   // #region Strict mode
@@ -306,8 +272,8 @@ function OpenApiMappingCreator(): ReactElement {
     }
 
     const combinedMappingPairs = [
-      ...updatedRequestMappingPairState.mappingPairs,
-      ...updatedResponseMappingPairState.mappingPairs,
+      ...updatedRequestMappingPairs,
+      ...updatedResponseMappingPairs,
     ];
 
     if (
@@ -320,12 +286,12 @@ function OpenApiMappingCreator(): ReactElement {
 
     const flatTargetRequest = Object.keys(flatten(targetRequestSchema));
     const flatRequestMapping = Object.keys(
-      flatten(pairs2Trans(updatedRequestMappingPairState.mappingPairs)),
+      flatten(pairs2Trans(updatedRequestMappingPairs)),
     );
 
     const flatSourceResponse = Object.keys(flatten(sourceResponseSchema));
     const flatResponseMapping = Object.keys(
-      flatten(pairs2Trans(updatedResponseMappingPairState.mappingPairs)),
+      flatten(pairs2Trans(updatedResponseMappingPairs)),
     );
 
     const missingRequest = flatTargetRequest.filter(
@@ -339,12 +305,19 @@ function OpenApiMappingCreator(): ReactElement {
   }, [
     sourceResponseSchema,
     targetRequestSchema,
-    updatedRequestMappingPairState.mappingPairs,
-    updatedResponseMappingPairState.mappingPairs,
+    updatedRequestMappingPairs,
+    updatedResponseMappingPairs,
   ]);
   // #endregion
 
   // #region Interaction handlers
+  const handleClear = useCallback(() => {
+    setPartialSourceOperation(undefined);
+    setTargetOperations(undefined);
+    setRequestMappingPairs([]);
+    setResponseMappingPairs([]);
+  }, []);
+
   const [saving, setSaving] = useState<boolean>(false);
   const handleSaveMapping = useCallback(async () => {
     if (
@@ -365,12 +338,8 @@ function OpenApiMappingCreator(): ReactElement {
       createdBy: authState.user.id,
       sourceId: getId(sourceOperation),
       targetIds: Object.keys(targetOperations),
-      requestMapping: JSON.stringify(
-        pairs2Trans(updatedRequestMappingPairState.mappingPairs),
-      ),
-      responseMapping: JSON.stringify(
-        pairs2Trans(updatedResponseMappingPairState.mappingPairs),
-      ),
+      requestMapping: JSON.stringify(pairs2Trans(updatedRequestMappingPairs)),
+      responseMapping: JSON.stringify(pairs2Trans(updatedResponseMappingPairs)),
     };
 
     try {
@@ -380,15 +349,17 @@ function OpenApiMappingCreator(): ReactElement {
       setError('An error occurred');
     } finally {
       setSaving(false);
+      handleClear();
     }
   }, [
     authState,
     sourceOperation,
     strictEnabled,
     isValid,
+    handleClear,
     targetOperations,
-    updatedRequestMappingPairState.mappingPairs,
-    updatedResponseMappingPairState.mappingPairs,
+    updatedRequestMappingPairs,
+    updatedResponseMappingPairs,
   ]);
 
   const [adapterCreating, setAdapterCreating] = useState<boolean>(false);
@@ -405,12 +376,8 @@ function OpenApiMappingCreator(): ReactElement {
       createdBy: authState.user.id,
       sourceId: getId(sourceOperation),
       targetIds: Object.keys(targetOperations),
-      requestMapping: JSON.stringify(
-        pairs2Trans(updatedRequestMappingPairState.mappingPairs),
-      ),
-      responseMapping: JSON.stringify(
-        pairs2Trans(updatedResponseMappingPairState.mappingPairs),
-      ),
+      requestMapping: JSON.stringify(pairs2Trans(updatedRequestMappingPairs)),
+      responseMapping: JSON.stringify(pairs2Trans(updatedResponseMappingPairs)),
     };
 
     try {
@@ -427,16 +394,9 @@ function OpenApiMappingCreator(): ReactElement {
     authState,
     sourceOperation,
     targetOperations,
-    updatedRequestMappingPairState.mappingPairs,
-    updatedResponseMappingPairState.mappingPairs,
+    updatedRequestMappingPairs,
+    updatedResponseMappingPairs,
   ]);
-
-  const handleClear = useCallback(() => {
-    setPartialSourceOperation(undefined);
-    setTargetOperations(undefined);
-    setRequestMappingPairs([]);
-    setResponseMappingPairs([]);
-  }, []);
   // #endregion
 
   return (
@@ -476,11 +436,8 @@ function OpenApiMappingCreator(): ReactElement {
           required="target"
           strict={strictEnabled}
           mappingPairs={requestMappingPairs}
-          onMappingPairsChange={(mappingPairs) => {
-            setUpdatedRequestMappingPairState({
-              mappingPairs,
-            });
-          }}
+          onMappingPairsChange={setUpdatedRequestMappingPairs}
+          addMappingInterceptor={handleAddRequestMappingPair}
           sourceSchema={sourceRequestSchema}
           targetSchema={targetRequestSchema}
         />
@@ -493,11 +450,8 @@ function OpenApiMappingCreator(): ReactElement {
           required="source"
           strict={strictEnabled}
           mappingPairs={responseMappingPairs}
-          onMappingPairsChange={(mappingPairs) =>
-            setUpdatedResponseMappingPairState({
-              mappingPairs,
-            })
-          }
+          onMappingPairsChange={setUpdatedResponseMappingPairs}
+          addMappingInterceptor={handleAddResponseMappingPair}
           sourceSchema={sourceResponseSchema}
           targetSchema={targetResponseSchema}
         />
@@ -505,8 +459,8 @@ function OpenApiMappingCreator(): ReactElement {
 
       {/* Testing */}
       <MappingTest
-        requestMappingPairs={updatedRequestMappingPairState.mappingPairs}
-        responseMappingPairs={updatedResponseMappingPairState.mappingPairs}
+        requestMappingPairs={updatedRequestMappingPairs}
+        responseMappingPairs={updatedResponseMappingPairs}
         sourceRequestSchema={sourceRequestSchema}
         targetOperations={targetOperations}
       />
