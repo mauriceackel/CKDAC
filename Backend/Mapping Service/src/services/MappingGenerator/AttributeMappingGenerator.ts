@@ -183,6 +183,7 @@ function performTransformations(edges: IAttributeEdge[]): string {
     // The edges point from source to target, so we have to start replacing at the end
     const [finalEdge] = edges.slice(-1);
     const otherEdges = edges.slice(0, -1);
+    // There are no edges -> This should never happen
     if(finalEdge === undefined) return "";
 
     const joined = otherEdges.reduceRight((trans, e) => {

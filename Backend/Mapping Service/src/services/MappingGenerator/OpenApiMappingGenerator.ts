@@ -134,7 +134,7 @@ function executeMappingTree(mappingTree: Tree<IMapping & Document>, targetIds: s
         newRequestInput = parsedMapping.requestMapping;
     } else {
         //If there is already a request input set, we apply the current mapping on the input
-        newRequestInput = performRequestMapping(requestInput, parsedMapping.requestMapping);
+        newRequestInput = performRequestMapping(requestInput, parsedMapping.requestMapping, parsedMapping.requestMappingInputKeys);
     }
 
     //The combined input (i.e. mappings) from all children
@@ -226,7 +226,7 @@ function performResponseMapping(input: { [key: string]: string }, mapping: { [ke
  *
  * @returns A combined mapping from "mapping.source" to "input.target"
  */
-function performRequestMapping(input: { [key: string]: string }, mapping: { [key: string]: string }) {
+function performRequestMapping(input: { [key: string]: string }, mapping: { [key: string]: string }, mappingInputKeys: { [key: string]: string[] }) {
     const inputKeys = Object.keys(input);
     const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
     const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
@@ -236,6 +236,11 @@ function performRequestMapping(input: { [key: string]: string }, mapping: { [key
 
     //For each entry in the mapping, try to replace a key from the input with a value from the input
     for (const key in mapping) {
+        //If a mapping entry requires value from a source other the the current input source API, skip it
+        if (!mappingInputKeys[key].every(k => inputKeys.includes(k))) {
+            continue;
+        }
+
         result[key] = mapping[key].replace(extendedRegex, (match) => {
             const resultingKey = match.split('.').slice(1).map(v => v.slice(1, -1)).join('.')
             return input[resultingKey];
