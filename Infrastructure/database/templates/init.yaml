@@ -50,6 +50,8 @@ data:
     {"_id":{"$oid":"5e14cfe59db771209adf830f"},"name":"updateMapping","method":"PUT","url":"^.*/mappings/(?!generate(/|$))[^/]+/?$"}
     {"_id":{"$oid":"5e14cffe9db771209adf8311"},"name":"deleteMapping","method":"DELETE","url":"^.*/mappings/(?!generate(/|$))[^/]+/?$"}
     {"_id":{"$oid":"5e14cffe9db771209adf8312"},"name":"generateMapping","method":"POST","url":"^.*/mappings/generate/?$"}
+    {"_id":{"$oid":"5e14cffe9db771209adf8316"},"name":"generateAttributeMapping","method":"POST","url":"^.*/mappings/generate/attribute?$"}
+    {"_id":{"$oid":"5e14cffe9db771209adf8315"},"name":"getMappedOperations","method":"POST","url":"^.*/mappings/mapped-operations/?$"}
     {"_id":{"$oid":"5e14d2219db771209adf8313"},"name":"createAdapter","method":"POST","url":"^.*/adapters/generate/[^/]+/?$"}
     {"_id":{"$oid":"5e14d2219db771209adf8314"},"name":"createAdapter","method":"GET","url":"^.*/adapters/download/[^/]+/?$"}
     ACTIVITIES
@@ -65,10 +67,10 @@ data:
     {"_id":{"$oid":"5e14d2d26ed91211d6b56246"},"name":"listApis","activities":[{"$oid":"5e14caca6ed91211d6b54b98"}]}
     {"_id":{"$oid":"5e14c89c6ed91211d6b54552"},"name":"createApi","activities":[{"$oid":"5e14cb326ed91211d6b54cdd"}]}
     {"_id":{"$oid":"5e14d0e76ed91211d6b55cb6"},"name":"manageMapping","activities":[{"$oid":"5e14cf5f9db771209adf8308"},{"$oid":"5e14cfe59db771209adf830f"},{"$oid":"5e14cffe9db771209adf8311"}]}
-    {"_id":{"$oid":"5e14d0ff6ed91211d6b55cfc"},"name":"generateMapping","activities":[{"$oid":"5e14cffe9db771209adf8312"}]}
+    {"_id":{"$oid":"5e14d0ff6ed91211d6b55cfc"},"name":"generateMapping","activities":[{"$oid":"5e14cffe9db771209adf8312"},{"$oid":"5e14cffe9db771209adf8316"}]}
     {"_id":{"$oid":"5e14cd276ed91211d6b5523b"},"name":"createMapping","activities":[{"$oid":"5e14cfdb9db771209adf830e"}]}
     {"_id":{"$oid":"5e14cd916ed91211d6b55351"},"name":"getMapping","activities":[{"$oid":"5e14cf5f9db771209adf8308"}]}
-    {"_id":{"$oid":"5e14cd916ed91211d6b55352"},"name":"listMappings","activities":[{"$oid":"5e14cfab9db771209adf830b"}]}
+    {"_id":{"$oid":"5e14cd916ed91211d6b55352"},"name":"listMappings","activities":[{"$oid":"5e14cfab9db771209adf830b"},{"$oid":"5e14cffe9db771209adf8315"}]}
     {"_id":{"$oid":"5e14d1776ed91211d6b55e4c"},"name":"createAdapter","activities":[{"$oid":"5e14d2219db771209adf8313"},{"$oid":"5e14d2219db771209adf8314"}]}
     PERMISSIONS
 
