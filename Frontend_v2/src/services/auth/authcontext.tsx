@@ -139,27 +139,30 @@ function AuthProvider({ children }: PropsWithChildren<unknown>): ReactElement {
 
   // #region Load user
   useEffect(() => {
-    const userId = getSignedInUserId();
+    async function loadUser() {
+      const userId = getSignedInUserId();
 
-    if (!userId) {
-      return;
-    }
+      try {
+        if (!userId) {
+          throw new Error('No user id yet');
+        }
 
-    getUser(userId)
-      .then((user) =>
+        const user = await getUser(userId);
         setAuthState((current) => ({
           ...current,
           user,
           loading: false,
-        })),
-      )
-      .catch(() =>
+        }));
+      } catch (err) {
         setAuthState((current) => ({
           ...current,
           user: undefined,
           loading: false,
-        })),
-      );
+        }));
+      }
+    }
+
+    loadUser();
   }, []);
   // #endregion
 
