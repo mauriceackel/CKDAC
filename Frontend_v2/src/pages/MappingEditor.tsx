@@ -39,6 +39,7 @@ import {
   getMessageSchema,
   parseApiSpec as parseAsyncApiSpec,
 } from 'utils/helpers/asyncApiParser';
+import { clusterMappingPairs } from 'utils/helpers/mappingHelpers';
 
 type MappingOption = {
   value: MappingModel;
@@ -268,9 +269,10 @@ function MappingEditor(): ReactElement {
         {},
       );
 
-      const messageMappingPairs = trans2Pairs(
-        JSON.parse((selectedMapping as OpenApiMappingModel).requestMapping),
-      );
+      const mapping = selectedMapping as AsyncApiMappingModel;
+      const messageMappingPairs = Object.values(
+        mapping.messageMappings,
+      ).flatMap((rawMapping) => trans2Pairs(JSON.parse(rawMapping)));
 
       setRequestData({
         mappingPairs: messageMappingPairs,
@@ -310,7 +312,7 @@ function MappingEditor(): ReactElement {
   // #endregion
 
   // #region Determine current mapping validity
-  const isValid = useMemo(() => {
+  const isValidOpenApi = useCallback(() => {
     if (!selectedMapping || !requestData || !responseData) {
       return false;
     }
@@ -353,6 +355,62 @@ function MappingEditor(): ReactElement {
     updatedRequestMappingPairState.mappingPairs,
     updatedResponseMappingPairState.mappingPairs,
   ]);
+
+  const isValidAsyncApi = useCallback(() => {
+    if (!selectedMapping || !requestData || mappingDirection === undefined) {
+      return false;
+    }
+
+    if (
+      updatedRequestMappingPairState.mappingPairs.some(
+        (mappingPair) => !mappingPair.mappingTransformation,
+      )
+    ) {
+      return false;
+    }
+
+    const clusteredMappingPairs = clusterMappingPairs(
+      updatedRequestMappingPairState.mappingPairs,
+      mappingDirection,
+    );
+
+    const valid = Object.keys(requestData.targetSchema).every((targetId) => {
+      // Check for every target
+      const flatRequiredSchema = Object.keys(
+        flatten(
+          mappingDirection === MappingDirection.INPUT
+            ? requestData.sourceSchema
+            : { [targetId]: requestData.targetSchema[targetId] }, // Extract a single target
+        ),
+      );
+      const flatMapping = Object.keys(
+        flatten(pairs2Trans(clusteredMappingPairs[targetId] ?? [])),
+      );
+
+      const missing = flatRequiredSchema.filter(
+        (attributeId) => !flatMapping.includes(attributeId),
+      );
+
+      return missing.length === 0;
+    });
+
+    return valid;
+  }, [
+    mappingDirection,
+    requestData,
+    selectedMapping,
+    updatedRequestMappingPairState.mappingPairs,
+  ]);
+
+  const isValid = useMemo(() => {
+    if (apiType === ApiType.OPEN_API) {
+      return isValidOpenApi();
+    }
+    if (apiType === ApiType.ASYNC_API) {
+      return isValidAsyncApi();
+    }
+    return undefined;
+  }, [apiType, isValidAsyncApi, isValidOpenApi]);
   // #endregion
 
   // #region Handle interactions
