@@ -4,7 +4,7 @@ RUN rm -rf /usr/share/nginx/html/*
 
 COPY deployment/nginx.conf /etc/nginx/nginx.conf
 
-COPY public /usr/share/nginx/html
+COPY build /usr/share/nginx/html
 
 EXPOSE 8080
 
