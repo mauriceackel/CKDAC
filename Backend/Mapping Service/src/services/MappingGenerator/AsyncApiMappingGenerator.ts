@@ -32,7 +32,7 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
         let subresult: { [key: string]: string } = {}
         if (direction === MappingDirection.INPUT) {
             for (let j = 0; j < mappingTrees.length; j++) {
-                const { messageMappings: msgMap, break: breakLoop } = executeMappingTreeSubscribe(mappingTrees[j], requiredSourceKeys);
+                const { messageMappings: msgMap, break: breakLoop } = executeMappingTreeInputDirection(mappingTrees[j], requiredSourceKeys);
                 subresult = { ...subresult, ...msgMap[targetIds[i]] };
                 if (breakLoop) break;
             }
@@ -45,7 +45,7 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
             }
         } else if (direction === MappingDirection.OUTPUT) {
             for (let j = 0; j < mappingTrees.length; j++) {
-                const { messageMapping: msgMap, break: breakLoop } = executeMappingTreePublish(mappingTrees[j], targetIds[i], requiredTargetKeys);
+                const { messageMapping: msgMap, break: breakLoop } = executeMappingTreeOutputDirection(mappingTrees[j], targetIds[i], requiredTargetKeys);
                 subresult = { ...subresult, ...msgMap };
                 if (breakLoop) break;
             }
@@ -108,24 +108,24 @@ function parseAsyncApiMapping(m: IMapping & Document): ParsedAsyncApiMapping {
     return parsedMapping
 }
 
-function executeMappingTreeSubscribe(mappingTree: Tree<IMapping & Document>, requiredKeys: string[]): { messageMappings: { [targetId: string]: { [key: string]: string } }, break?: boolean } {
+function executeMappingTreeInputDirection(mappingTree: Tree<IMapping & Document>, requiredKeys: string[]): { messageMappings: { [targetId: string]: { [key: string]: string } }, break?: boolean } {
     const { node, children } = mappingTree;
 
-    const parsedMaping = parseAsyncApiMapping(node);
+    const parsedMapping = parseAsyncApiMapping(node);
 
     if (children === undefined) {
-        return { messageMappings: parsedMaping.messageMappings };
+        return { messageMappings: parsedMapping.messageMappings };
     }
 
     const messageMappings: { [targetId: string]: { [key: string]: string } } = {};
 
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        const result = executeMappingTreeSubscribe(child, requiredKeys);
+        const result = executeMappingTreeInputDirection(child, requiredKeys);
         if (result.break) {
             return result;
         }
-        const msgMappings = performMessageMapping(result.messageMappings, parsedMaping.messageMappings[child.node.sourceId]);
+        const msgMappings = performInputMessageMapping(result.messageMappings, parsedMapping.messageMappings[child.node.sourceId], parsedMapping.messageMappingsInputKeys[child.node.sourceId]);
         for (const targetId in msgMappings) {
             messageMappings[targetId] = { ...(messageMappings[targetId] || {}), ...msgMappings[targetId] };
         }
@@ -138,24 +138,24 @@ function executeMappingTreeSubscribe(mappingTree: Tree<IMapping & Document>, req
     return { messageMappings, break: messageMappingValid };
 }
 
-function executeMappingTreePublish(mappingTree: Tree<IMapping & Document>, finalTargetId: string, requiredKeys: string[]): { messageMapping: { [key: string]: string }, break?: boolean } {
+function executeMappingTreeOutputDirection(mappingTree: Tree<IMapping & Document>, finalTargetId: string, requiredKeys: string[]): { messageMapping: { [key: string]: string }, break?: boolean } {
     const { node, children } = mappingTree;
 
-    const parsedMaping = parseAsyncApiMapping(node);
+    const parsedMapping = parseAsyncApiMapping(node);
 
     if (children === undefined) {
-        return { messageMapping: parsedMaping.messageMappings[finalTargetId] };
+        return { messageMapping: parsedMapping.messageMappings[finalTargetId] };
     }
 
     let messageMapping: { [key: string]: string } = {};
 
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        const result = executeMappingTreePublish(child, finalTargetId, requiredKeys);
+        const result = executeMappingTreeOutputDirection(child, finalTargetId, requiredKeys);
         if (result.break) {
             return result;
         }
-        const msgMappings = performRequestMapping(parsedMaping.messageMappings[child.node.sourceId], result.messageMapping);
+        const msgMappings = performOutputMessageMapping(parsedMapping.messageMappings[child.node.sourceId], result.messageMapping);
         messageMapping = { ...messageMapping, ...msgMappings };
     }
 
@@ -165,12 +165,13 @@ function executeMappingTreePublish(mappingTree: Tree<IMapping & Document>, final
     return { messageMapping, break: messageMappingValid };
 }
 
-function performMessageMapping(input: { [targetId: string]: { [key: string]: string } }, mapping: { [key: string]: string }) {
+function performInputMessageMapping(input: { [targetId: string]: { [key: string]: string } }, mapping: { [key: string]: string }, mappingInputKeys: { [key: string]: string[] }) {
     const targetIds = Object.keys(input);
     const result: { [targetId: string]: { [key: string]: string } } = {};
 
     for (let i = 0; i < targetIds.length; i++) {
-        const inputKeys = Object.keys(input[targetIds[i]]);
+        const targetId = targetIds[i];
+        const inputKeys = Object.keys(input[targetId]);
         const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
         const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
         const extendedRegex = new RegExp(extendedInputKeys.join('|'), 'g');
@@ -179,14 +180,19 @@ function performMessageMapping(input: { [targetId: string]: { [key: string]: str
 
         //For each entry in the mapping, try to replace a key from the input with a value from the input
         for (const key in mapping) {
+            //If a mapping entry requires value from a source other the the current input source API, skip it
+            if (!mappingInputKeys[key].every(k => inputKeys.includes(k))) {
+                continue;
+            }
+           
             subresult[key] = mapping[key].replace(extendedRegex, (match) => {
                 const resultingKey = match.split('.').slice(1).map(v => v.slice(1, -1)).join('.')
-                return input[targetIds[i]][resultingKey];
+                return input[targetId][resultingKey];
             });
-            subresult[key] = subresult[key].replace(simpleRegex, (match) => input[targetIds[i]][match]);
+            subresult[key] = subresult[key].replace(simpleRegex, (match) => input[targetId][match]);
         }
 
-        result[targetIds[i]] = subresult;
+        result[targetId] = subresult;
     }
 
     return result;
@@ -205,7 +211,7 @@ function performMessageMapping(input: { [targetId: string]: { [key: string]: str
  *
  * @returns A combined mapping from "mapping.source" to "input.target"
  */
-function performRequestMapping(input: { [key: string]: string }, mapping: { [key: string]: string }) {
+function performOutputMessageMapping(input: { [key: string]: string }, mapping: { [key: string]: string }) {
     const inputKeys = Object.keys(input);
     const simpleRegex = new RegExp(inputKeys.map((k) => `^${k}$`).join('|'), 'g');
     const extendedInputKeys = inputKeys.map(k => `\\$\\.${k.split('.').map(p => `"${p}"`).join('\\.')}`);
@@ -214,12 +220,12 @@ function performRequestMapping(input: { [key: string]: string }, mapping: { [key
     const result: { [key: string]: string } = {};
 
     //For each entry in the mapping, try to replace a key from the input with a value from the input
-    for (const key in mapping) {
-        result[key] = result[key].replace(extendedRegex, (match) => {
+    for (const key in mapping) {     
+        result[key] = mapping[key].replace(extendedRegex, (match) => {
             const resultingKey = match.split('.').slice(1).map(v => v.slice(1, -1)).join('.')
             return input[resultingKey];
         });
-        result[key] = mapping[key].replace(simpleRegex, (match) => input[match]);
+        result[key] = result[key].replace(simpleRegex, (match) => input[match]);
     }
 
     return result;
