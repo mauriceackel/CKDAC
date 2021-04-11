@@ -3,7 +3,7 @@ entries:
   adapter-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-04-11T17:09:51.020433772Z"
+    created: "2021-04-11T17:09:53.252247801Z"
     description: Deploys the CKDAC mapping service
     digest: 7f7a734287edb8268e21bf45fd80db82516889d44eb40874a26a04309e00e17d
     name: adapter-service
@@ -13,7 +13,7 @@ entries:
     version: 0.1.0
   api-gateway:
   - apiVersion: v2
-    created: "2021-04-11T17:09:51.021047796Z"
+    created: "2021-04-11T17:09:53.25299103Z"
     dependencies:
     - alias: internal-gateway
       name: gateway
@@ -33,7 +33,7 @@ entries:
   api-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-04-11T17:09:51.021591618Z"
+    created: "2021-04-11T17:09:53.253554253Z"
     description: Deploys the CKDAC mapping service
     digest: 2824e5b6b4590c4265af134612ba2d2890f96ad558746baf6cd38713eada4ec1
     name: api-service
@@ -44,7 +44,7 @@ entries:
   auth-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-04-11T17:09:51.02239795Z"
+    created: "2021-04-11T17:09:53.254130476Z"
     description: Deploys the CKDAC auth service
     digest: 070d352d6384d797e293efefaa72db6b430ac4e13ef2a0e99f08df93eb73ab07
     name: auth-service
@@ -54,7 +54,7 @@ entries:
     version: 0.1.0
   ckdac:
   - apiVersion: v2
-    created: "2021-04-11T17:09:51.028358387Z"
+    created: "2021-04-11T17:09:53.260003609Z"
     dependencies:
     - name: secrets
       repository: https://mauriceackel.github.io/CKDAC
@@ -93,7 +93,7 @@ entries:
   database:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2021-04-11T17:09:51.028891508Z"
+    created: "2021-04-11T17:09:53.260477228Z"
     digest: 2e4c7fd667395820ab808d0ca6523ae2748548dcfd69a6ac739ac14b54737b7f
     name: database
     type: application
@@ -103,7 +103,7 @@ entries:
   mapping-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-04-11T17:09:51.029473931Z"
+    created: "2021-04-11T17:09:53.26101265Z"
     description: Deploys the CKDAC mapping service
     digest: badca9b87133434839041182021991a0042fd4ee88562d7487e85eb9e840142a
     name: mapping-service
@@ -113,7 +113,7 @@ entries:
     version: 0.1.0
   secrets:
   - apiVersion: v2
-    created: "2021-04-11T17:09:51.030212661Z"
+    created: "2021-04-11T17:09:53.261684776Z"
     dependencies:
     - name: db-users
       repository: file://./charts/db-users
@@ -137,7 +137,7 @@ entries:
   user-service:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-04-11T17:09:51.030823485Z"
+    created: "2021-04-11T17:09:53.2622654Z"
     description: Deploys the CKDAC user service
     digest: 767f4dbc925b8b5103ee767dda007b15b49300290070dda8a7d39c128406a147
     name: user-service
@@ -148,7 +148,7 @@ entries:
   web-app:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2021-04-11T17:09:51.031245302Z"
+    created: "2021-04-11T17:09:53.262728518Z"
     description: A user frontend for Knowledge Driven Architecture Composition
     digest: c790ff5a459be7f7e73ccdbd59d0bf771bd30fe67f1344270b9b2137594b4f63
     name: web-app
@@ -156,4 +156,4 @@ entries:
     urls:
     - https://mauriceackel.github.io/CKDAC/web-app-0.1.0.tgz
     version: 0.1.0
-generated: "2021-04-11T17:09:51.01963684Z"
+generated: "2021-04-11T17:09:53.251194659Z"
