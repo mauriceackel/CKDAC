@@ -87,8 +87,15 @@ function parseAsyncApiMapping(m: IMapping & Document): ParsedAsyncApiMapping {
 
         for (const key in flattened) {
             const value = flattened[key];
+            const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
+
+            if (inputs.length === 0) {
+                // ignore mappings with static values
+                continue;
+            }
+
             messageMappings[targetId][key] = operatorsRegex.test(value) ? `(${value})` : value;
-            messageMappingsInputKeys[targetId][key] = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
+            messageMappingsInputKeys[targetId][key] = inputs;
         }
     }
 
