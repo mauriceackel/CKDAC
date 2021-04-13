@@ -187,6 +187,7 @@ export function pairs2Trans(
 
 export function trans2Pairs(
   transformation: MappingTransformation,
+  providedAttributeId?: string, // Required for AsyncApi Mapping if the value is static
 ): MappingPair[] {
   const flat: Record<string, string> = flatten(transformation);
 
@@ -201,7 +202,10 @@ export function trans2Pairs(
 
       const mappingPair: MappingPair = {
         creationType: MappingPairType.MANUAL,
-        providedAttributeIds: uniqueInputs,
+        providedAttributeIds:
+          providedAttributeId && uniqueInputs.length === 0
+            ? [providedAttributeId]
+            : uniqueInputs,
         requiredAttributeId: requiredKey,
         mappingTransformation,
       };

@@ -69,18 +69,52 @@ function MappingEditor(): ReactElement {
   const [mappingOptions, setMappingOptions] = useState<MappingOption[]>();
 
   useEffect(() => {
-    if (authState.user) {
-      getMappings({ createdBy: authState.user.id, apiType }).then(
-        (mappings) => {
-          setMappingOptions(
-            mappings.map((mapping) => ({
-              value: mapping,
-              label: `${mapping.sourceId} -> ${mapping.targetIds}`,
-            })),
-          );
-        },
-      );
+    async function loadMappings() {
+      if (!authState.user) {
+        return;
+      }
+
+      const mappings = await getMappings({
+        createdBy: authState.user.id,
+        apiType,
+      });
+
+      const options = mappings.map(async (mapping) => {
+        const [sourceApi, ...targetApis] = await Promise.all([
+          getApi(mapping.sourceId.split('_')[0]),
+          ...mapping.targetIds.map((tId) => getApi(tId.split('_')[0])),
+        ]);
+
+        const sourceLabel = `${sourceApi.name} (${
+          mapping.sourceId.split('_')[1]
+        })`;
+
+        const targetsLabel = targetApis
+          .map(
+            (tApi, i) => `${tApi.name} (${mapping.targetIds[i].split('_')[1]})`,
+          )
+          .join(' & ');
+
+        const prefix =
+          mapping.apiType === ApiType.ASYNC_API
+            ? `${
+                (mapping as AsyncApiMappingModel).direction ===
+                MappingDirection.INPUT
+                  ? 'Publish'
+                  : 'Subscribe'
+              }: `
+            : '';
+
+        return {
+          value: mapping,
+          label: `${prefix}${sourceLabel} -> ${targetsLabel}`,
+        };
+      });
+
+      setMappingOptions(await Promise.all(options));
     }
+
+    loadMappings();
   }, [authState, apiType]);
   // #endregion
 
@@ -270,9 +304,11 @@ function MappingEditor(): ReactElement {
       );
 
       const mapping = selectedMapping as AsyncApiMappingModel;
-      const messageMappingPairs = Object.values(
+      const messageMappingPairs = Object.entries(
         mapping.messageMappings,
-      ).flatMap((rawMapping) => trans2Pairs(JSON.parse(rawMapping)));
+      ).flatMap(([apiId, rawMapping]) =>
+        trans2Pairs(JSON.parse(rawMapping), apiId),
+      );
 
       setRequestData({
         mappingPairs: messageMappingPairs,

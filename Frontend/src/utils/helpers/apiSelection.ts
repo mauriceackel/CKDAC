@@ -1,4 +1,5 @@
 import { ApiModel } from 'models/ApiModel';
+import { OptionTypeBase } from 'react-select';
 
 export type ApiOption = {
   value: ApiModel;
@@ -6,12 +7,12 @@ export type ApiOption = {
 };
 
 export function optionFilter(
-  option: any,
+  option: OptionTypeBase,
   searchText: string | undefined,
 ): boolean {
   const lowerSearch = searchText?.toLowerCase();
 
-  const { value: api } = option as { value: ApiModel };
+  const { value: api } = option;
 
   return (
     !lowerSearch ||

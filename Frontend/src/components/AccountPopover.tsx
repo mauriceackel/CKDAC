@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { UserModel } from 'models/UserModel';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
-import { Redirect, useHistory, useLocation } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { Popover } from 'react-tiny-popover';
 import { AuthContext } from 'services/auth/authcontext';
 import { signOut } from 'services/auth/authservice';

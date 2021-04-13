@@ -3,7 +3,6 @@ import { AUTH_BASE_URL } from 'config';
 import ApiResponse from 'models/ApiResponse';
 import { UserModel } from 'models/UserModel';
 import jwtDecode from 'jwt-decode';
-import { getUser } from 'services/userservice';
 
 type TokenResponse = ApiResponse<{
   accessToken: string;
