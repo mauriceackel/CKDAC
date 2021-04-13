@@ -2229,4 +2229,4 @@ var jsonata = (function () {
 
 })();
 
-module.exports = jsonata;
+export default jsonata;

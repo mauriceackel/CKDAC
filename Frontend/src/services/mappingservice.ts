@@ -12,7 +12,7 @@ import {
 import { OpenApiOperation } from 'utils/helpers/swaggerParser';
 import flatten, { unflatten } from 'flat';
 import { AsyncApiOperation } from 'utils/helpers/asyncApiParser';
-import getinputs from '../utils/helpers/get-inputs/get-inputs';
+import customJsonata from '../utils/helpers/get-inputs/get-inputs';
 
 // #region Types
 export type MappedOperations = { apiId: string; operationId: string }[];
@@ -192,7 +192,7 @@ export function trans2Pairs(
 
   return Object.entries(flat).reduce<MappingPair[]>(
     (mappingPairs, [requiredKey, mappingTransformation]) => {
-      const inputs: string[] = getinputs(
+      const inputs: string[] = customJsonata(
         `{"${requiredKey}": ${mappingTransformation}}`,
       ).getInputs({});
       const uniqueInputs = inputs.filter(

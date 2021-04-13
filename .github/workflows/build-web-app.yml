@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build angular
-        run: npm run build -- --prod
+      - name: Build app
+        run: npm run build
 
       - name: Build docker
         run: npm run docker-build
