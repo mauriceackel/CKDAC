@@ -1,4 +1,4 @@
-name: Infrastructure
+name: Api Gateway
 
 on:
   workflow_dispatch:
@@ -6,15 +6,15 @@ on:
   push:
     branches: [main]
     paths:
-      - "Infrastructure/**"
+      - "Backend/Api\ Gateway/**"
 
 jobs:
   build:
-    name: Build Infrastructure
+    name: Build Api Gateway
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "./main/Infrastructure"
+        working-directory: "./main/Backend/Api\ Gateway"
 
     steps:
       # Checkout main branch
@@ -23,6 +23,24 @@ jobs:
         with:
           path: main
 
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build typescript
+        run: npm run build
+
+      - name: Build docker
+        run: npm run docker-build
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push docker
+        run: npm run docker-push
+
       # Checkout chart repo
       - name: Checkout chart-repo
         uses: actions/checkout@v2
@@ -30,13 +48,11 @@ jobs:
           ref: 'chart-repo'
           path: chart-repo
 
-      - name: Create helm charts
-        run: |
-          for dirname in `find . -mindepth 1 -maxdepth 1 -type d`
-          do
-            helm package $dirname -d $GITHUB_WORKSPACE/chart-repo
-            helm repo index $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
-          done
+      - name: Create fresh helm chart
+        run: npm run helm-build -- -d $GITHUB_WORKSPACE/chart-repo
+      
+      - name: Register chart in repository
+        run: npm run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
 
       # Push to chart repo
       - name: Push to chart-repo
@@ -53,7 +69,7 @@ jobs:
             git stash
             git pull
             git checkout stash -- .
-            helm repo index $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+            npm --prefix $GITHUB_WORKSPACE/main/Backend/Api\ Gateway run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
             git add .
             git commit -m "Updated chart repository"
             ((COUNTER=COUNTER+1))

@@ -69,7 +69,7 @@ jobs:
             git stash
             git pull
             git checkout stash -- .
-            npm --prefix $GITHUB_WORKSPACE/main/Backend/User\ Service run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+            npm --prefix $GITHUB_WORKSPACE/main/Backend/Auth\ Service run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
             git add .
             git commit -m "Updated chart repository"
             ((COUNTER=COUNTER+1))
