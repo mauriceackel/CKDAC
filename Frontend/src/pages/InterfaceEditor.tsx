@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -32,6 +33,8 @@ type ApiData = yup.InferType<typeof ApiSchema>;
 // #endregion
 
 function InterfaceEditor(): ReactElement {
+  const specFileRef = useRef<HTMLInputElement>(null);
+
   const { user } = useContext(AuthContext).authState;
 
   const { mode } = useParams<{ mode: string }>();
@@ -53,6 +56,7 @@ function InterfaceEditor(): ReactElement {
     errors,
     reset: resetForm,
     setError,
+    clearErrors,
   } = useForm({
     resolver: yupResolver(ApiSchema),
   });
@@ -152,6 +156,39 @@ function InterfaceEditor(): ReactElement {
   }
   // #endregion
 
+  // #region Api Spec file
+  function updateSpec() {
+    const file = specFileRef.current?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    clearErrors('apiSpec');
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const spec = event.target?.result;
+
+      if (!spec || typeof spec !== 'string') {
+        return;
+      }
+
+      try {
+        control.setValue('apiSpec', JSON.parse(spec));
+      } catch {
+        console.log('parseError');
+        setError('apiSpec', {
+          type: 'parse',
+          message: 'File content is not a valid JSON document',
+        });
+      }
+    };
+
+    reader.readAsText(file);
+  }
+  // #endregion
+
   return (
     <div className="content-page flex flex-col items-center">
       <form
@@ -200,18 +237,37 @@ function InterfaceEditor(): ReactElement {
         </div>
 
         <p className="mt-2 font-bold text-sm">Api Specification</p>
-        <div className="max-w-md">
-          <Controller
-            name="apiSpec"
-            control={control}
-            defaultValue={{}}
-            render={({ onChange, value }) => (
-              <JsonEditor value={value} onChange={onChange} />
+        <div className="flex flex-col">
+          <div className="max-w-md">
+            <Controller
+              name="apiSpec"
+              control={control}
+              defaultValue={{}}
+              render={({ onChange, value }) => (
+                <JsonEditor value={value} onChange={onChange} />
+              )}
+            />
+            {errors.apiSpec && (
+              <p className="h-6 text-sm text-red-600">
+                {errors.apiSpec.message}
+              </p>
             )}
-          />
-          {errors.apiSpec && (
-            <p className="h-6 text-sm text-red-600">{errors.apiSpec.message}</p>
-          )}
+          </div>
+
+          <label
+            htmlFor="spec-file"
+            className="self-end mt-2 cursor-pointer button bg-red-900 text-white font-bold"
+          >
+            Upload File
+            <input
+              ref={specFileRef}
+              id="spec-file"
+              type="file"
+              hidden
+              className="w-1"
+              onChange={updateSpec}
+            />
+          </label>
         </div>
 
         <button

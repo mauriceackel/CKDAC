@@ -6,7 +6,7 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
-var parseSignature = require('./signature');
+import parseSignature from './signature';
 
 const parser = (() => {
     'use strict';
@@ -1375,4 +1375,4 @@ const parser = (() => {
     return parser;
 })();
 
-module.exports = parser;
+export default parser;

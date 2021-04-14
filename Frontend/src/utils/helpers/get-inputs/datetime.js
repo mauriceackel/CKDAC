@@ -6,7 +6,7 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
-const utils = require('./utils');
+import utils from './utils';
 
 /**
  * DateTime formatting and parsing functions
@@ -1298,4 +1298,4 @@ const dateTime = (function () {
     };
 })();
 
-module.exports = dateTime;
+export default dateTime;

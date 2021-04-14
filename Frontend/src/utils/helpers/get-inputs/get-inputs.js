@@ -11,11 +11,11 @@
  * @description JSON query and transformation language
  */
 
-var datetime = require('./datetime');
-var fn = require('./functions');
-var utils = require('./utils');
-var parser = require('./parser');
-var parseSignature = require('./signature');
+import datetime from './datetime';
+import fn from './functions';
+import utils from './utils';
+import parser from './parser';
+import parseSignature from './signature';
 var inputs = [];
 
 /**

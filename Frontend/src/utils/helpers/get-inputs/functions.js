@@ -6,7 +6,7 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
-var utils = require('./utils');
+import utils from './utils';
 
 const functions = (() => {
     'use strict';
@@ -2067,4 +2067,4 @@ const functions = (() => {
     };
 })();
 
-module.exports = functions;
+export default functions;

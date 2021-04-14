@@ -18,7 +18,7 @@ function MappingArea(): ReactElement {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex flex-grow flex-wrap -m-1 content-start">
+      <div className="flex flex-grow flex-wrap -m-1 content-start overflow-hidden">
         {mappingPairs.map((mappingPair) => (
           <div
             key={

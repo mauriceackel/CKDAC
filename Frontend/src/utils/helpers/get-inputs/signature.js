@@ -6,7 +6,7 @@
  *   This project is licensed under the MIT License, see LICENSE
  */
 
-var utils = require('./utils');
+import utils from './utils';
 
 const signature = (() => {
     'use strict';
@@ -316,4 +316,4 @@ const signature = (() => {
     return parseSignature;
 })();
 
-module.exports = signature;
+export default signature;
