@@ -1,4 +1,4 @@
-name: Infrastructure
+name: Docker Infrastructure
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "Infrastructure/**"
+      - "Docker\ Infrastructure/**"
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "./main/Infrastructure"
+        working-directory: "./main/Helm\ Infrastructure"
 
     steps:
       # Checkout main branch

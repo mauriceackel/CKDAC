@@ -2,7 +2,9 @@
   "name": "web-app",
   "version": "1.0.0",
   "private": true,
-  "dockerRepoPrefix": "mackel/ckdac-",
+  "config": {
+    "dockerRepoPrefix": "mackel/ckdac-"
+  },
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.0.2",
     "@asyncapi/parser": "^1.4.1",
@@ -36,8 +38,8 @@
     "cypress": "cypress open --config-file cypress/cypress.json",
     "format": "prettier --write src/**/*.ts{,x}",
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
-    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
-    "docker-push": "docker push ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_config_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-push": "docker push ${npm_package_config_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
     "helm-build": "helm package -u ./deployment/helm --app-version=${npm_package_version}",
     "helm-index": "helm repo index",
     "open-cluster": "telepresence --mount=/tmp/tel_root --swap-deployment ${npm_package_name} --expose 8080 --method inject-tcp"

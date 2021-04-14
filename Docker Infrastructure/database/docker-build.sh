@@ -1,0 +1,1 @@
+docker build -f Dockerfile . -t mackel/ckdac-mongodb:1.0.0

@@ -1,0 +1,57 @@
+[
+    {
+        "host": "api-gateway-int",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/adapters",
+        "rewrite": "",
+        "target": "http://adapter-service:8080"
+    },
+    {
+        "host": "api-gateway-int",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/apis",
+        "rewrite": "",
+        "cors": {
+            "headers": "*",
+            "origins": "*",
+            "methods": "*",
+            "credentials": true
+        },
+        "target": "http://api-service:8080"
+    },
+    {
+        "host": "api-gateway-int",
+        "hostRegex": false,
+        "bypassAuth": true,
+        "prefix": "/auth/",
+        "rewrite": "/",
+        "target": "http://auth-service:8080"
+
+    },
+    {
+        "host": "api-gateway-int",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/mappings",
+        "rewrite": "",
+        "target": "http://mapping-service:8080"
+    },
+    {
+        "host": "api-gateway-int",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/validate",
+        "rewrite": "",        
+        "target": "http://user-service:8080"
+    },
+    {
+        "host": "api-gateway-int",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/users",
+        "rewrite": "",        
+        "target": "http://user-service:8080"
+    }
+]

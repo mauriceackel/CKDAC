@@ -1,0 +1,170 @@
+version: '3.5'
+
+networks:
+  ckdac:
+    name: ckdac
+
+services:
+  database:
+    image: mackel/ckdac-mongodb:1.0.0
+    environment:
+        # Set mongo root user data
+        MONGO_INITDB_DATABASE: admin
+        MONGO_INITDB_ROOT_USERNAME: ${DB_ADMIN_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${DB_ADMIN_PASSWORD}
+        # Set application data
+        API_SERVICE_USER: ${DB_API_SERVICE_USERNAME}
+        API_SERVICE_PW: ${DB_API_SERVICE_PASSWORD}        
+        API_SERVICE_API_KEY: ${API_KEY_API_SERVICE}
+        ADAPTER_SERVICE_USER: ${DB_ADAPTER_SERVICE_USERNAME}
+        ADAPTER_SERVICE_PW: ${DB_ADAPTER_SERVICE_PASSWORD}       
+        ADAPTER_SERVICE_API_KEY: ${API_KEY_ADAPTER_SERVICE}
+        AUTH_SERVICE_USER: ${DB_AUTH_SERVICE_USERNAME}
+        AUTH_SERVICE_PW: ${DB_AUTH_SERVICE_PASSWORD}       
+        AUTH_SERVICE_API_KEY: ${API_KEY_AUTH_SERVICE}
+        MAPPING_SERVICE_USER: ${DB_MAPPING_SERVICE_USERNAME}
+        MAPPING_SERVICE_PW: ${DB_MAPPING_SERVICE_PASSWORD}     
+        MAPPING_SERVICE_API_KEY: ${API_KEY_MAPPING_SERVICE}
+        USER_SERVICE_USER: ${DB_USER_SERVICE_USERNAME}
+        USER_SERVICE_PW: ${DB_USER_SERVICE_PASSWORD}     
+        USER_SERVICE_API_KEY: ${API_KEY_USER_SERVICE}
+        APP_ROOT_USER: ${APP_ROOT_EMAIL}
+        APP_ROOT_PW: ${APP_ROOT_PASSWORD}
+    restart: on-failure
+    networks:
+      - ckdac
+    volumes: 
+      - /data/db
+  
+  api-gateway-ext:
+    image: mackel/ckdac-api-gateway:1.0.0
+    environment:
+      TLS_SECRETS_PATH: '/home/node/tls'
+      MAPPINGS_PATH: '/home/node/routes.json'
+      AUTH_SERVICE_URL: auth-service:8080
+      PORT: "8080"
+      HOST: "0.0.0.0"                  
+      SSL_ENABLED: "true"
+    ports:
+      - ${SERVER_PORT}:8080 # api is accessible via SERVER_PORT on this host
+    restart: on-failure
+    networks:
+      - ckdac
+    volumes:
+      # pass internal routes
+      - ./routes/routes-external.json:/home/node/routes.json
+      - ./secrets/tls:/home/node/tls
+
+  api-gateway-int:
+    image: mackel/ckdac-api-gateway:1.0.0
+    environment:
+      MAPPINGS_PATH: '/home/node/routes.json'
+      AUTH_SERVICE_URL: auth-service:8080
+      PORT: "8080"
+      HOST: "0.0.0.0"
+    restart: on-failure
+    networks:
+      - ckdac
+    volumes:
+      # pass internal routes
+      - ./routes/routes-internal.json:/home/node/routes.json
+
+  api-service:
+    image: mackel/ckdac-api-service:1.0.0
+    environment:
+      # reference mongodb container
+      DB_URL: mongodb://database:27017/api-service
+      DB_USER: ${DB_API_SERVICE_USERNAME}
+      DB_PW: ${DB_API_SERVICE_PASSWORD}
+      API_KEY: ${API_KEY_API_SERVICE}
+      ACCESS_TOKEN_PATH: /secrets
+      PORT: "8080"
+      HOST: "0.0.0.0"
+    restart: on-failure
+    networks:
+      - ckdac
+    volumes:
+      - ./secrets/access-token:/secrets
+
+  adapter-service:
+    image: mackel/ckdac-adapter-service:1.0.0
+    environment:
+      DB_URL: mongodb://database:27017/adapter-service
+      DB_USER: ${DB_ADAPTER_SERVICE_USERNAME}
+      DB_PW: ${DB_ADAPTER_SERVICE_PASSWORD}
+      API_KEY: ${API_KEY_ADAPTER_SERVICE}
+      ACCESS_TOKEN_PATH: /secrets      
+      PORT: "8080"
+      HOST: "0.0.0.0"
+      GATEWAY_INT_URL: http://api-gateway-int:8080 
+    restart: on-failure   
+    networks:
+      - ckdac
+    volumes:
+      - ./secrets/access-token:/secrets
+
+  auth-service:
+    image: mackel/ckdac-auth-service:1.0.0
+    environment:
+      DB_URL: mongodb://database:27017/auth-service
+      DB_USER: ${DB_AUTH_SERVICE_USERNAME}
+      DB_PW: ${DB_AUTH_SERVICE_PASSWORD}
+      API_KEY: ${API_KEY_AUTH_SERVICE}
+      ACCESS_TOKEN_PATH: /secrets
+      PORT: "8080"
+      HOST: "0.0.0.0"
+      GATEWAY_INT_URL: http://api-gateway-int:8080
+      # Publicly available FQDN of the auth service
+      AUTH_HOSTNAME: https://${SERVER_FQDN}:${SERVER_PORT}/auth
+      #AUTH_DETAILS_TOKEN_TTL: 
+      #ACCESS_TOKEN_TTL:
+      #REFRESH_TOKEN_TTL:
+      #PW_TOKEN_TTL:
+      #ACCESS_TOKEN_PATH:
+    restart: on-failure
+    networks:
+      - ckdac
+    volumes:
+      - ./secrets/access-token:/secrets 
+
+  mapping-service:
+    image: mackel/ckdac-mapping-service:1.0.0
+    environment:
+      DB_URL: mongodb://database:27017/mapping-service
+      DB_USER: ${DB_MAPPING_SERVICE_USERNAME}
+      DB_PW: ${DB_MAPPING_SERVICE_PASSWORD}
+      API_KEY: ${API_KEY_MAPPING_SERVICE}
+      ACCESS_TOKEN_PATH: /secrets
+      PORT: "8080"
+      HOST: "0.0.0.0"
+    restart: on-failure   
+    networks:
+      - ckdac
+    volumes:
+      - ./secrets/access-token:/secrets
+
+  user-service:
+    image: mackel/ckdac-user-service:1.0.0
+    environment:
+      DB_URL: mongodb://database:27017/user-service
+      DB_USER: ${DB_USER_SERVICE_USERNAME}
+      DB_PW: ${DB_USER_SERVICE_PASSWORD}
+      API_KEY: ${API_KEY_USER_SERVICE}
+      ACCESS_TOKEN_PATH: /secrets
+      PORT: "8080"
+      HOST: "0.0.0.0"
+    restart: on-failure
+    networks:
+      - ckdac
+    volumes:
+      - ./secrets/access-token:/secrets
+  
+  web-app:
+    image: mackel/ckdac-web-app:1.0.0
+    environment:
+      # This has to be adjusted depending on the server FQDN
+      API_URL: https://${SERVER_FQDN}:${SERVER_PORT}/api
+      AUTH_URL: https://${SERVER_FQDN}:${SERVER_PORT}/auth
+    restart: on-failure
+    networks:
+      - ckdac

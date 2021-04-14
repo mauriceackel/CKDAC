@@ -1,0 +1,56 @@
+[
+    {
+        "host": "localhost",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/api/adapters",
+        "rewrite": "/adapters",
+        "target": "http://adapter-service:8080"
+    },
+    {
+        "host": "localhost",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/api/apis",
+        "rewrite": "/apis",
+        "cors": {
+            "headers": "*",
+            "origins": "*",
+            "methods": "*",
+            "credentials": true
+        },
+        "target": "http://api-service:8080"
+    },
+    {
+        "host": "localhost",
+        "hostRegex": false,
+        "bypassAuth": true,
+        "prefix": "/auth/",
+        "rewrite": "/",
+        "target": "http://auth-service:8080"
+
+    },
+    {
+        "host": "localhost",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/api/mappings",
+        "rewrite": "/mappings",
+        "target": "http://mapping-service:8080"
+    },
+    {
+        "host": "localhost",
+        "hostRegex": false,
+        "bypassAuth": false,
+        "prefix": "/api/users",
+        "rewrite": "/users",
+        "target": "http://user-service:8080"
+    },
+    {
+        "host": "localhost",
+        "hostRegex": false,
+        "bypassAuth": true,
+        "prefix": "/",
+        "target": "http://web-app:8080"
+    }
+]

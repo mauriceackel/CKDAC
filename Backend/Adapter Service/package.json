@@ -4,7 +4,9 @@
   "description": "",
   "author": "Maurice Ackel",
   "main": "Service.js",
-  "dockerRepoPrefix": "mackel/ckdac-",
+  "config": {
+    "dockerRepoPrefix": "mackel/ckdac-"
+  },
   "scripts": {
     "build-generator": "npm i --prefix assets/asyncapi-generator/source-template && npm i --prefix assets/asyncapi-generator/target-template",
     "build": "npm run build-generator && ncp ./assets ./bin && tsc",
@@ -12,8 +14,8 @@
     "prestart": "npm run build",
     "debug": "node --inspect ./bin/Service.js",
     "predebug": "npm run build",
-    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
-    "docker-push": "docker push ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_config_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-push": "docker push ${npm_package_config_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
     "helm-build": "helm package -u ./deployment/helm --app-version=${npm_package_version}",
     "helm-index": "helm repo index",
     "open-cluster": "telepresence --mount=/tmp/tel_root --swap-deployment ${npm_package_name} --expose 8080 --method inject-tcp"

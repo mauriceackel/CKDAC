@@ -1,0 +1,1 @@
+docker push mackel/ckdac-mongodb:1.0.0

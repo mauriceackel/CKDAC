@@ -1,18 +1,20 @@
 {
   "name": "api-gateway",
   "version": "1.0.0",
-  "description": "",
   "author": "Maurice Ackel",
   "main": "Service.js",
-  "dockerRepoPrefix": "mackel/ckdac-",
+  "config": {
+    "dockerRepoPrefix": "mackel/ckdac-"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node ./bin/Service.js",
     "prestart": "npm run build",
     "debug": "node --inspect ./bin/Service.js",
     "predebug": "npm run build",
-    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
-    "docker-push": "docker push ${npm_package_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-build": "docker build -f deployment/docker/Dockerfile . -t ${npm_package_config_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "docker-push": "docker push ${npm_package_config_dockerRepoPrefix}${npm_package_name}:${npm_package_version}",
+    "te": "echo ${npm_package_config_dockerRepoPrefix}",
     "open-cluster": "telepresence --mount=/tmp/tel_root --swap-deployment ${npm_package_name} --expose 8080 --method inject-tcp"
   },
   "dependencies": {
