@@ -3,8 +3,8 @@
         "host": "localhost",
         "hostRegex": false,
         "bypassAuth": false,
-        "prefix": "/api/adapters",
-        "rewrite": "/adapters",
+        "prefix": "/api/adapters/",
+        "rewrite": "/",
         "target": "http://adapter-service:8080"
     },
     {

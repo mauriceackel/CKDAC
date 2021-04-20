@@ -53,7 +53,7 @@ data:
     {"_id":{"$oid":"5e14cffe9db771209adf8316"},"name":"generateAttributeMapping","method":"POST","url":"^.*/mappings/generate/attribute?$"}
     {"_id":{"$oid":"5e14cffe9db771209adf8315"},"name":"getMappedOperations","method":"POST","url":"^.*/mappings/mapped-operations/?$"}
     {"_id":{"$oid":"5e14d2219db771209adf8313"},"name":"createAdapter","method":"POST","url":"^.*/adapters/generate/[^/]+/?$"}
-    {"_id":{"$oid":"5e14d2219db771209adf8314"},"name":"createAdapter","method":"GET","url":"^.*/adapters/download/[^/]+/?$"}
+    {"_id":{"$oid":"5e14d2219db771209adf8314"},"name":"downloadAdapter","method":"GET","url":"^.*/adapters/download/[^/]+/?$"}
     ACTIVITIES
 
     mongoimport --username=$CLUSTER_ADMIN_USER --password=$CLUSTER_ADMIN_PW --authenticationDatabase=admin --db=auth-service --collection=permissions <<"PERMISSIONS"

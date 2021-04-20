@@ -122,7 +122,7 @@ mongoimport --username=$MONGO_INITDB_ROOT_USERNAME --password=$MONGO_INITDB_ROOT
 {"_id":{"$oid":"5e14cffe9db771209adf8316"},"name":"generateAttributeMapping","method":"POST","url":"^.*/mappings/generate/attribute?$"}
 {"_id":{"$oid":"5e14cffe9db771209adf8315"},"name":"getMappedOperations","method":"POST","url":"^.*/mappings/mapped-operations/?$"}
 {"_id":{"$oid":"5e14d2219db771209adf8313"},"name":"createAdapter","method":"POST","url":"^.*/adapters/generate/[^/]+/?$"}
-{"_id":{"$oid":"5e14d2219db771209adf8314"},"name":"createAdapter","method":"GET","url":"^.*/adapters/download/[^/]+/?$"}
+{"_id":{"$oid":"5e14d2219db771209adf8314"},"name":"downloadAdapter","method":"GET","url":"^.*/adapters/download/[^/]+/?$"}
 ACTIVITIES
 
 mongoimport --username=$MONGO_INITDB_ROOT_USERNAME --password=$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase=admin --db=auth-service --collection=permissions <<"PERMISSIONS"
