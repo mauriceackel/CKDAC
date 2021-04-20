@@ -41,36 +41,36 @@ jobs:
       - name: Push docker
         run: npm run docker-push
 
-      # Checkout chart repo
-      - name: Checkout chart-repo
-        uses: actions/checkout@v2
-        with:
-          ref: 'chart-repo'
-          path: chart-repo
+      # # Checkout chart repo
+      # - name: Checkout chart-repo
+      #   uses: actions/checkout@v2
+      #   with:
+      #     ref: 'chart-repo'
+      #     path: chart-repo
 
-      - name: Create fresh helm chart
-        run: npm run helm-build -- -d $GITHUB_WORKSPACE/chart-repo
+      # - name: Create fresh helm chart
+      #   run: npm run helm-build -- -d $GITHUB_WORKSPACE/chart-repo
       
-      - name: Register chart in repository
-        run: npm run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+      # - name: Register chart in repository
+      #   run: npm run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
 
-      # Push to chart repo
-      - name: Push to chart-repo
-        run: |
-          cd $GITHUB_WORKSPACE/chart-repo
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "Updated chart repository"
-          COUNTER=0
-          while [[ $(git push | echo $?) && $COUNTER -lt 3 ]]; do
-            git reset HEAD~1
-            git checkout index.yaml
-            git stash
-            git pull
-            git checkout stash -- .
-            npm --prefix $GITHUB_WORKSPACE/main/Backend/Api\ Gateway run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
-            git add .
-            git commit -m "Updated chart repository"
-            ((COUNTER=COUNTER+1))
-          done;
+      # # Push to chart repo
+      # - name: Push to chart-repo
+      #   run: |
+      #     cd $GITHUB_WORKSPACE/chart-repo
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     git add .
+      #     git commit -m "Updated chart repository"
+      #     COUNTER=0
+      #     while [[ $(git push | echo $?) && $COUNTER -lt 3 ]]; do
+      #       git reset HEAD~1
+      #       git checkout index.yaml
+      #       git stash
+      #       git pull
+      #       git checkout stash -- .
+      #       npm --prefix $GITHUB_WORKSPACE/main/Backend/Api\ Gateway run helm-index -- $GITHUB_WORKSPACE/chart-repo --url https://mauriceackel.github.io/CKDAC
+      #       git add .
+      #       git commit -m "Updated chart repository"
+      #       ((COUNTER=COUNTER+1))
+      #     done;
