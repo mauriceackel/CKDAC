@@ -10,6 +10,7 @@ import { NoSuchElementError } from "../../utils/errors/NoSuchElementError";
 import { escapeQuote, stringifyedToJsonata } from "../../utils/jsonata-helpers";
 import * as ApiService from "../ApiService";
 import Zip from "adm-zip";
+import ncp from 'ncp';
 import { camelcase } from "../../utils/camelcase";
 
 export async function createAdapter(adapterType: AdapterType, mapping: IOpenApiMapping, userId: string): Promise<string> {
@@ -40,8 +41,7 @@ export async function createAdapter(adapterType: AdapterType, mapping: IOpenApiM
     logger.info(`Writing specs`);
     fs.mkdirSync(filePath, { recursive: true });
 
-    fs.mkdirSync(`${filePath}/source/`);
-    fs.writeFileSync(`${filePath}/source/apiSpec.json`, source.apiSpec);
+    fs.writeFileSync(`${filePath}/apiSpec.json`, source.apiSpec);
 
     fs.mkdirSync(`${filePath}/targets/`);
     for (const target of targets) {
@@ -93,7 +93,7 @@ async function createJavaScriptAdapter(
         const targetInfo: { [key: string]: string | boolean } = {
             targetApiId: target.apiId,
             targetFullId: `${target.apiId}_${target.operationId}_${target.responseId}`,
-            targetApiPath: `../../../targets/${target.apiId}`,
+            targetApiPath: `targets/${target.apiId}`,
             targetApiName,
             targetFunctionName: target.operationId,
         }
@@ -108,11 +108,35 @@ async function createJavaScriptAdapter(
 
     await generateOpenApiInterface(
         'javascript-adapter',
-        `${filePath}/source`,
+        `${filePath}`,
         additionalParameters.join(',')
     );
+
+
+    const targetFolders = fs.readdirSync(`${filePath}/targets/`, { withFileTypes : true });
+    for (const folder of targetFolders) {
+        if (!folder.isDirectory()) {
+            continue;
+        }
+
+        await moveFolder(`${filePath}/targets/${folder.name}/src`, `${filePath}/src/targets/${folder.name}`);
+    }
 }
 
+async function moveFolder(sourcePath: string, destPath: string): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+        ncp(sourcePath, destPath, (err) => {
+            if(err) {
+                reject(err);
+                return;
+            }
+
+            resolve();
+        });
+    });
+
+    fs.rmdirSync(sourcePath, { recursive: true });
+}
 
 
 // ----------- HELPERS ------------ //
