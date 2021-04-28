@@ -112,7 +112,7 @@ async function createJavaScriptAdapter(
         additionalParameters.join(',')
     );
 
-
+    fs.mkdirSync(`${filePath}/src/targets/`);
     const targetFolders = fs.readdirSync(`${filePath}/targets/`, { withFileTypes : true });
     for (const folder of targetFolders) {
         if (!folder.isDirectory()) {
