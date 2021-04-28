@@ -45,11 +45,7 @@ export class Service {
 
             //Start http server
             logger.info(`Trying to start http server at ${Config.HOST}:${Config.PORT}.`);
-            this.httpServer = http.createServer(this.express).listen(Config.PORT, Config.HOST, (err: any) => {
-                if (err) {
-                    logger.error('Http server creation failed: ', err);
-                    return process.exit(1);
-                }
+            this.httpServer = http.createServer(this.express).listen(Config.PORT, Config.HOST, () => {
                 return logger.info(`Http server creation successful. Listening on host ${Config.HOST}, port ${Config.PORT}.`);
             });
 
@@ -69,7 +65,7 @@ export class Service {
                 //Stop http server if existing.
                 if (this.httpServer) {
                     logger.info('Trying to stop http server.');
-                    let httpPromise = new Promise((resolve, reject) => {
+                    let httpPromise = new Promise<void>((resolve, reject) => {
                         this.httpServer!.close((err: any) => {
                             if (err) {
                                 logger.error('Http server could not be stopped.');
