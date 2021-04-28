@@ -36,6 +36,8 @@ function MappingTest(props: MappingTestProps): ReactElement {
   useEffect(() => setRequestData(sourceRequestSchema ?? {}), [
     sourceRequestSchema,
   ]);
+  const [mappedRequestData, setMappedRequestData] = useState<any>({});
+  const [rawResponseData, setRawResponseData] = useState<any>({});
   const [responseData, setResponseData] = useState<any>({});
 
   const [logs, setLogs] = useState<string[]>();
@@ -55,6 +57,7 @@ function MappingTest(props: MappingTestProps): ReactElement {
       const targetsRequestData: Record<string, any> = jsonata(
         requestMappingString,
       ).evaluate(requestData);
+      setMappedRequestData(targetsRequestData);
 
       const targetResponseData: Record<string, any> = {};
       const promises = Object.entries(targetsRequestData).map(
@@ -94,6 +97,7 @@ function MappingTest(props: MappingTestProps): ReactElement {
 
       await Promise.all(promises);
 
+      setRawResponseData(targetResponseData);
       const responseMapping = pairs2Trans(responseMappingPairs);
       const responseMappingString = stringified2Jsonata(
         JSON.stringify(responseMapping),
@@ -138,11 +142,23 @@ function MappingTest(props: MappingTestProps): ReactElement {
         <div className="flex flex-col pt-2">
           <div className="flex">
             <div className="w-1/2 mr-1">
-              Request Data
+              Raw Request Data
               <JsonEditor value={requestData} onChange={setRequestData} />
             </div>
+
             <div className="w-1/2 ml-1">
-              Response Data
+              Mapped Request Data
+              <JsonEditor value={mappedRequestData} readonly />
+            </div>
+          </div>
+          <div className="flex">
+            <div className="w-1/2 mr-1">
+              Raw Response Data
+              <JsonEditor value={rawResponseData} readonly />
+            </div>
+
+            <div className="w-1/2 ml-1">
+              Mapped Response Data
               <JsonEditor value={responseData} readonly />
             </div>
           </div>

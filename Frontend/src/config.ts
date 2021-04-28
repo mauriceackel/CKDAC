@@ -6,6 +6,6 @@ declare global {
 }
 
 export const BACKEND_BASE_URL =
-  window.env?.backendBaseUrl ?? 'https://api.ckdac.com';
+  window.env?.backendBaseUrl ?? 'https://localhost:8443/api';
 export const AUTH_BASE_URL =
-  window.env?.authBaseUrl ?? 'https://auth.ckdac.com';
+  window.env?.authBaseUrl ?? 'https://localhost:8443/auth';
