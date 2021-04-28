@@ -49,6 +49,7 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
     public static final String EMIT_MODEL_METHODS = "emitModelMethods";
     public static final String EMIT_JS_DOC = "emitJSDoc";
     public static final String NPM_REPOSITORY = "npmRepository";
+    public static final String OPERATION_ID = "operationId";
 
     final String[][] JAVASCRIPT_ES6_SUPPORTING_FILES = new String[][]{
             // new String[]{"index.mustache", "src/index.js"},
@@ -59,6 +60,7 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
     protected String moduleName;
     protected String projectDescription;
     protected String projectVersion;
+    protected String operationId;
     protected String licenseName;
 
     protected String invokerPackage;
@@ -179,6 +181,9 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
                 .defaultValue(Boolean.TRUE.toString()));
         cliOptions.add(new CliOption(CodegenConstants.MODEL_PROPERTY_NAMING, CodegenConstants.MODEL_PROPERTY_NAMING_DESC).defaultValue("camelCase"));
         cliOptions.add(new CliOption(NPM_REPOSITORY, "Use this property to set an url your private npmRepo in the package.json"));
+
+        // Custom addition
+        cliOptions.add(new CliOption(OPERATION_ID, "Id of the operation to map"));
     }
 
     @Override
@@ -248,6 +253,11 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
         if (additionalProperties.containsKey(NPM_REPOSITORY)) {
             setNpmRepository(((String) additionalProperties.get(NPM_REPOSITORY)));
         }
+
+        // Custom
+        if (additionalProperties.containsKey(OPERATION_ID)) {
+            setOperationId(((String) additionalProperties.get(OPERATION_ID)));
+        }
     }
 
     @Override
@@ -301,6 +311,7 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
         additionalProperties.put(MODULE_NAME, moduleName);
         additionalProperties.put(PROJECT_DESCRIPTION, escapeText(projectDescription));
         additionalProperties.put(PROJECT_VERSION, projectVersion);
+        additionalProperties.put(OPERATION_ID, operationId);
         additionalProperties.put(CodegenConstants.LICENSE_NAME, licenseName);
         additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
         additionalProperties.put(CodegenConstants.INVOKER_PACKAGE, invokerPackage);
@@ -406,6 +417,10 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
 
     public void setProjectVersion(String projectVersion) {
         this.projectVersion = projectVersion;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
     }
 
     public void setLicenseName(String licenseName) {
@@ -1009,12 +1024,8 @@ public class JavascriptTargetGenerator extends DefaultCodegen implements Codegen
         Map<String, Object> ops = (Map<String, Object>) results.get("operations");
         ArrayList<CodegenOperation> opList = (ArrayList<CodegenOperation>) ops.get("operation");
 
-        if (!additionalProperties.containsKey("operationId")) {
-            return results;
-        }
-
         for (CodegenOperation co : opList) {
-            boolean isOperation = co.operationId.equals(additionalProperties.get("operationId").toString());
+            boolean isOperation = co.operationId.equals(this.operationId);
             if (isOperation) {
                 additionalProperties.put("targetApiName", ops.get("classname").toString());
                 additionalProperties.put("targetBodyExists", false);

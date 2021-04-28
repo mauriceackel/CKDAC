@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 parsed-target.txt
 src/ApiClient.js
 src/api/PetApi.js

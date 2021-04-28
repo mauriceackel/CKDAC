@@ -11,7 +11,7 @@
  *
  */
 
-const ApiClient = require('../ApiClient');
+import ApiClient from '../ApiClient';
 
 /**
  * The Order model module.
@@ -137,5 +137,5 @@ Order['StatusEnum'] = {
 
 
 
-module.exports = Order;
+export default Order;
 

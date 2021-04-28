@@ -11,7 +11,7 @@
  *
  */
 
-const ApiClient = require('../ApiClient');
+import ApiClient from '../ApiClient';
 
 /**
  * The User model module.
@@ -125,5 +125,5 @@ User.prototype['userStatus'] = undefined;
 
 
 
-module.exports = User;
+export default User;
 

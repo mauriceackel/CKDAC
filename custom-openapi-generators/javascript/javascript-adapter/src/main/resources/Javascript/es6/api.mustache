@@ -1,13 +1,13 @@
 {{>licenseInfo}}
 
 {{=< >=}}
-const ApiClient = require('../ApiClient');
-<#imports>const <&import> = require('../<#modelPackage><&modelPackage>/</modelPackage><import>');
+import ApiClient from "../ApiClient";
+<#imports>import <&import> from '../<#modelPackage><&modelPackage>/</modelPackage><import>';
 </imports>
 <#containsOperation>
-const jsonata = require('jsonata');
+import * as jsonata from 'jsonata';
 <#targets>
-const { <targetApiName>: _<targetFullId>TargetApi, ApiClient: _<targetFullId>ApiClient } = require('<targetApiPath>/src/index');
+import { <targetApiName> as _<targetFullId>TargetApi, ApiClient as _<targetFullId>ApiClient } from '<targetApiPath>/src/index';
 </targets>
 </containsOperation>
 
@@ -16,7 +16,7 @@ const { <targetApiName>: _<targetFullId>TargetApi, ApiClient: _<targetFullId>Api
 * @module <#invokerPackage><&invokerPackage>/</invokerPackage><#apiPackage><&apiPackage>/</apiPackage><classname>
 * @version <&projectVersion>
 */</emitJSDoc>
-module.exports = class <&classname> {
+export default class <&classname> {
 
     <#emitJSDoc>/**
     * Constructs a new <&classname>. <#description>
@@ -49,7 +49,7 @@ module.exports = class <&classname> {
      * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}</returnType></usePromises><#usePromises>
      * @return {Promise} a {@link https://www.promisejs.org/|Promise}<#returnType>, with an object containing data of type {@link <&vendorExtensions.x-jsdoc-type>} and HTTP response</returnType><^returnType>, with an object containing HTTP response</returnType></usePromises>
      */
-</emitJSDoc>    <#vendorExtensions.source>async </vendorExtensions.source><operationId><#usePromises>WithHttpInfo</usePromises>(<vendorExtensions.x-codegen-arg-list>) {
+</emitJSDoc>    <operationId><#usePromises>WithHttpInfo</usePromises>(<vendorExtensions.x-codegen-arg-list>) {
       <#vendorExtensions.x-codegen-has-optional-params>
       opts = opts || {};
       </vendorExtensions.x-codegen-has-optional-params>
@@ -64,16 +64,16 @@ module.exports = class <&classname> {
 </allParams>
 
       let pathParams = {<#pathParams>
-        '<baseName>': <#required><paramName></required><^required>opts['<paramName>']</required><#hasMore>,</hasMore></pathParams>
+        '<baseName>': <#required><paramName></required><^required>opts['<paramName>']</required><^-last>,</-last></pathParams>
       };
       let queryParams = {<#queryParams>
-        '<baseName>': <#collectionFormat>this.apiClient.buildCollectionParam(<#required><paramName></required><^required>opts['<paramName>']</required>, '<collectionFormat>')</collectionFormat><^collectionFormat><#required><paramName></required><^required>opts['<paramName>']</required></collectionFormat><#hasMore>,</hasMore></queryParams>
+        '<baseName>': <#collectionFormat>this.apiClient.buildCollectionParam(<#required><paramName></required><^required>opts['<paramName>']</required>, '<collectionFormat>')</collectionFormat><^collectionFormat><#required><paramName></required><^required>opts['<paramName>']</required></collectionFormat><^-last>,</-last></queryParams>
       };
       let headerParams = {<#headerParams>
-        '<baseName>': <#required><paramName></required><^required>opts['<paramName>']</required><#hasMore>,</hasMore></headerParams>
+        '<baseName>': <#required><paramName></required><^required>opts['<paramName>']</required><^-last>,</-last></headerParams>
       };
       let formParams = {<#formParams>
-        '<baseName>': <#collectionFormat>this.apiClient.buildCollectionParam(<#required><paramName></required><^required>opts['<paramName>']</required>, '<collectionFormat>')</collectionFormat><^collectionFormat><#required><paramName></required><^required>opts['<paramName>']</required></collectionFormat><#hasMore>,</hasMore></formParams>
+        '<baseName>': <#collectionFormat>this.apiClient.buildCollectionParam(<#required><paramName></required><^required>opts['<paramName>']</required>, '<collectionFormat>')</collectionFormat><^collectionFormat><#required><paramName></required><^required>opts['<paramName>']</required></collectionFormat><^-last>,</-last></formParams>
       };
 
       <#vendorExtensions.source>
@@ -115,9 +115,9 @@ module.exports = class <&classname> {
       return { data: sourceOutputData };
       </vendorExtensions.source>
       <^vendorExtensions.source>
-      let authNames = [<#authMethods>'<name>'<#hasMore>, </hasMore></authMethods>];
-      let contentTypes = [<#consumes>'<& mediaType>'<#hasMore>, </hasMore></consumes>];
-      let accepts = [<#produces>'<& mediaType>'<#hasMore>, </hasMore></produces>];
+      let authNames = [<#authMethods>'<name>'<^-last>, </-last></authMethods>];
+      let contentTypes = [<#consumes>'<& mediaType>'<^-last>, </-last></consumes>];
+      let accepts = [<#produces>'<& mediaType>'<^-last>, </-last></produces>];
       let returnType = <#vendorExtensions.x-return-type><&vendorExtensions.x-return-type></vendorExtensions.x-return-type><^vendorExtensions.x-return-type>null</vendorExtensions.x-return-type>;
       <#servers.0>
       let basePaths = [<#servers>'<url>'<^-last>, </-last></servers>];

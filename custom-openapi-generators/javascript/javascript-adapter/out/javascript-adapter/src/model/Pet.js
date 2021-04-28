@@ -11,9 +11,9 @@
  *
  */
 
-const ApiClient = require('../ApiClient');
-const Category = require('./Category');
-const Tag = require('./Tag');
+import ApiClient from '../ApiClient';
+import Category from './Category';
+import Tag from './Tag';
 
 /**
  * The Pet model module.
@@ -142,5 +142,5 @@ Pet['StatusEnum'] = {
 
 
 
-module.exports = Pet;
+export default Pet;
 
