@@ -12,15 +12,15 @@
  */
 
 
-const ApiClient = require('../ApiClient');
-const User = require('../model/User');
+import ApiClient from "../ApiClient";
+import User from '../model/User';
 
 /**
 * User service.
 * @module api/UserApi
 * @version 1.0.0
 */
-module.exports = class UserApi {
+export default class UserApi {
 
     /**
     * Constructs a new UserApi. 

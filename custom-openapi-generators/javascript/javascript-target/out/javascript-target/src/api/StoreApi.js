@@ -12,15 +12,15 @@
  */
 
 
-const ApiClient = require('../ApiClient');
-const Order = require('../model/Order');
+import ApiClient from "../ApiClient";
+import Order from '../model/Order';
 
 /**
 * Store service.
 * @module api/StoreApi
 * @version 1.0.0
 */
-module.exports = class StoreApi {
+export default class StoreApi {
 
     /**
     * Constructs a new StoreApi. 

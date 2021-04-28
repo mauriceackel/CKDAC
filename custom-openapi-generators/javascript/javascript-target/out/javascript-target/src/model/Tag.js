@@ -11,7 +11,7 @@
  *
  */
 
-const ApiClient = require('../ApiClient');
+import ApiClient from '../ApiClient';
 
 /**
  * The Tag model module.
@@ -76,5 +76,5 @@ Tag.prototype['name'] = undefined;
 
 
 
-module.exports = Tag;
+export default Tag;
 

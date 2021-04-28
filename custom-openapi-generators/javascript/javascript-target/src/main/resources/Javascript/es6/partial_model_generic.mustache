@@ -26,7 +26,7 @@ class {{classname}} {{#parent}}{{^parentModel}}{{#vendorExtensions.x-is-array}}e
      * Only for internal use.
      */{{/emitJSDoc}}
     static initialize(obj{{#vendorExtensions.x-all-required}}, {{name}}{{/vendorExtensions.x-all-required}}) { {{#vars}}{{#required}}
-        obj['{{baseName}}'] = {{name}};{{/required}}{{/vars}}
+        {{#defaultValue}}obj['{{baseName}}'] = {{name}} || {{{defaultValue}}};{{/defaultValue}}{{^defaultValue}}obj['{{baseName}}'] = {{name}};{{/defaultValue}}{{/required}}{{/vars}}
     }
 
     {{#emitJSDoc}}/**
@@ -98,5 +98,5 @@ class {{classname}} {{#parent}}{{^parentModel}}{{#vendorExtensions.x-is-array}}e
 {{>partial_model_inner_enum}}
 {{/isContainer}}{{/items}}{{/items.isEnum}}{{/vars}}
 
-module.exports = {{classname}};
+export default {{classname}};
 {{/models}}

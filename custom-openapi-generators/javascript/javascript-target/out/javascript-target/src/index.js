@@ -12,16 +12,16 @@
  */
 
 
-const ApiClient = require('./ApiClient');
-const ApiResponse = require('./model/ApiResponse');
-const Category = require('./model/Category');
-const Order = require('./model/Order');
-const Pet = require('./model/Pet');
-const Tag = require('./model/Tag');
-const User = require('./model/User');
-const PetApi = require('./api/PetApi');
-const StoreApi = require('./api/StoreApi');
-const UserApi = require('./api/UserApi');
+import ApiClient from './ApiClient';
+import ApiResponse from './model/ApiResponse';
+import Category from './model/Category';
+import Order from './model/Order';
+import Pet from './model/Pet';
+import Tag from './model/Tag';
+import User from './model/User';
+import PetApi from './api/PetApi';
+import StoreApi from './api/StoreApi';
+import UserApi from './api/UserApi';
 
 
 /**
@@ -55,7 +55,7 @@ const UserApi = require('./api/UserApi');
 * @module index
 * @version 1.0.0
 */
-module.exports = {
+export {
     /**
      * The ApiClient constructor.
      * @property {module:ApiClient}

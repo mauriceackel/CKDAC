@@ -1,5 +1,4 @@
 .babelrc
-.openapi-generator-ignore
 .travis.yml
 README.md
 docs/ApiResponse.md
@@ -25,12 +24,3 @@ src/model/Order.js
 src/model/Pet.js
 src/model/Tag.js
 src/model/User.js
-test/api/PetApi.spec.js
-test/api/StoreApi.spec.js
-test/api/UserApi.spec.js
-test/model/ApiResponse.spec.js
-test/model/Category.spec.js
-test/model/Order.spec.js
-test/model/Pet.spec.js
-test/model/Tag.spec.js
-test/model/User.spec.js

@@ -12,16 +12,16 @@
  */
 
 
-const ApiClient = require('../ApiClient');
-const ApiResponse = require('../model/ApiResponse');
-const Pet = require('../model/Pet');
+import ApiClient from "../ApiClient";
+import ApiResponse from '../model/ApiResponse';
+import Pet from '../model/Pet';
 
 /**
 * Pet service.
 * @module api/PetApi
 * @version 1.0.0
 */
-module.exports = class PetApi {
+export default class PetApi {
 
     /**
     * Constructs a new PetApi. 

@@ -11,7 +11,7 @@
  *
  */
 
-const ApiClient = require('../ApiClient');
+import ApiClient from '../ApiClient';
 
 /**
  * The Category model module.
@@ -76,5 +76,5 @@ Category.prototype['name'] = undefined;
 
 
 
-module.exports = Category;
+export default Category;
 

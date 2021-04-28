@@ -11,7 +11,7 @@
  *
  */
 
-const ApiClient = require('../ApiClient');
+import ApiClient from '../ApiClient';
 
 /**
  * The ApiResponse model module.
@@ -84,5 +84,5 @@ ApiResponse.prototype['message'] = undefined;
 
 
 
-module.exports = ApiResponse;
+export default ApiResponse;
 
