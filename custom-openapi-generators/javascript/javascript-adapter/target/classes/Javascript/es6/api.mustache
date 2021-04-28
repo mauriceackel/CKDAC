@@ -5,9 +5,9 @@ import ApiClient from "../ApiClient";
 <#imports>import <&import> from '../<#modelPackage><&modelPackage>/</modelPackage><import>';
 </imports>
 <#containsOperation>
-import * as jsonata from 'jsonata';
+const jsonata = require('jsonata');
 <#targets>
-import { <targetApiName> as _<targetFullId>TargetApi, ApiClient as _<targetFullId>ApiClient } from '<targetApiPath>/index';
+import { <targetApiName> as _<targetFullId>TargetApi, ApiClient as _<targetFullId>ApiClient } from '../<targetApiPath>/index';
 </targets>
 </containsOperation>
 
