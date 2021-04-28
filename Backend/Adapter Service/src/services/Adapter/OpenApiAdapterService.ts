@@ -119,11 +119,13 @@ async function createJavaScriptAdapter(
             continue;
         }
 
-        await moveFolder(`${filePath}/targets/${folder.name}/src`, `${filePath}/src/targets/${folder.name}`);
+        await copyFolder(`${filePath}/targets/${folder.name}/src`, `${filePath}/src/targets/${folder.name}`);
     }
+
+    fs.rmdirSync(`${filePath}/targets/`, { recursive: true });
 }
 
-async function moveFolder(sourcePath: string, destPath: string): Promise<void> {
+async function copyFolder(sourcePath: string, destPath: string): Promise<void> {
     await new Promise<void>((resolve, reject) => {
         ncp(sourcePath, destPath, (err) => {
             if(err) {
@@ -134,8 +136,6 @@ async function moveFolder(sourcePath: string, destPath: string): Promise<void> {
             resolve();
         });
     });
-
-    fs.rmdirSync(sourcePath, { recursive: true });
 }
 
 
