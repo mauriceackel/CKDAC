@@ -6,7 +6,7 @@ networks:
 
 services:
   database:
-    image: mackel/ckdac-mongodb:1.0.0
+    image: mackel/ckdac-mongodb:demo
     environment:
         # Set mongo root user data
         MONGO_INITDB_DATABASE: admin
@@ -31,6 +31,8 @@ services:
         APP_ROOT_USER: ${APP_ROOT_EMAIL}
         APP_ROOT_PW: ${APP_ROOT_PASSWORD}
     restart: on-failure
+    ports:
+      - 27017:27017
     networks:
       - ckdac
     volumes: 

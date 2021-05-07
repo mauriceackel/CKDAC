@@ -1,0 +1,210 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Yeelight",
+    "version": "1.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3009",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/{lightId}/power": {
+      "post": {
+        "operationId": "setPower",
+        "parameters": [
+          {
+            "name": "lightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PowerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Power was set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad parameters passed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{lightId}/color": {
+      "post": {
+        "operationId": "setColor",
+        "parameters": [
+          {
+            "name": "lightId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ColorRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Color was set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad parameters passed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PowerRequest": {
+        "type": "object",
+        "properties": {
+          "power": {
+            "type": "string",
+            "enum": [
+              "on",
+              "off"
+            ]
+          },
+          "brightness": {
+            "type": "number"
+          }
+        }
+      },
+      "PowerResponse": {
+        "type": "object",
+        "properties": {
+          "power": {
+            "type": "string",
+            "enum": [
+              "on",
+              "off"
+            ]
+          },
+          "brightness": {
+            "type": "number"
+          },
+          "lightId": {
+            "type": "string"
+          },
+          "timeDay": {
+            "type": "string"
+          },
+          "timeMonth": {
+            "type": "string"
+          },
+          "timeYear": {
+            "type": "string"
+          },
+          "timeHour": {
+            "type": "string"
+          },
+          "timeMinute": {
+            "type": "string"
+          },
+          "timeSecond": {
+            "type": "string"
+          }
+        }
+      },
+      "ColorRequest": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "example": "#aa7700"
+          }
+        }
+      },
+      "ColorResponse": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "example": "#aa7700"
+          },
+          "lightId": {
+            "type": "string"
+          },
+          "timeDay": {
+            "type": "string"
+          },
+          "timeMonth": {
+            "type": "string"
+          },
+          "timeYear": {
+            "type": "string"
+          },
+          "timeHour": {
+            "type": "string"
+          },
+          "timeMinute": {
+            "type": "string"
+          },
+          "timeSecond": {
+            "type": "string"
+          }
+        }
+      },
+      "BadRequestResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

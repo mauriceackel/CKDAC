@@ -1,0 +1,122 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Phillips",
+    "version": "1.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3008/api",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/state": {
+      "post": {
+        "description": "Set the state of a certain light bulb",
+        "operationId": "controlLight",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlLightRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Light state was successfully set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlLightResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad parameters passed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ControlLightRequest": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "power": {
+            "type": "string",
+            "enum": [
+              "on",
+              "off"
+            ]
+          },
+          "color": {
+            "type": "string",
+            "example": "#ff8800"
+          },
+          "brightness": {
+            "type": "number"
+          }
+        }
+      },
+      "ControlLightResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "time": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string"
+              },
+              "month": {
+                "type": "string"
+              },
+              "year": {
+                "type": "string"
+              },
+              "hour": {
+                "type": "string"
+              },
+              "minute": {
+                "type": "string"
+              },
+              "second": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "BadRequestResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

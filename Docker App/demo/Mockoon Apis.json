@@ -1,0 +1,252 @@
+{
+    "source": "mockoon:1.13.0",
+    "data": [
+        {
+            "type": "environment",
+            "item": {
+                "uuid": "",
+                "lastMigration": 13,
+                "name": "Philips",
+                "endpointPrefix": "api/",
+                "latency": 0,
+                "port": 3008,
+                "routes": [
+                    {
+                        "uuid": "",
+                        "documentation": "",
+                        "method": "post",
+                        "endpoint": "state",
+                        "responses": [
+                            {
+                                "uuid": "",
+                                "body": "{\n  \"status\": \"error\",\n  \"message\": \"Bad Request\"\n}",
+                                "latency": 0,
+                                "statusCode": 400,
+                                "label": "Bad input parameters",
+                                "headers": [],
+                                "filePath": "",
+                                "sendFileAsBody": false,
+                                "rules": [],
+                                "rulesOperator": "OR",
+                                "disableTemplating": false
+                            },
+                            {
+                                "uuid": "",
+                                "body": "{\n  \"success\": true,\n  \"time\": {\n    \"day\": \"{{now 'dd'}}\",\n    \"month\": \"{{now 'MM'}}\",\n    \"year\": \"{{now 'YYYY'}}\",\n    \"hour\": \"{{now 'HH'}}\",\n    \"minute\": \"{{now 'mm'}}\",\n    \"second\": \"{{now 'ss'}}\"\n  }\n}",
+                                "latency": 0,
+                                "statusCode": 200,
+                                "label": "Success response",
+                                "headers": [],
+                                "filePath": "",
+                                "sendFileAsBody": false,
+                                "rules": [
+                                    {
+                                        "target": "body",
+                                        "modifier": "power",
+                                        "value": "^on$|^off$",
+                                        "isRegex": true
+                                    },
+                                    {
+                                        "target": "body",
+                                        "modifier": "deviceId",
+                                        "value": ".+",
+                                        "isRegex": true
+                                    },
+                                    {
+                                        "target": "body",
+                                        "modifier": "color",
+                                        "value": "^#[a-f0-9]{6}$",
+                                        "isRegex": true
+                                    },
+                                    {
+                                        "target": "body",
+                                        "modifier": "brightness",
+                                        "value": "^[1-9][0-9]?$|^100$",
+                                        "isRegex": true
+                                    }
+                                ],
+                                "rulesOperator": "AND",
+                                "disableTemplating": false
+                            }
+                        ],
+                        "enabled": true,
+                        "randomResponse": false
+                    }
+                ],
+                "proxyMode": false,
+                "proxyHost": "",
+                "https": false,
+                "cors": true,
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Origin",
+                        "value": "*"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Methods",
+                        "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Headers",
+                        "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+                    }
+                ],
+                "proxyReqHeaders": [
+                    {
+                        "key": "",
+                        "value": ""
+                    }
+                ],
+                "proxyResHeaders": [
+                    {
+                        "key": "",
+                        "value": ""
+                    }
+                ]
+            }
+        },
+        {
+            "type": "environment",
+            "item": {
+                "uuid": "",
+                "lastMigration": 13,
+                "name": "Yeelight",
+                "endpointPrefix": "",
+                "latency": 0,
+                "port": 3009,
+                "routes": [
+                    {
+                        "uuid": "",
+                        "documentation": "",
+                        "method": "post",
+                        "endpoint": ":lightId/power",
+                        "responses": [
+                            {
+                                "uuid": "",
+                                "body": "{\n  \"error\": \"Bad Request\"\n}",
+                                "latency": 0,
+                                "statusCode": 400,
+                                "label": "Bad input parameters",
+                                "headers": [],
+                                "filePath": "",
+                                "sendFileAsBody": false,
+                                "rules": [],
+                                "rulesOperator": "OR",
+                                "disableTemplating": false
+                            },
+                            {
+                                "uuid": "",
+                                "body": "{\n  \"power\": \"{{body 'power'}}\",\n  \"bightness\": {{body 'brightness'}},\n  \"lightId\": \"{{urlParam 'lightId'}}\",\n  \"timeDay\": \"{{now 'dd'}}\",\n  \"timeMonth\": \"{{now 'MM'}}\",\n  \"timeYear\": \"{{now 'YYYY'}}\",\n  \"timeHour\": \"{{now 'HH'}}\",\n  \"timeMinute\": \"{{now 'mm'}}\",\n  \"timeSecond\": \"{{now 'ss'}}\"\n}",
+                                "latency": 0,
+                                "statusCode": 200,
+                                "label": "Success response",
+                                "headers": [],
+                                "filePath": "",
+                                "sendFileAsBody": false,
+                                "rules": [
+                                    {
+                                        "target": "body",
+                                        "modifier": "power",
+                                        "value": "^on$|^off$",
+                                        "isRegex": true
+                                    },
+                                    {
+                                        "target": "body",
+                                        "modifier": "brightness",
+                                        "value": "^0(\\.\\d+)?$|^1$",
+                                        "isRegex": true
+                                    }
+                                ],
+                                "rulesOperator": "AND",
+                                "disableTemplating": false
+                            }
+                        ],
+                        "enabled": true,
+                        "randomResponse": false
+                    },
+                    {
+                        "uuid": "",
+                        "documentation": "",
+                        "method": "post",
+                        "endpoint": ":lightId/color",
+                        "responses": [
+                            {
+                                "uuid": "",
+                                "body": "{\n  \"error\": \"Bad Request\"\n}",
+                                "latency": 0,
+                                "statusCode": 400,
+                                "label": "Bad input parameters",
+                                "headers": [],
+                                "filePath": "",
+                                "sendFileAsBody": false,
+                                "rules": [],
+                                "rulesOperator": "OR",
+                                "disableTemplating": false
+                            },
+                            {
+                                "uuid": "",
+                                "body": "{\n  \"color\": \"{{body 'color'}}\",\n  \"lightId\": \"{{urlParam 'lightId'}}\",\n  \"timeDay\": \"{{now 'dd'}}\",\n  \"timeMonth\": \"{{now 'MM'}}\",\n  \"timeYear\": \"{{now 'YYYY'}}\",\n  \"timeHour\": \"{{now 'HH'}}\",\n  \"timeMinute\": \"{{now 'mm'}}\",\n  \"timeSecond\": \"{{now 'ss'}}\"\n}",
+                                "latency": 0,
+                                "statusCode": 200,
+                                "label": "Success response",
+                                "headers": [],
+                                "filePath": "",
+                                "sendFileAsBody": false,
+                                "rules": [
+                                    {
+                                        "target": "body",
+                                        "modifier": "color",
+                                        "value": "^#[a-f0-9]{6}$",
+                                        "isRegex": true
+                                    }
+                                ],
+                                "rulesOperator": "AND",
+                                "disableTemplating": false
+                            }
+                        ],
+                        "enabled": true,
+                        "randomResponse": false
+                    }
+                ],
+                "proxyMode": false,
+                "proxyHost": "",
+                "https": false,
+                "cors": true,
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Origin",
+                        "value": "*"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Methods",
+                        "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Headers",
+                        "value": "Content-Type, Origin, Accept, Authorization, Content-Length, X-Requested-With"
+                    }
+                ],
+                "proxyReqHeaders": [
+                    {
+                        "key": "",
+                        "value": ""
+                    }
+                ],
+                "proxyResHeaders": [
+                    {
+                        "key": "",
+                        "value": ""
+                    }
+                ]
+            }
+        }
+    ]
+}
