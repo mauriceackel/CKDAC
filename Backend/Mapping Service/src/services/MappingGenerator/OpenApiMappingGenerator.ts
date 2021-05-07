@@ -31,7 +31,7 @@ export async function generateMapping(source: IOpenApiOperation, targets: { [key
 
     //Now we build the final mappings by executing each identified mapping tree. The results get merged together into one request and response mapping.
     for (let i = 0; i < mappingTrees.length; i++) {
-        const { requestMapping: reqMap, responseMapping: resMap, break: breakLoop } = executeMappingTree(mappingTrees[i], targetIds, requiredSourceKeys, requiredTargetKeys);
+        const { requestMapping: reqMap, responseMapping: resMap, break: breakLoop } = executeMappingTree(mappingTrees[i], sourceId, targetIds, requiredSourceKeys, requiredTargetKeys);
         responseMapping = { ...responseMapping, ...resMap };
         requestMapping = { ...requestMapping, ...reqMap };
         if (breakLoop) break;
@@ -53,8 +53,14 @@ export async function generateMapping(source: IOpenApiOperation, targets: { [key
     }
 }
 
-function parseOpenApiMapping(m: IMapping & Document, targetIds: string[]): ParsedOpenApiMapping {
+function parseOpenApiMapping(m: IMapping & Document, sourceId: string, targetIds: string[]): ParsedOpenApiMapping {
     const mapping = m.toObject() as IOpenApiMapping;
+    
+    const mappingComesFromSource = mapping.sourceId === sourceId;
+    const mappingPointsToTarget = targetIds.some(tId => mapping.targetIds.includes(tId));
+
+    // If mapping points directly from source to target, include static values
+    const includeStatic = mappingComesFromSource && mappingPointsToTarget;
     
     // Request mapping
     const flatRequestMapping: { [key: string]: string } = flatten(JSON.parse(mapping.requestMapping));
@@ -65,7 +71,7 @@ function parseOpenApiMapping(m: IMapping & Document, targetIds: string[]): Parse
         const value = flatRequestMapping[key];
         const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
 
-        if (inputs.length === 0) {
+        if (inputs.length === 0 && !includeStatic) {
             // ignore mappings with static values
             continue;
         }
@@ -82,12 +88,12 @@ function parseOpenApiMapping(m: IMapping & Document, targetIds: string[]): Parse
     const responseMapping: { [key: string]: string } = {};
     const responseMappingInputKeys: { [key: string]: string[] } = {};
 
-    const mappingPointsToTarget = targetIds.some(tId => mapping.targetIds.includes(tId));
     for (const key in flatResponseMapping) {
         const value = flatResponseMapping[key];
         const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
 
-        if (inputs.length === 0) {
+        // Include if mapping goes from source directly to target
+        if (inputs.length === 0 && !includeStatic) {
             // Ignore static mappings
             continue;
         }
@@ -119,10 +125,10 @@ function parseOpenApiMapping(m: IMapping & Document, targetIds: string[]): Parse
   * @param targetIds The IDs of all target APIs, required for filtering
   * @param requestInput The processed request mapping so far (required, as it needs to be passed downards the tree)
   */
-function executeMappingTree(mappingTree: Tree<IMapping & Document>, targetIds: string[], requiredSourceKeys: string[], requiredTargetKeys: string[], requestInput?: { [key: string]: string }): { responseMapping: { [key: string]: string }, requestMapping: { [key: string]: string }, break?: boolean } {
+function executeMappingTree(mappingTree: Tree<IMapping & Document>, sourceId: string, targetIds: string[], requiredSourceKeys: string[], requiredTargetKeys: string[], requestInput?: { [key: string]: string }): { responseMapping: { [key: string]: string }, requestMapping: { [key: string]: string }, break?: boolean } {
     const { node, children } = mappingTree;
 
-    const parsedMapping = parseOpenApiMapping(node, targetIds);
+    const parsedMapping = parseOpenApiMapping(node, sourceId, targetIds);
 
     //The request mapping that is passed back from the leafs to the root
     let requestMapping = {};
@@ -147,7 +153,7 @@ function executeMappingTree(mappingTree: Tree<IMapping & Document>, targetIds: s
     let responseInput: { [key: string]: string } = {};
     //Current element is not a leaf, so we continue the recursion
     for (let i = 0; i < children.length; i++) {
-        const result = executeMappingTree(children[i], targetIds, requiredSourceKeys, requiredTargetKeys, newRequestInput);
+        const result = executeMappingTree(children[i], sourceId, targetIds, requiredSourceKeys, requiredTargetKeys, newRequestInput);
         if (result.break) {
             return result;
         }

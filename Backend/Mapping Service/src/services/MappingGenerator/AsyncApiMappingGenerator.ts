@@ -32,7 +32,7 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
         let subresult: { [key: string]: string } = {}
         if (direction === MappingDirection.INPUT) {
             for (let j = 0; j < mappingTrees.length; j++) {
-                const { messageMappings: msgMap, break: breakLoop } = executeMappingTreeInputDirection(mappingTrees[j], requiredSourceKeys);
+                const { messageMappings: msgMap, break: breakLoop } = executeMappingTreeInputDirection(mappingTrees[j], sourceId, targetIds, requiredSourceKeys);
                 subresult = { ...subresult, ...msgMap[targetIds[i]] };
                 if (breakLoop) break;
             }
@@ -45,7 +45,7 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
             }
         } else if (direction === MappingDirection.OUTPUT) {
             for (let j = 0; j < mappingTrees.length; j++) {
-                const { messageMapping: msgMap, break: breakLoop } = executeMappingTreeOutputDirection(mappingTrees[j], targetIds[i], requiredTargetKeys);
+                const { messageMapping: msgMap, break: breakLoop } = executeMappingTreeOutputDirection(mappingTrees[j], sourceId, targetIds, targetIds[i], requiredTargetKeys);
                 subresult = { ...subresult, ...msgMap };
                 if (breakLoop) break;
             }
@@ -75,8 +75,14 @@ export async function generateMapping(source: IAsyncApiOperation, targets: { [ke
     return mappingPairs;
 }
 
-function parseAsyncApiMapping(m: IMapping & Document): ParsedAsyncApiMapping {
+function parseAsyncApiMapping(m: IMapping & Document, sourceId: string, targetIds: string[]): ParsedAsyncApiMapping {
     const mapping = m.toObject() as IAsyncApiMapping;
+
+    const mappingComesFromSource = mapping.sourceId === sourceId;
+    const mappingPointsToTarget = targetIds.some(tId => mapping.targetIds.includes(tId));
+
+    // If mapping points directly from source to target, include static values
+    const includeStatic = mappingComesFromSource && mappingPointsToTarget;
 
     const messageMappings: { [targetId: string]: { [key: string]: string } } = {};
     const messageMappingsInputKeys: { [targetId: string]: { [key: string]: string[] } } = {};
@@ -89,7 +95,7 @@ function parseAsyncApiMapping(m: IMapping & Document): ParsedAsyncApiMapping {
             const value = flattened[key];
             const inputs = getinputs(`{"${key}": ${value}}`).getInputs({}) as string[];
 
-            if (inputs.length === 0) {
+            if (inputs.length === 0 && !includeStatic) {
                 // ignore mappings with static values
                 continue;
             }
@@ -108,10 +114,10 @@ function parseAsyncApiMapping(m: IMapping & Document): ParsedAsyncApiMapping {
     return parsedMapping
 }
 
-function executeMappingTreeInputDirection(mappingTree: Tree<IMapping & Document>, requiredKeys: string[]): { messageMappings: { [targetId: string]: { [key: string]: string } }, break?: boolean } {
+function executeMappingTreeInputDirection(mappingTree: Tree<IMapping & Document>, sourceId: string, targetIds: string[], requiredKeys: string[]): { messageMappings: { [targetId: string]: { [key: string]: string } }, break?: boolean } {
     const { node, children } = mappingTree;
 
-    const parsedMapping = parseAsyncApiMapping(node);
+    const parsedMapping = parseAsyncApiMapping(node, sourceId, targetIds);
 
     if (children === undefined) {
         return { messageMappings: parsedMapping.messageMappings };
@@ -121,7 +127,7 @@ function executeMappingTreeInputDirection(mappingTree: Tree<IMapping & Document>
 
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        const result = executeMappingTreeInputDirection(child, requiredKeys);
+        const result = executeMappingTreeInputDirection(child, sourceId, targetIds, requiredKeys);
         if (result.break) {
             return result;
         }
@@ -138,10 +144,10 @@ function executeMappingTreeInputDirection(mappingTree: Tree<IMapping & Document>
     return { messageMappings, break: messageMappingValid };
 }
 
-function executeMappingTreeOutputDirection(mappingTree: Tree<IMapping & Document>, finalTargetId: string, requiredKeys: string[]): { messageMapping: { [key: string]: string }, break?: boolean } {
+function executeMappingTreeOutputDirection(mappingTree: Tree<IMapping & Document>, sourceId: string, targetIds: string[], finalTargetId: string, requiredKeys: string[]): { messageMapping: { [key: string]: string }, break?: boolean } {
     const { node, children } = mappingTree;
 
-    const parsedMapping = parseAsyncApiMapping(node);
+    const parsedMapping = parseAsyncApiMapping(node, sourceId, targetIds);
 
     if (children === undefined) {
         return { messageMapping: parsedMapping.messageMappings[finalTargetId] };
@@ -151,7 +157,7 @@ function executeMappingTreeOutputDirection(mappingTree: Tree<IMapping & Document
 
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
-        const result = executeMappingTreeOutputDirection(child, finalTargetId, requiredKeys);
+        const result = executeMappingTreeOutputDirection(child, sourceId, targetIds, finalTargetId, requiredKeys);
         if (result.break) {
             return result;
         }
