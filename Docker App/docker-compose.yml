@@ -45,8 +45,7 @@ services:
       MAPPINGS_PATH: '/home/node/routes.json'
       AUTH_SERVICE_URL: auth-service:8080
       PORT: "8080"
-      HOST: "0.0.0.0"                  
-      SSL_ENABLED: "true"
+      HOST: "0.0.0.0"
     ports:
       - ${SERVER_PORT}:8080 # api is accessible via SERVER_PORT on this host
     restart: on-failure
@@ -117,7 +116,7 @@ services:
       HOST: "0.0.0.0"
       GATEWAY_INT_URL: http://api-gateway-int:8080
       # Publicly available FQDN of the auth service
-      AUTH_HOSTNAME: https://${SERVER_FQDN}:${SERVER_PORT}/auth
+      AUTH_HOSTNAME: http://${SERVER_FQDN}:${SERVER_PORT}/auth
       #AUTH_DETAILS_TOKEN_TTL: 
       #ACCESS_TOKEN_TTL:
       #REFRESH_TOKEN_TTL:
@@ -165,8 +164,8 @@ services:
     image: mackel/ckdac-web-app:1.0.0
     environment:
       # This has to be adjusted depending on the server FQDN
-      API_URL: https://${SERVER_FQDN}:${SERVER_PORT}/api
-      AUTH_URL: https://${SERVER_FQDN}:${SERVER_PORT}/auth
+      API_URL: http://${SERVER_FQDN}:${SERVER_PORT}/api
+      AUTH_URL: http://${SERVER_FQDN}:${SERVER_PORT}/auth
     restart: on-failure
     networks:
       - ckdac
