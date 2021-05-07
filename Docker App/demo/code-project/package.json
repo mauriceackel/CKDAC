@@ -1,0 +1,11 @@
+{
+  "name": "demo-project",
+  "version": "1.0.0",
+  "description": "Demo project for tool demonstration",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "Maurice Ackel",
+  "license": "ISC"
+}
