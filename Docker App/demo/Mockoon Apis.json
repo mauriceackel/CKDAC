@@ -7,7 +7,7 @@
                 "uuid": "",
                 "lastMigration": 13,
                 "name": "Philips",
-                "endpointPrefix": "api/",
+                "endpointPrefix": "api",
                 "latency": 0,
                 "port": 3008,
                 "routes": [
