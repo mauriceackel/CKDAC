@@ -30,7 +30,7 @@ export default function App(): ReactElement {
     <AuthProvider>
       <Router>
         <header className="fixed z-40 top-0 left-0 right-0 h-14 shadow-md flex items-center justify-between px-4 bg-red-900 text-white">
-          <h1 className="text-xl mr-2">SYMBIOTE</h1>
+          <h1 className="text-xl mr-2">GABBLE</h1>
 
           <NavLink
             to="/"
