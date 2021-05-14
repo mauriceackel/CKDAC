@@ -103,3 +103,7 @@ button:focus {
     transform: rotate(360deg);
   }
 }
+
+.jsoneditor-value {
+  color: #1a1a1a !important;
+}
