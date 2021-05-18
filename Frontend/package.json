@@ -1,5 +1,6 @@
 {
   "name": "web-app",
+  "author": "Maurice Ackel",
   "version": "1.0.0",
   "private": true,
   "config": {

@@ -1,7 +1,7 @@
 {
   "name": "target-template",
   "version": "0.10.1",
-  "description": "Node.js template for the AsyncAPI generator.",
+  "description": "",
   "keywords": [
     "asyncapi",
     "generator",
